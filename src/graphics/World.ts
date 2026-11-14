@@ -12,6 +12,12 @@ export function disposeScene(scene: THREE.Scene): void {
   const materials = new Set<THREE.Material>();
   const textures = new Set<THREE.Texture>();
   scene.traverse((object) => {
+    if (
+      object instanceof THREE.DirectionalLight ||
+      object instanceof THREE.SpotLight ||
+      object instanceof THREE.PointLight
+    )
+      object.shadow.dispose();
     if (!(object instanceof THREE.Mesh)) return;
     geometries.add(object.geometry);
     for (const material of Array.isArray(object.material)

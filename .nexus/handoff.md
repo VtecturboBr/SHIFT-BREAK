@@ -1,3 +1,3 @@
 # Retomada
 
-Reabrir git status, .nexus/tasks.md e docs/PROGRESS.md. Incremento 01 concluído em feat/01-project-foundation. Repositório começou vazio. Não fazer merge na main. Próxima ação: branch empilhada feat/02-room-prototype e implementação do quarto físico com câmera sentada e mouse look.
+Reabrir git status, .nexus/tasks.md e docs/PROGRESS.md. Incrementos 01–02 concluídos em branches locais empilhadas. Repositório começou vazio. Não fazer merge na main. Próxima ação: feat/03-interactive-monitor, projeção DOM, isolamento de entrada, oclusão e prova de captura do quadro final.

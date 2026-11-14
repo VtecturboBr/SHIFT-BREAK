@@ -6,6 +6,7 @@ test('renders and switches diagnostic scenes without navigation', async ({
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto('/');
+  await page.getByRole('button', { name: 'Diagnóstico', exact: true }).click();
   await expect(page.locator('#app')).toHaveAttribute('data-mode', 'diagnostic');
   await expect(page.locator('canvas')).toBeVisible();
   await page.getByRole('button', { name: 'Alternar cena' }).click();

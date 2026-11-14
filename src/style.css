@@ -11,6 +11,60 @@
 body {
   margin: 0;
 }
+[hidden] {
+  display: none !important;
+}
+.top-actions {
+  position: fixed;
+  right: 32px;
+  top: 32px;
+  display: flex;
+  gap: 8px;
+}
+.top-actions button,
+.controls button {
+  background: #1a1e25e8;
+  border-color: #59606f;
+  font-size: 12px;
+  padding: 10px 14px;
+}
+.room-help {
+  position: fixed;
+  left: 36px;
+  bottom: 44px;
+  max-width: min(700px, calc(100% - 72px));
+  padding: 16px 20px;
+  border-left: 2px solid #eb5360;
+  background: #12161be8;
+}
+.room-help h1 {
+  font-size: 22px;
+  margin: 8px 0;
+}
+.room-help p {
+  color: #cbd0db;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.controls label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.controls input {
+  width: 100px;
+  accent-color: #f46b75;
+}
+.world canvas {
+  touch-action: none;
+}
 button,
 input,
 select {
