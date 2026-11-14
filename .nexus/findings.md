@@ -6,3 +6,4 @@ FATO: quarto e cenas de diagnóstico validados no Chromium por software; screens
 DECISÃO: placeholders explícitos; não usar dados do git config como identidade pública.
 RISCO: projeção HTML não compartilha automaticamente o depth buffer WebGL; validar oclusão antes de declarar incremento 03 completo.
 RESULTADO: projeção e cliques reais validados. Oclusão conservadora por cinco raios; limite e evolução descritos no ADR-001. Quadro 3D capturado e visto no monitor físico.
+RESULTADO: OS Core com múltiplas janelas validado no monitor; arraste e teclado não alteram câmera; minimizar preserva texto. Próximo risco é a apresentação de conteúdo real e fallback sem WebGL.

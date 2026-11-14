@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 import {
   DESKTOP,
+  desktopCoordinates,
   monitorCoordinates,
   screenProjection,
   screenVisible,
@@ -46,6 +47,9 @@ describe('physical monitor projection', () => {
         ).applyMatrix4(matrix);
         const x = css.x / css.w,
           y = css.y / css.w;
+        const local = desktopCoordinates(x, y, width, height, camera, screen);
+        expect(local?.x).toBeCloseTo(u! * DESKTOP.width, 4);
+        expect(local?.y).toBeCloseTo(v! * DESKTOP.height, 4);
         const point = monitorCoordinates(
           x + 20,
           y + 30,

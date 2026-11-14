@@ -1,5 +1,6 @@
 import './style.css';
 import './monitor/monitor.css';
+import './os/os.css';
 import { Application } from './app/Application';
 
 const root = document.querySelector<HTMLDivElement>('#app');

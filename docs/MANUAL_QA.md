@@ -27,3 +27,13 @@ Pointer lock concedido/negado, troca real de aba e navegação em GPUs físicas 
 7. Olhar para longe: UI deve acompanhar o plano e sumir quando ocultada. A oclusão é conservadora por cinco amostras, conforme ADR-001; a exploração livre exigirá máscara de profundidade.
 
 Este protótipo não é a cinemática final. Jogos, áudio e ALEF//OS completo seguem nos incrementos posteriores.
+
+## Núcleo do ALEF//OS
+
+1. Entrar no monitor e abrir Notas pelo ícone. Editar texto; minimizar e restaurar pela taskbar mantém o conteúdo.
+2. Abrir Sobre o sistema pelo menu. Clicar entre janelas: borda e empilhamento indicam foco.
+3. Arrastar pelo título até os limites da tela: janela inteira permanece acessível e não move a câmera.
+4. Focar o título com Tab e mover com setas. Maximizar ocupa a área útil sem cobrir a taskbar; restaurar recupera posição/tamanho.
+5. Fechar remove a janela e a taskbar correspondente; o foco retorna à próxima janela ou ao menu.
+6. Confirmar relógio local e dispensar uma notificação com o botão próprio.
+7. Sair do monitor durante um arraste, retornar e mover o mouse: arraste não fica preso. Repetir troca de cenas para verificar regressão e descarte de timers/listeners.

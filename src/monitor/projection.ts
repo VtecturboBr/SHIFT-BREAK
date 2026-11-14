@@ -2,6 +2,20 @@ import * as THREE from 'three';
 
 export const DESKTOP = { width: 960, height: 540 };
 
+export function desktopCoordinates(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  camera: THREE.PerspectiveCamera,
+  screen: THREE.Mesh,
+): { x: number; y: number } | null {
+  const inverse = screenProjection(screen, camera, width, height).invert();
+  const point = new THREE.Vector4(x, y, 0, 1).applyMatrix4(inverse);
+  if (Math.abs(point.w) < 1e-8) return null;
+  return { x: point.x / point.w, y: point.y / point.w };
+}
+
 // CSS pixels → local plane → camera clip → viewport. Browser hit testing uses the same homography.
 export function screenProjection(
   screen: THREE.Mesh,

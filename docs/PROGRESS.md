@@ -14,7 +14,8 @@
 | 01 · 0.1.0 | Concluído e validado                          |
 | 02 · 0.2.0 | Concluído e validado                          |
 | 03 · 0.3.0 | Concluído e validado                          |
-| 04–14      | Pendentes, escopo preservado na especificação |
+| 04 · 0.4.0 | Concluído e validado                          |
+| 05–14      | Pendentes, escopo preservado na especificação |
 
 ## Incremento 01 — Project Foundation
 
@@ -50,3 +51,14 @@
 - ADR-001 registra alternativas, projeção, captura e limites. Oclusão conservadora por cinco raios; precisa de máscara antes de objetos móveis/exploração livre. Zoom e engines além de Chromium ainda não validados.
 - Performance: capturas no Chromium com renderização por software mostram 4–8 fps com trace/DPR 1–2. Não representa GPU física e não atende ainda à meta de otimização final. Sem números de performance de produção inventados.
 - SHA256 da especificação local e original são idênticos. Próximo incremento: 04, OS Core.
+
+## Incremento 04 — OS Core
+
+- Desktop original, ícones, registro de apps, menu, taskbar, relógio local e notificações dispensáveis.
+- Janelas independentes: foco/empilhamento, arraste por coordenadas projetadas, mover por teclado, minimizar/restaurar, maximizar/restaurar e fechar. Layout limitado à tela útil; minimizar preserva conteúdo.
+- Apps reais de diagnóstico do monitor, notas temporárias e informações da versão. O diagnóstico anterior continua testável como app.
+- `npm run check`: typecheck, lint, format, 7 testes unitários e build passaram.
+- `npm run test:e2e`: 7 testes Chromium passaram (2,8 min), incluindo múltiplas janelas e todas as regressões dos incrementos 01–03.
+- Screenshot real revisado em `docs/evidence/04-desktop.png`.
+- Auditoria: listeners por janela são abortados ao fechar; timers e eventos globais descartados junto do desktop. Arraste é cancelado na saída, blur e visibilitychange. Conteúdo usa textContent ou templates internos estáticos.
+- Limites anteriores de oclusão, software rendering e bundle permanecem explícitos. Dados profissionais, arquivos e fallback acessível são o próximo incremento (05); jogos continuam 06–12.

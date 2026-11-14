@@ -1,9 +1,12 @@
 import type * as THREE from 'three';
 import {
+  desktopCoordinates,
   monitorCoordinates,
   screenProjection,
   screenVisible,
 } from './projection';
+import { Desktop } from '../os/Desktop';
+import { coreApps } from '../os/registry';
 
 export class MonitorSurface {
   readonly element = document.createElement('section');
@@ -12,6 +15,7 @@ export class MonitorSurface {
   private frame = false;
   private count = 0;
   private focusPending = false;
+  private readonly desktop: Desktop;
 
   constructor(
     private readonly host: HTMLElement,
@@ -62,10 +66,25 @@ export class MonitorSurface {
       },
       { signal },
     );
+    const diagnostic =
+      this.element.querySelector<HTMLElement>('.monitor-body')!;
+    diagnostic.remove();
+    this.desktop = new Desktop(this.element, coreApps(diagnostic), (x, y) => {
+      const rect = this.host.getBoundingClientRect();
+      return desktopCoordinates(
+        x - rect.left,
+        y - rect.top,
+        rect.width,
+        rect.height,
+        this.camera,
+        this.screen,
+      );
+    });
     this.setActive(false);
   }
 
   setActive(active: boolean): void {
+    if (!active) this.desktop.cancelDrag();
     this.focusPending = active && !this.active;
     this.active = active;
     this.element.inert = !active;
@@ -99,6 +118,7 @@ export class MonitorSurface {
   }
 
   dispose(): void {
+    this.desktop.dispose();
     this.events.abort();
     this.element.remove();
   }
