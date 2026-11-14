@@ -9,3 +9,5 @@ RESULTADO: projeção e cliques reais validados. Oclusão conservadora por cinco
 RESULTADO: OS Core com múltiplas janelas validado no monitor; arraste e teclado não alteram câmera; minimizar preserva texto. Próximo risco é a apresentação de conteúdo real e fallback sem WebGL.
 RESULTADO: VFS, conteúdo central e fallback móvel/WebGL ausente validados. Dados pessoais aguardam preenchimento conforme decisão explícita do proprietário. Quarto sob demanda removeu gargalo de renderização contínua no OS; testes comprovam ausência de redraw extra.
 RESULTADO: ciclo do launcher validado com jogo de teste real, incluindo vitória, timeout/derrota, pause/retry, saída temporária, cancelamento lazy e retorno ao mesmo canvas sem reload. Todos os 13 e2e passaram. O primeiro jogo 3D permanece pendente.
+
+- 07: ida/volta preservou canvas e notas em duas sessões reais no Chromium. Modelo completou pista; arte provisória e playtest humano/GPU/cross-browser pendentes.

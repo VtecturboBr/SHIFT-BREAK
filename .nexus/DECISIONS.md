@@ -11,3 +11,5 @@
 - Quarto estático sob demanda: renderer só redesenha em mudança de câmera, viewport ou cena; loop de domínio/DOM continua único. Métrica conta frames realmente desenhados e mostra idle. Isso resolveu gargalo no teste DPR 2 sem elevar timeout.
 - Incremento 06: SIGNAL.exe 2D é a menor prova completa de jogo/launcher, com vitória/derrota, pausa, restart e retorno. Não substitui os gêneros 3D. Sessões compartilham o loop principal e descartam seus recursos; ADR-002 orienta o próximo módulo 3D.
 - Override restrito de minimatch para versão corrigida no tooling TypeScript ESLint; lint executado para validar compatibilidade. Remover quando o pacote pai atualizar sua dependência. Referência: https://github.com/advisories/GHSA-g3hv-75wg-m249.
+
+- 07: REDLINE usa apresentação imersiva temporária e suspensão do quarto, sem segundo renderer/loop; física arcade por distância/lateral testável. Ver ADR-003.

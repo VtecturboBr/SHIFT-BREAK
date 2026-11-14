@@ -3,6 +3,7 @@ import './monitor/monitor.css';
 import './os/os.css';
 import './content/content.css';
 import './games/games.css';
+import './games/redline/redline.css';
 import type { Application } from './app/Application';
 import { accessiblePortfolio } from './ui/AccessiblePortfolio';
 

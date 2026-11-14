@@ -17,7 +17,8 @@
 | 04 · 0.4.0 | Concluído e validado                                                 |
 | 05 · 0.5.0 | Concluído e validado; dados do autor pendentes por escolha explícita |
 | 06 · 0.6.0 | Concluído e validado · MVP técnico                                   |
-| 07–14      | Pendentes, escopo preservado na especificação                        |
+| 07 · 0.7.0 | Protótipo REDLINE implementado e validado                            |
+| 08–14      | Pendentes                                                            |
 
 ## Incremento 01 — Project Foundation
 
@@ -90,3 +91,14 @@
 - Screenshot real revisado: `docs/evidence/06-signal.png`. ADR-002 documenta o ciclo e os cuidados para o futuro renderer 3D de REDLINE.
 - **Este é o MVP 01–06, não a versão 1.0.** Permanecem 07–14: três jogos 3D, FLOW, campanha contínua, áudio, revelação, exploração/polimento e publicação. Apps complementares exigidos pela especificação (terminal, settings, música e achievements) também permanecem na entrega futura, sem rótulo de concluídos.
 - Conteúdo pessoal segue pendente por autorização explícita. Limites de oclusão por amostragem, arte provisória, validação multi-browser/GPU e aviso do bundle 3D continuam abertos. Não houve publicação nem merge.
+
+## Incremento 07 — REDLINE 0.7.0
+
+- DRIFT.exe disponível na biblioteca: pista procedural de 720 m, descida/curvas, asfalto de baixa rugosidade, neblina, montanhas, árvores, guard-rails, carro e rival, faróis e bloqueio final.
+- Física arcade independente do renderer, passos fixos 1/120 s, aceleração/freio/esterço/drift, pontuação por movimento, colisões com cooldown/dano, chegada, derrota por dano/tempo e restart. Pools de fumaça e marcas limitados.
+- Apresentação imersiva temporária; suspend/resume preserva mundo do quarto, OS, notas e mesmo renderer/canvas. Input exclusivo, pausa em blur/aba oculta, limpeza de teclas e descarte na saída. Loading lazy cancelável e invalidado se o modo mudar.
+- npm run check: tipos/lint/formatação, 14 unitários e build passaram. npm run test:e2e: 14 testes passaram em 1,5 min, incluindo duas execuções do jogo com teclas reais e retorno sem perda de notas. Screenshot real revisado em docs/evidence/07-redline.png.
+- Modelo de teste completa o percurso com controle determinístico e cobre drift/colisão/derrota/pausa/restart. Não foi realizado playtest humano completo da pista nem aferição de GPU física. A pontuação ainda não é o FLOW da campanha.
+- Arte e efeitos são provisórios, sem áudio final nem cinemática de transição para luta. Arquitetura e limites em ADR-003-REDLINE.md. Próximo incremento: 08 BREAKPOINT. Dados pessoais seguem pendentes por escolha do proprietário.
+
+- Smoke de produção: npm run test:production passou com cinco testes (31,6s), incluindo REDLINE, renderer preservado, arquivos e fallback. Sem servidor deixado rodando ou reinstalação de dependências.

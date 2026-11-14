@@ -53,7 +53,7 @@ export const portfolio: PortfolioContent = {
       id: 'shift-break',
       title: 'SHIFT//BREAK × ALEF//OS',
       summary:
-        'Portfólio 3D em desenvolvimento: um quarto com computador interativo, interface projetada e gerenciador de janelas. Os três jogos e a campanha ainda não estão disponíveis.',
+        'Portfólio 3D em desenvolvimento: quarto, computador interativo e gerenciador de janelas. REDLINE disponível em protótipo; luta, FPS e campanha seguem em desenvolvimento.',
       status: 'Protótipo em desenvolvimento',
       technologies: ['Three.js', 'TypeScript', 'Vite'],
       images: [room],

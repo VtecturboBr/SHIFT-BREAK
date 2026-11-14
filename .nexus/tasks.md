@@ -10,7 +10,9 @@
 
 - [x] T06 — Biblioteca de jogos, lançamento lazy, pausa/restart/saída, ownership de input e descarte; SIGNAL.exe com vitória/derrota. Evidência: 11 unitários, 13 e2e, build/check, audit sem vulnerabilidades e screenshot real revisado. Mesmo canvas e nenhuma navegação ao sair.
 
-- [ ] T07a — REDLINE: decidir apresentação 3D (imersiva temporária ou target no monitor), preservar RoomWorld/OS ao suspender, estabelecer contrato de GameSession e validar launch/return antes de implementar pista completa. Referência ADR-002.
-- [ ] T07b — Física arcade testável de aceleração/freio/esterço/drift, pista curta com elevação/curvas/limites, carro/rival, efeitos, HUD, pontuação/chegada/retry e acesso via DRIFT.exe. Depende de T07a. Gates: domínio determinístico e percurso jogável no browser sem regressões do MVP.
+- [x] T07a — REDLINE: decidir apresentação 3D (imersiva temporária ou target no monitor), preservar RoomWorld/OS ao suspender, estabelecer contrato de GameSession e validar launch/return antes de implementar pista completa. Referência ADR-002.
+- [x] T07b — Física arcade testável de aceleração/freio/esterço/drift, pista curta com elevação/curvas/limites, carro/rival, efeitos, HUD, pontuação/chegada/retry e acesso via DRIFT.exe. Depende de T07a. Gates: domínio determinístico e percurso jogável no browser sem regressões do MVP.
 
 08–14 continuam obrigatórios e devem ser decompostos na ordem da especificação após 07. Apps complementares (terminal/settings/música/achievements) ainda pendentes; não confundir o MVP com ALEF//OS/SHIFT//BREAK 1.0 completo.
+
+Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisado. Próxima tarefa: T08 — decompor BREAKPOINT, preservando renderer/retorno do quarto e regressões.

@@ -4,15 +4,17 @@ import { DiagnosticWorld } from '../graphics/DiagnosticWorld';
 import { RoomWorld } from '../room/RoomWorld';
 import { accessiblePortfolio } from '../ui/AccessiblePortfolio';
 
-type Mode = 'room' | 'monitor' | 'diagnostic' | 'alternate';
+type Mode = 'room' | 'monitor' | 'game' | 'diagnostic' | 'alternate';
 
 export class Application {
   private engine?: Engine;
   private room?: RoomWorld;
   private readonly events = new AbortController();
+  private modeVersion = 0;
   private readonly state = new StateMachine<Mode>('room', {
     room: ['diagnostic', 'monitor'],
-    monitor: ['room', 'diagnostic'],
+    monitor: ['room', 'diagnostic', 'game'],
+    game: ['monitor'],
     diagnostic: ['alternate', 'room'],
     alternate: ['diagnostic', 'room'],
   });
@@ -28,14 +30,21 @@ export class Application {
     }
     this.root.innerHTML = `
       <main class="world" aria-label="Quarto tridimensional"></main>
-      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.6</small></header>
+      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.7</small></header>
       <nav class="top-actions" aria-label="Navegação"><button data-action="room">Quarto</button><button data-action="monitor">Usar computador</button><button data-action="restore" hidden>Restaurar interface</button><button data-action="diagnostic">Diagnóstico</button><a href="?view=portfolio">Portfólio acessível</a></nav>
-      <section class="room-help"><p class="eyebrow">06 / GAME LAUNCHER</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
+      <section class="room-help"><p class="eyebrow">07 / REDLINE</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
       <section class="monitor-help" hidden><span>NO COMPUTADOR · ESC PARA SAIR</span><button data-action="exit">Voltar ao quarto</button></section>
       <section class="panel" hidden><p class="eyebrow">01 / PROJECT FOUNDATION</p><h1>Diagnóstico</h1><p>Cenas independentes, sem recarregar a página.</p><button data-action="switch">Alternar cena</button><button data-action="capture">Capturar quadro no monitor</button><p data-capture-status role="status"></p></section>
       <output class="diagnostics" aria-label="Diagnóstico de renderização"></output>`;
     const host = this.root.querySelector<HTMLElement>('.world')!;
     const signal = this.events.signal;
+    host.addEventListener(
+      'redline-launch',
+      () => {
+        void this.launchRedline();
+      },
+      { signal },
+    );
     const action = (name: string, run: () => void) =>
       this.root
         .querySelector(`[data-action="${name}"]`)!
@@ -93,7 +102,10 @@ export class Application {
       },
       { signal },
     );
-    this.state.subscribe((mode) => this.showWorld(mode));
+    this.state.subscribe((mode) => {
+      this.modeVersion++;
+      this.showWorld(mode);
+    });
     window.addEventListener(
       'keydown',
       (event) => {
@@ -136,6 +148,14 @@ export class Application {
 
   private showWorld(mode: Mode): void {
     if (!this.engine) return;
+    if (mode !== 'monitor')
+      this.root.querySelector('.redline-loading')?.remove();
+    if (mode === 'game') {
+      this.root.dataset.mode = mode;
+      for (const selector of ['.panel', '.room-help', '.monitor-help'])
+        this.root.querySelector<HTMLElement>(selector)!.hidden = true;
+      return;
+    }
     const inRoom = mode === 'room' || mode === 'monitor';
     if (inRoom && !this.room) {
       const room = new RoomWorld(this.engine.renderer.domElement, () => {
@@ -176,6 +196,65 @@ export class Application {
     } catch {
       this.root.querySelector<HTMLElement>('[data-status]')!.textContent =
         'Olhar livre indisponível. Arraste no cenário ou use as setas. Escape libera o cursor.';
+    }
+  }
+
+  private loadingRedline = false;
+  private async launchRedline(): Promise<void> {
+    if (
+      this.state.state !== 'monitor' ||
+      this.loadingRedline ||
+      !this.engine ||
+      !this.room
+    )
+      return;
+    this.loadingRedline = true;
+    const modeVersion = this.modeVersion;
+    let cancelled = false;
+    const notice = document.createElement('section');
+    notice.className = 'redline-loading';
+    notice.setAttribute('role', 'status');
+    const message = document.createElement('span');
+    message.textContent = 'Carregando REDLINE…';
+    const cancel = document.createElement('button');
+    cancel.textContent = 'Cancelar carregamento';
+    cancel.onclick = () => {
+      cancelled = true;
+      notice.remove();
+    };
+    notice.append(message, cancel);
+    this.root.append(notice);
+    try {
+      const { RedlineWorld } = await import('../games/redline/RedlineWorld');
+      if (
+        this.events.signal.aborted ||
+        this.state.state !== 'monitor' ||
+        cancelled ||
+        modeVersion !== this.modeVersion
+      )
+        return;
+      const game = new RedlineWorld(this.root, () => {
+        this.engine?.resumeWorld();
+        this.room?.setSuspended(false);
+        this.state.transition('monitor');
+      });
+      this.room.setSuspended(true);
+      this.engine.suspendWorld(game);
+      this.state.transition('game');
+    } catch (error) {
+      console.error(error);
+      if (
+        !cancelled &&
+        !this.events.signal.aborted &&
+        modeVersion === this.modeVersion
+      ) {
+        message.textContent =
+          'Não foi possível carregar REDLINE. Feche este aviso e tente novamente.';
+        cancel.textContent = 'Fechar aviso';
+      }
+    } finally {
+      if (cancelled || modeVersion !== this.modeVersion) notice.remove();
+      this.loadingRedline = false;
     }
   }
 

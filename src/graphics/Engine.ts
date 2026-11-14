@@ -4,6 +4,7 @@ import type { World } from './World';
 export class Engine {
   readonly renderer: THREE.WebGLRenderer;
   private world?: World;
+  private suspended?: World;
   private lastTime = 0;
   private elapsed = 0;
   private frames = 0;
@@ -66,8 +67,27 @@ export class Engine {
   }
 
   setWorld(world: World): void {
+    if (this.suspended)
+      throw new Error('Resume the suspended world before replacing it');
     this.world?.dispose();
     this.world = world;
+    this.resize();
+  }
+
+  suspendWorld(world: World): void {
+    if (!this.world || this.suspended)
+      throw new Error('A world is already suspended or missing');
+    this.suspended = this.world;
+    this.world = world;
+    this.resize();
+  }
+
+  resumeWorld(): void {
+    if (!this.suspended) return;
+    this.world?.dispose();
+    this.world = this.suspended;
+    this.suspended = undefined;
+    this.lastTime = 0;
     this.resize();
   }
 
@@ -120,6 +140,7 @@ export class Engine {
     this.renderer.setAnimationLoop(null);
     this.observer.disconnect();
     this.world?.dispose();
+    this.suspended?.dispose();
     this.renderer.dispose();
     this.renderer.domElement.remove();
   }

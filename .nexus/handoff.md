@@ -1,13 +1,11 @@
-# Retomada
+# Retomada — 0.7.0
 
-Reabrir git status, .nexus/tasks.md e docs/PROGRESS.md. Incrementos 01–06 concluídos em seis branches locais empilhadas; branch mais recente feat/06-game-launcher contém todo o MVP. Remoto começou vazio, sem main com commits; não houve merge/push/deploy. Não integrar main sem autorização.
+Branch feat/07-redline, empilhada sobre feat/06-game-launcher. Incremento 07 implementado como protótipo jogável. Nenhum push/merge/deploy autorizado ou realizado; não integrar main.
 
-Checks: 11 unitários, 13 e2e Chromium, typecheck/lint/format/build e npm audit passaram. Screenshots em docs/evidence. SIGNAL.exe é só o teste 2D do launcher; nenhum dos três jogos 3D ou campanha foi declarado pronto. Dados pessoais/contatos/CV ficam pendentes por escolha explícita do proprietário, centralizados em src/content/portfolio.ts.
+REDLINE: circuito procedural de 720 m, carro/rival, física arcade em passos fixos, aceleração/freio/esterço/drift, pontuação, limites/colisões/dano, vitória/derrota, pausa e restart. Arte e efeitos provisórios. Sem campanha/FLOW/áudio final. Teclas e controles no HUD.
 
-Validação final: npm ci limpo e npm run check passaram. npm run test:production passou com quatro smokes sobre o build estático. Prévia local iniciada em http://127.0.0.1:4174/; se o processo já tiver terminado, executar npm run preview -- --port 4174 --strictPort. Não é publicação externa.
+Engine.suspendWorld/resumeWorld preservam RoomWorld, DOM do OS e mesmo canvas, usando um só loop. RoomWorld.setSuspended bloqueia input e esconde o monitor durante apresentação imersiva temporária. dispose também libera o mundo suspenso. Import lazy tem cancelamento e invalidação por mudança de modo. Ver ADR-003-REDLINE.md.
 
-Próxima ação única: T07a em branch feat/07-redline — escolher renderer/apresentação e validar ida/volta de um módulo 3D preservando RoomWorld/OS, conforme ADR-002. Engine.setWorld atualmente descarta a cena anterior, portanto não usá-lo para suspender o quarto sem adaptar ciclo de vida.
+Validação: npm run check com 14 unitários e build passou; npm run test:e2e com 14 testes passou (1,5 min). Teste de domínio completa a pista; navegador valida duas sessões, condução, pausa/restart, mesmo canvas e notas preservadas. Screenshot real em docs/evidence/07-redline.png. Consultar PROGRESS.md para smoke de produção final. Não confundir trajetória automatizada do domínio com playtest humano completo.
 
-Arquitetura: loop único Engine → RoomWorld → MonitorSurface → GameHost; room renderiza sob demanda, futuros objetos animados devem invalidar needsRender. Monitor DOM por homografia invertível, UV/raycast e oclusão conservadora de cinco amostras (ADR-001); exige máscara antes de objetos móveis/exploração livre. Captura técnica de frame não é a revelação do incremento 12.
-
-Pendências preservadas: 07 REDLINE, 08 BREAKPOINT, 09 OVERDRIVE, 10 campanha, 11 FLOW/áudio/resultados, 12 revelação, 13 exploração/arte/iluminação, 14 cross-browser/otimização/conteúdo/publicação. Terminal, settings, música e achievements também ainda não implementados. Sem medir FPS de GPU física ou alegar arte final.
+Próxima ação: especificar e implementar 08 BREAKPOINT em nova branch, mantendo o retorno ao quarto e a regressão do REDLINE. 09–14 e apps complementares continuam pendentes. Dados pessoais permanecem explicitamente pendentes, conforme escolha do proprietário. Quarto/arte/oclusão por amostragem, GPU física e cross-browser ainda sem validação final.

@@ -56,3 +56,7 @@ Este protótipo não é a cinemática final. Jogos, áudio e ALEF//OS completo s
 4. Sair do jogo restaura biblioteca/janelas e foco, sem navegação ou recriação do canvas 3D. Abrir e fechar repetidamente não duplica handlers/canvas de jogo.
 5. Bloquear rede durante loading e cancelar; conclusão tardia não pode reabrir a sessão. Falha de carregamento deve permitir voltar à biblioteca.
 6. Build de produção: `npm run build` e `npm run test:production`. Smoke verifica arquivos/imagens, modo móvel/WebGL ausente e o ciclo completo de jogo no bundle estático, incluindo imports lazy.
+
+## REDLINE
+
+Abrir Biblioteca → Iniciar DRIFT.exe. W/setas acelera, S freia, A/D esterça, Espaço drift. Completar 720 m, conferir pontuação em drift e dano nos guard-rails. Escape pausa, R reinicia. Sair restaura janelas e notas. Testar blur, aba oculta, restart após vitória/derrota e duas sessões consecutivas. Revisão de dirigibilidade por pessoa e GPU física ainda necessária.

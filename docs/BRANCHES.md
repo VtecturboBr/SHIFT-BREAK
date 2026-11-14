@@ -12,3 +12,5 @@ O remoto iniciou vazio: `main` é apenas o nome configurado como padrão no GitH
 | feat/06-game-launcher       | feat/05-portfolio-system    | 06 · 0.6.0 |
 
 São branches empilhadas; a mais recente contém as anteriores. Comparar cada branch com sua base para revisar apenas seu incremento. Usar `git log --oneline --decorate` para consultar hashes reais. A integração à main depende de autorização do proprietário.
+
+Incremento 07: feat/07-redline, base feat/06-game-launcher, versão 0.7.0. Sem merge/push.

@@ -1,6 +1,9 @@
 import type { AppDefinition } from '../registry';
 
-export function gameLibrary(launch: () => void): AppDefinition {
+export function gameLibrary(
+  launch: () => void,
+  launchRedline: () => void,
+): AppDefinition {
   return {
     id: 'games',
     title: 'Biblioteca de jogos',
@@ -29,8 +32,8 @@ export function gameLibrary(launch: () => void): AppDefinition {
         [
           'DRIFT.exe',
           'Corrida e drift na estrada de montanha.',
-          'Em desenvolvimento · incremento 07',
-          false,
+          'Disponível · protótipo REDLINE',
+          true,
         ],
         [
           'FIGHT.exe',
@@ -63,7 +66,8 @@ export function gameLibrary(launch: () => void): AppDefinition {
           ? `Iniciar ${title}`
           : 'Indisponível nesta versão';
         button.disabled = !available;
-        if (available) button.onclick = launch;
+        if (available)
+          button.onclick = title === 'DRIFT.exe' ? launchRedline : launch;
         card.append(cover, name, note, state, button);
         root.append(card);
       }

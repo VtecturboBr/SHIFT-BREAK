@@ -1,0 +1,84 @@
+.redline-hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  color: #f5f7ff;
+  font-family: 'Segoe UI', sans-serif;
+}
+.redline-hud header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 28px;
+  background: linear-gradient(#101824ee, transparent);
+}
+.redline-hud strong {
+  flex: 1;
+  font-size: 26px;
+  font-style: italic;
+  color: #ff8797;
+}
+.redline-hud small {
+  font: 11px monospace;
+  color: #d6e4f4;
+  margin-left: 12px;
+}
+.redline-hud button {
+  pointer-events: auto;
+  font-size: 13px;
+  padding: 10px 14px;
+}
+.redline-stats {
+  display: block;
+  margin: 0 28px;
+  padding: 12px;
+  background: #111d2cdd;
+  width: fit-content;
+  font: 14px monospace;
+}
+.redline-message {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 28px;
+  background: #111b29ee;
+  border: 1px solid #b15d73;
+  border-radius: 6px;
+  max-width: 520px;
+  width: 90%;
+  text-align: center;
+}
+.redline-message h1 {
+  font-size: 30px;
+}
+.redline-message p {
+  line-height: 1.7;
+}
+.redline-hud footer {
+  position: absolute;
+  bottom: 20px;
+  left: 28px;
+  right: 28px;
+  background: #101824dd;
+  padding: 12px;
+  font-size: 13px;
+}
+#app[data-mode='game'] > .brand,
+#app[data-mode='game'] > .top-actions,
+#app[data-mode='game'] > .diagnostics {
+  display: none;
+}
+.redline-loading {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #172434;
+  padding: 20px;
+  border: 1px solid #c17488;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}

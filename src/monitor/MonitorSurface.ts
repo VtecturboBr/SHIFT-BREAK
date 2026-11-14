@@ -79,9 +79,16 @@ export class MonitorSurface {
       [
         ...coreApps(diagnostic),
         ...portfolioApps,
-        gameLibrary(() => {
-          void this.games.launchSignal();
-        }),
+        gameLibrary(
+          () => {
+            void this.games.launchSignal();
+          },
+          () => {
+            host.dispatchEvent(
+              new CustomEvent('redline-launch', { bubbles: true }),
+            );
+          },
+        ),
       ],
       (x, y) => {
         const rect = this.host.getBoundingClientRect();

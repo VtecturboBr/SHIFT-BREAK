@@ -13,6 +13,7 @@ export class RoomWorld implements World {
   readonly screen: THREE.Mesh;
   readonly surface: MonitorSurface;
   needsRender = true;
+  private suspended = false;
   private frameDirty = true;
   private readonly previousCamera = new THREE.Matrix4();
   private previousAspect = 0;
@@ -201,7 +202,7 @@ export class RoomWorld implements World {
     canvas.addEventListener(
       'pointerdown',
       (event) => {
-        if (event.button !== 0 || this.monitorMode) return;
+        if (event.button !== 0 || this.monitorMode || this.suspended) return;
         this.pointerStart.set(event.clientX, event.clientY);
         this.dragging = true;
         canvas.setPointerCapture(event.pointerId);
@@ -252,7 +253,7 @@ export class RoomWorld implements World {
     canvas.addEventListener(
       'keydown',
       (event) => {
-        if (this.monitorMode) return;
+        if (this.monitorMode || this.suspended) return;
         const delta: Record<string, [number, number]> = {
           ArrowLeft: [-35, 0],
           ArrowRight: [35, 0],
@@ -286,6 +287,14 @@ export class RoomWorld implements World {
     this.surface.setActive(active);
     if (document.pointerLockElement === this.canvas) document.exitPointerLock();
     if (!active) this.canvas.focus({ preventScroll: true });
+  }
+
+  setSuspended(suspended: boolean): void {
+    this.suspended = suspended;
+    this.setMonitorMode(false);
+    this.surface.element.hidden = suspended;
+    this.canvas.inert = suspended;
+    this.canvas.style.pointerEvents = suspended ? 'none' : '';
   }
 
   setFrame(texture: THREE.Texture): void {

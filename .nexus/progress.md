@@ -1,3 +1,3 @@
 # Progresso
 
-Incrementos 01–06 concluídos: MVP 0.6.0. 11 unitários, 13 e2e Chromium, build e audit passaram; screenshots reais inspecionados. Dados pessoais pendentes conforme escolha do proprietário. Evidências em docs/PROGRESS.md. Próximo: T07a REDLINE. Não há merge/push/deploy.
+Incrementos 01–07 implementados; REDLINE 0.7.0 jogável como protótipo. 14 unitários e 14 e2e aprovados. Evidências e limites em docs/PROGRESS.md. Próximo: 08 BREAKPOINT. Sem push/merge/deploy.
