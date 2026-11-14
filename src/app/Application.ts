@@ -28,9 +28,9 @@ export class Application {
     }
     this.root.innerHTML = `
       <main class="world" aria-label="Quarto tridimensional"></main>
-      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.5</small></header>
+      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.6</small></header>
       <nav class="top-actions" aria-label="Navegação"><button data-action="room">Quarto</button><button data-action="monitor">Usar computador</button><button data-action="restore" hidden>Restaurar interface</button><button data-action="diagnostic">Diagnóstico</button><a href="?view=portfolio">Portfólio acessível</a></nav>
-      <section class="room-help"><p class="eyebrow">05 / PORTFOLIO SYSTEM</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
+      <section class="room-help"><p class="eyebrow">06 / GAME LAUNCHER</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
       <section class="monitor-help" hidden><span>NO COMPUTADOR · ESC PARA SAIR</span><button data-action="exit">Voltar ao quarto</button></section>
       <section class="panel" hidden><p class="eyebrow">01 / PROJECT FOUNDATION</p><h1>Diagnóstico</h1><p>Cenas independentes, sem recarregar a página.</p><button data-action="switch">Alternar cena</button><button data-action="capture">Capturar quadro no monitor</button><p data-capture-status role="status"></p></section>
       <output class="diagnostics" aria-label="Diagnóstico de renderização"></output>`;

@@ -16,7 +16,8 @@
 | 03 · 0.3.0 | Concluído e validado                                                 |
 | 04 · 0.4.0 | Concluído e validado                                                 |
 | 05 · 0.5.0 | Concluído e validado; dados do autor pendentes por escolha explícita |
-| 06–14      | Pendentes, escopo preservado na especificação                        |
+| 06 · 0.6.0 | Concluído e validado · MVP técnico                                   |
+| 07–14      | Pendentes, escopo preservado na especificação                        |
 
 ## Incremento 01 — Project Foundation
 
@@ -74,3 +75,18 @@
 - Refinamento de performance motivado por um timeout em DPR 2: o quarto estático agora só redesenha ao mover câmera, redimensionar ou trocar conteúdo da cena. A interface DOM e o loop de atualização continuam ativos. O teste comprova que editar/navegar no OS não cria frames WebGL extras. Diagnóstico conta frames reais e identifica idle. A suíte anterior levou 3,6 min e falhou no teardown; após a correção passou em 35,2s, sem aumentar o timeout.
 - Screenshots reais revisados: `docs/evidence/05-files.png` e `05-accessible.png`. Erros de console no cenário de WebGL bloqueado são intencionais; fallback passou.
 - Limites: currículo real e links pessoais não fornecidos, portanto visualização/download PDF não foram validados com documento do autor. Outros browsers, GPU física, zoom e oclusão por pixel continuam pendentes. Próximo: 06 Game Launcher.
+
+## Incremento 06 — Game Launcher / MVP 0.6.0
+
+- Biblioteca com capas originais em CSS, títulos, descrições e estados honestos. SIGNAL.exe disponível; SHIFT//BREAK, DRIFT.exe, FIGHT.exe e FPS.exe ainda indisponíveis até 07–12.
+- SIGNAL.exe é uma prova jogável 2D original: oito sinais em vinte segundos, entradas de mouse/teclado, vitória, derrota, pausa, reinício e saída. Não é apresentado como um dos três jogos 3D.
+- GameHost com import lazy (~5,2 kB), isolamento do desktop via inert, ownership de entrada, cancelamento seguro de import tardio, descarte de listeners/canvas e restauração de foco/janelas. Atualização pelo loop único do quarto; sem RAF paralelo.
+- Sair do computador, blur ou aba oculta pausa a sessão. Fechar retorna ao mesmo OS e canvas do quarto, sem navegação/reload. Resultado mantém foco para atalhos e ações acessíveis.
+- `npm run check`: typecheck, lint, format, 11 unitários e build passaram.
+- `npm run test:e2e`: 13 testes Chromium passaram (1,1 min), cobrindo vitória/derrota/retry, saída temporária ao quarto, cancelamento de loading, mesmo canvas sem reload, e todas as regressões anteriores.
+- `npm audit` e `npm audit --omit=dev`: zero vulnerabilidades.
+- Instalação limpa `npm ci` passou; `npm run check` repetido após a instalação passou. `npm run test:production`: quatro smokes no bundle estático passaram (6s), cobrindo imports lazy, jogo, arquivos/imagens, leitura móvel e fallback WebGL.
+- Prévia local de produção iniciada em `http://127.0.0.1:4174/` (não é deploy público).
+- Screenshot real revisado: `docs/evidence/06-signal.png`. ADR-002 documenta o ciclo e os cuidados para o futuro renderer 3D de REDLINE.
+- **Este é o MVP 01–06, não a versão 1.0.** Permanecem 07–14: três jogos 3D, FLOW, campanha contínua, áudio, revelação, exploração/polimento e publicação. Apps complementares exigidos pela especificação (terminal, settings, música e achievements) também permanecem na entrega futura, sem rótulo de concluídos.
+- Conteúdo pessoal segue pendente por autorização explícita. Limites de oclusão por amostragem, arte provisória, validação multi-browser/GPU e aviso do bundle 3D continuam abertos. Não houve publicação nem merge.

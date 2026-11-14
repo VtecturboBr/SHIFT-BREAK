@@ -9,5 +9,6 @@ O remoto iniciou vazio: `main` é apenas o nome configurado como padrão no GitH
 | feat/03-interactive-monitor | feat/02-room-prototype      | 03 · 0.3.0 |
 | feat/04-os-core             | feat/03-interactive-monitor | 04 · 0.4.0 |
 | feat/05-portfolio-system    | feat/04-os-core             | 05 · 0.5.0 |
+| feat/06-game-launcher       | feat/05-portfolio-system    | 06 · 0.6.0 |
 
 São branches empilhadas; a mais recente contém as anteriores. Comparar cada branch com sua base para revisar apenas seu incremento. Usar `git log --oneline --decorate` para consultar hashes reais. A integração à main depende de autorização do proprietário.

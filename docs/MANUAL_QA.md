@@ -47,3 +47,12 @@ Este protótipo não é a cinemática final. Jogos, áudio e ALEF//OS completo s
 5. Bloquear WebGL e recarregar o caminho principal: deve abrir o mesmo conteúdo acessível com explicação e caminho para tentar o quarto novamente.
 6. Forçar falha de imagem/rede: apresentar estado legível sem travar a janela. Quando o currículo real existir, verificar leitura e download do arquivo configurado antes de publicar.
 7. Editar texto no OS com câmera parada: cena física permanece visível sem redraw contínuo; mover câmera e redimensionar precisam redesenhá-la. O diagnóstico identifica frames reais e idle, sem atribuir FPS fictício à interface DOM.
+
+## Biblioteca e jogo de teste
+
+1. Menu ALEF// → Biblioteca de jogos → Iniciar SIGNAL.exe. A moldura e o quarto devem continuar visíveis. Os outros quatro títulos devem mostrar desenvolvimento, sem botões de sucesso fictícios.
+2. Coletar oito sinais por clique/Espaço com alvo em foco: mostrar vitória. Não coletar durante vinte segundos: mostrar derrota. Ambas aceitam reinício.
+3. Escape pausa e congela o tempo; R reinicia inclusive no resultado. Voltar ao quarto pausa a sessão; entrar novamente exige retomada explícita.
+4. Sair do jogo restaura biblioteca/janelas e foco, sem navegação ou recriação do canvas 3D. Abrir e fechar repetidamente não duplica handlers/canvas de jogo.
+5. Bloquear rede durante loading e cancelar; conclusão tardia não pode reabrir a sessão. Falha de carregamento deve permitir voltar à biblioteca.
+6. Build de produção: `npm run build` e `npm run test:production`. Smoke verifica arquivos/imagens, modo móvel/WebGL ausente e o ciclo completo de jogo no bundle estático, incluindo imports lazy.

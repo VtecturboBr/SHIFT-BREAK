@@ -344,7 +344,7 @@ export class RoomWorld implements World {
     const ready =
       this.camera.position.distanceTo(this.targetPosition) < 0.005 &&
       this.camera.quaternion.angleTo(this.targetRotation) < 0.005;
-    this.surface.update(ready);
+    this.surface.update(ready, dt);
   }
 
   dispose(): void {

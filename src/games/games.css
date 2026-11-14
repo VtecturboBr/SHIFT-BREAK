@@ -1,0 +1,143 @@
+.game-library {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+.game-library > h2 {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.game-card {
+  padding: 12px;
+  border: 1px solid #4c5e77;
+  border-radius: 5px;
+}
+.game-card h3 {
+  margin: 10px 0 6px;
+}
+.game-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  min-height: 36px;
+}
+.game-card small {
+  display: block;
+  color: #c2cadd;
+  font-size: 10px;
+  margin: 8px 0;
+}
+.game-card button {
+  width: 100%;
+}
+.game-cover {
+  height: 80px;
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(
+    125deg,
+    #172435 0 30px,
+    #4b2436 31px 34px,
+    #172435 35px 65px
+  );
+  font: bold 23px monospace;
+  color: #ff8b9e;
+  letter-spacing: -1px;
+}
+.game-session {
+  position: absolute;
+  inset: 0;
+  z-index: 2000000;
+  background: #101b29;
+  color: #ecf4ff;
+  overflow: hidden;
+}
+.game-session > p {
+  padding: 30px;
+}
+.game-session > button {
+  margin-left: 30px;
+}
+.game-toolbar {
+  height: 64px;
+  padding: 10px 20px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-bottom: 1px solid #536a85;
+}
+.game-toolbar strong {
+  font: bold 26px monospace;
+  color: #ffa2af;
+}
+.game-toolbar span {
+  flex: 1;
+  font: 10px monospace;
+  letter-spacing: 2px;
+}
+.game-toolbar button,
+.game-result button {
+  font-size: 13px;
+  padding: 9px 14px;
+}
+.game-stats {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  font: 14px monospace;
+  color: #94e4c5;
+}
+.signal-arena {
+  height: 380px;
+  width: 960px;
+  position: relative;
+}
+.signal-arena canvas {
+  display: block;
+  width: 960px;
+  height: 380px;
+}
+.signal-target {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #bd324e;
+  border: 3px solid #ffb6c4;
+  box-shadow: 0 0 0 8px #ee68762b;
+  padding: 0;
+  color: #fff;
+  font-size: 30px;
+  line-height: 1;
+}
+.signal-target:hover {
+  background: #e54c69;
+}
+.game-instructions {
+  height: 54px;
+  padding: 14px 24px;
+  font-size: 12px;
+  color: #bfcedf;
+  background: #172434;
+  border-top: 1px solid #4c5e77;
+}
+.game-result {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: #111d2bf2;
+  padding: 40px;
+}
+.game-result h2 {
+  font-size: 36px;
+  margin: 0 0 12px;
+  color: #ffa2af;
+}
+.game-result p {
+  font-size: 16px;
+  line-height: 1.6;
+}

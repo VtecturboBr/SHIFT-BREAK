@@ -8,3 +8,4 @@ RISCO: projeção HTML não compartilha automaticamente o depth buffer WebGL; va
 RESULTADO: projeção e cliques reais validados. Oclusão conservadora por cinco raios; limite e evolução descritos no ADR-001. Quadro 3D capturado e visto no monitor físico.
 RESULTADO: OS Core com múltiplas janelas validado no monitor; arraste e teclado não alteram câmera; minimizar preserva texto. Próximo risco é a apresentação de conteúdo real e fallback sem WebGL.
 RESULTADO: VFS, conteúdo central e fallback móvel/WebGL ausente validados. Dados pessoais aguardam preenchimento conforme decisão explícita do proprietário. Quarto sob demanda removeu gargalo de renderização contínua no OS; testes comprovam ausência de redraw extra.
+RESULTADO: ciclo do launcher validado com jogo de teste real, incluindo vitória, timeout/derrota, pause/retry, saída temporária, cancelamento lazy e retorno ao mesmo canvas sem reload. Todos os 13 e2e passaram. O primeiro jogo 3D permanece pendente.

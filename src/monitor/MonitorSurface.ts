@@ -8,6 +8,8 @@ import {
 import { Desktop } from '../os/Desktop';
 import { coreApps } from '../os/registry';
 import { portfolioApps } from '../os/apps/portfolioApps';
+import { gameLibrary } from '../os/apps/GameLibrary';
+import { GameHost } from '../games/common/GameHost';
 
 export class MonitorSurface {
   readonly element = document.createElement('section');
@@ -17,6 +19,7 @@ export class MonitorSurface {
   private count = 0;
   private focusPending = false;
   private readonly desktop: Desktop;
+  private readonly games: GameHost;
 
   constructor(
     private readonly host: HTMLElement,
@@ -70,9 +73,16 @@ export class MonitorSurface {
     const diagnostic =
       this.element.querySelector<HTMLElement>('.monitor-body')!;
     diagnostic.remove();
+    this.games = new GameHost(this.element);
     this.desktop = new Desktop(
       this.element,
-      [...coreApps(diagnostic), ...portfolioApps],
+      [
+        ...coreApps(diagnostic),
+        ...portfolioApps,
+        gameLibrary(() => {
+          void this.games.launchSignal();
+        }),
+      ],
       (x, y) => {
         const rect = this.host.getBoundingClientRect();
         return desktopCoordinates(
@@ -89,6 +99,7 @@ export class MonitorSurface {
   }
 
   setActive(active: boolean): void {
+    this.games.setActive(active);
     if (!active) this.desktop.cancelDrag();
     this.focusPending = active && !this.active;
     this.active = active;
@@ -101,7 +112,8 @@ export class MonitorSurface {
     this.frame = show;
   }
 
-  update(ready: boolean): void {
+  update(ready: boolean, dt: number): void {
+    this.games.update(dt);
     const visible =
       !this.frame && screenVisible(this.scene, this.camera, this.screen);
     this.element.hidden = !visible;
@@ -117,12 +129,17 @@ export class MonitorSurface {
     if (ready && this.focusPending && this.active) {
       this.focusPending = false;
       this.element
-        .querySelector<HTMLButtonElement>('button')
+        .querySelector<HTMLButtonElement>(
+          this.element.dataset.game
+            ? '.game-session button:not(:disabled)'
+            : 'button',
+        )
         ?.focus({ preventScroll: true });
     }
   }
 
   dispose(): void {
+    this.games.dispose();
     this.desktop.dispose();
     this.events.abort();
     this.element.remove();

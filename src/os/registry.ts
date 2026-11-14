@@ -47,7 +47,7 @@ export function coreApps(diagnostic: HTMLElement): AppDefinition[] {
         const content = document.createElement('div');
         content.className = 'system-app';
         content.innerHTML =
-          '<p class="eyebrow">ALEF//OS · 0.5.0</p><h2>Um sistema dentro do mundo.</h2><p>Núcleo do desktop em desenvolvimento. Janelas, foco e controles funcionam no monitor físico.</p><p>Portfólio e arquivos disponíveis. Identidade, habilidades e contatos aguardam os dados do autor; jogos seguem o roadmap.</p>';
+          '<p class="eyebrow">ALEF//OS · 0.6.0</p><h2>Um sistema dentro do mundo.</h2><p>Núcleo do desktop em desenvolvimento. Janelas, foco e controles funcionam no monitor físico.</p><p>Portfólio e arquivos disponíveis. Identidade, habilidades e contatos aguardam os dados do autor; jogos seguem o roadmap.</p>';
         return content;
       },
     },
