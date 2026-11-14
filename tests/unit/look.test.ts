@@ -17,4 +17,7 @@ it('constrains seated camera, sensitivity and malformed input', () => {
   look.reset();
   expect(look.pitch).toBe(0);
   expect(look.yaw).toBe(0);
+  look.sensitivity = NaN;
+  look.move(20, 0);
+  expect(look.yaw).toBeCloseTo(-0.04);
 });

@@ -1,0 +1,147 @@
+.monitor-surface {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 960px;
+  height: 540px;
+  transform-origin: 0 0;
+  overflow: hidden;
+  background: #111820;
+  color: #f1f3f6;
+  border: 0;
+  font-size: 16px;
+  contain: layout style;
+}
+.monitor-bar {
+  height: 52px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #191f29;
+  border-bottom: 1px solid #354050;
+}
+.monitor-bar strong {
+  letter-spacing: -1px;
+  font-size: 23px;
+}
+.monitor-bar strong span {
+  color: #ff6b77;
+}
+.monitor-bar > span {
+  font: 10px monospace;
+  letter-spacing: 1.5px;
+  color: #c5cbd7;
+}
+.monitor-bar i {
+  font: 10px monospace;
+  color: #80dfba;
+}
+.monitor-body {
+  padding: 24px 48px;
+  height: 446px;
+  background: radial-gradient(ellipse at 95% 25%, #4e23384d, transparent 65%);
+}
+.monitor-body h1 {
+  font-size: 48px;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  margin: 14px 0;
+}
+.monitor-body p {
+  color: #c2c9d5;
+  font-size: 16px;
+  line-height: 1.55;
+}
+.monitor-test {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+}
+.monitor-test button {
+  font-size: 15px;
+  padding: 12px 18px;
+}
+.monitor-test b {
+  margin-left: 8px;
+  background: #101820;
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+.monitor-test label {
+  display: grid;
+  gap: 5px;
+  color: #d2d9e5;
+  font-size: 11px;
+}
+.monitor-test input {
+  width: 240px;
+  background: #222d3b;
+  border: 1px solid #59667c;
+  padding: 10px;
+  border-radius: 3px;
+  color: white;
+  font-size: 15px;
+}
+.monitor-footer {
+  height: 42px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #354050;
+  color: #a6b4c8;
+  font: 11px monospace;
+}
+.monitor-help {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 16px;
+  background: #11171ff0;
+  border: 1px solid #59606f;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.monitor-help span {
+  font: 11px monospace;
+  color: #c1cbdc;
+}
+.monitor-help button {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+@media (max-width: 700px) {
+  .brand {
+    top: 16px;
+    left: 16px;
+  }
+  .top-actions {
+    top: 84px;
+    left: 16px;
+    right: 16px;
+    flex-wrap: wrap;
+  }
+  .room-help {
+    left: 16px;
+    bottom: 44px;
+    max-width: calc(100% - 32px);
+    padding: 12px;
+  }
+  .monitor-help {
+    bottom: 38px;
+    gap: 8px;
+  }
+  .monitor-help span {
+    display: none;
+  }
+}

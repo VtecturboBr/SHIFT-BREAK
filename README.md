@@ -9,6 +9,8 @@ npm run dev
 
 Abra o endereço local exibido pelo Vite. Node 22.12+.
 
+O protótipo técnico 0.3 tem quarto físico, câmera por arraste/setas e monitor HTML interativo. Use E, clique na tela ou Usar computador; Escape retorna ao quarto. Diagnóstico → Capturar quadro no monitor demonstra a transferência de uma imagem 3D. A campanha, os jogos e o portfólio profissional continuam pendentes.
+
 ```sh
 npm run check
 npx playwright install chromium

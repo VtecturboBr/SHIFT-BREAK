@@ -13,7 +13,8 @@
 | ---------- | --------------------------------------------- |
 | 01 · 0.1.0 | Concluído e validado                          |
 | 02 · 0.2.0 | Concluído e validado                          |
-| 03–14      | Pendentes, escopo preservado na especificação |
+| 03 · 0.3.0 | Concluído e validado                          |
+| 04–14      | Pendentes, escopo preservado na especificação |
 
 ## Incremento 01 — Project Foundation
 
@@ -37,3 +38,15 @@
 - Screenshots reais revisados: `docs/evidence/02-room.png` e `02-window.png`.
 - Uma execução excedeu 30s com 16 comandos de teclado em dois navegadores software simultâneos. A suíte agora usa 1 worker, timeout de 60s e gesto de mouse equivalente; os comportamentos e asserts foram preservados.
 - Limites: arte geométrica provisória, sem caminhar e sem interação no monitor nesta versão. Pointer lock físico e outros navegadores ainda não verificados; checklist em MANUAL_QA.md. Próximo: 03.
+
+## Incremento 03 — Interactive Monitor
+
+- HTML real projetado na tela física, cliques e edição de texto nativos, coordenadas UV, câmera reversível, foco e isolamento room/monitor. Entrada por botão, E ou clique no objeto. Escape e botão de saída; contador e texto preservados.
+- Prova de captura: cena diagnóstica renderizada em target 16:9, transferida ao monitor como DataTexture e UI restaurável. É a viabilidade técnica, não a cinemática do incremento 12.
+- `npm run check`: typecheck, lint, format, 6 testes unitários e build passaram.
+- `npm run test:e2e`: 6 testes Chromium passaram em 2 minutos, incluindo DPR 1/2, resize, cliques/teclado reais, entrada interrompida, captura de quadro e regressão do quarto.
+- Screenshots reais revisados: `docs/evidence/03-monitor.png`, `03-monitor-dpr2.png` e `03-frame.png`.
+- Auditoria e refinamento: matriz CSS singular impedia hit testing apesar de desenhar corretamente; preservada base Z invertível e acrescido teste. Novo input interferiu em seletor genérico de sensibilidade; seletor específico e proteção contra NaN corrigiram a regressão. Métrica FPS agora usa tempo real separado do dt limitado da simulação.
+- ADR-001 registra alternativas, projeção, captura e limites. Oclusão conservadora por cinco raios; precisa de máscara antes de objetos móveis/exploração livre. Zoom e engines além de Chromium ainda não validados.
+- Performance: capturas no Chromium com renderização por software mostram 4–8 fps com trace/DPR 1–2. Não representa GPU física e não atende ainda à meta de otimização final. Sem números de performance de produção inventados.
+- SHA256 da especificação local e original são idênticos. Próximo incremento: 04, OS Core.

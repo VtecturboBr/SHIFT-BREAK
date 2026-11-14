@@ -32,15 +32,14 @@ export class Engine {
         this.lastTime = 0;
         return;
       }
-      const dt = this.lastTime
-        ? Math.min((time - this.lastTime) / 1000, 0.05)
-        : 0;
+      const frameTime = this.lastTime ? (time - this.lastTime) / 1000 : 0;
+      const dt = Math.min(frameTime, 0.05);
       this.lastTime = time;
       if (!this.world) return;
       try {
         this.world.update(dt);
         this.renderer.render(this.world.scene, this.world.camera);
-        this.elapsed += dt;
+        this.elapsed += frameTime;
         this.frames++;
         if (this.elapsed >= 1) {
           report(
@@ -62,6 +61,39 @@ export class Engine {
     this.world?.dispose();
     this.world = world;
     this.resize();
+  }
+
+  captureFrame(): THREE.DataTexture {
+    if (!this.world) throw new Error('No active scene to capture');
+    const width = 960,
+      height = 540;
+    const target = new THREE.WebGLRenderTarget(width, height);
+    target.texture.colorSpace = THREE.SRGBColorSpace;
+    const previousTarget = this.renderer.getRenderTarget();
+    const camera = this.world.camera;
+    const aspect = camera.aspect;
+    try {
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      this.renderer.setRenderTarget(target);
+      this.renderer.render(this.world.scene, camera);
+      const pixels = new Uint8Array(width * height * 4);
+      this.renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
+      const texture = new THREE.DataTexture(
+        pixels,
+        width,
+        height,
+        THREE.RGBAFormat,
+      );
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.needsUpdate = true;
+      return texture;
+    } finally {
+      this.renderer.setRenderTarget(previousTarget);
+      camera.aspect = aspect;
+      camera.updateProjectionMatrix();
+      target.dispose();
+    }
   }
 
   private resize(): void {
