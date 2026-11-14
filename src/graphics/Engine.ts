@@ -7,6 +7,8 @@ export class Engine {
   private lastTime = 0;
   private elapsed = 0;
   private frames = 0;
+  private forceRender = true;
+  private renderedFrames = 0;
   private readonly observer: ResizeObserver;
 
   constructor(
@@ -38,12 +40,18 @@ export class Engine {
       if (!this.world) return;
       try {
         this.world.update(dt);
-        this.renderer.render(this.world.scene, this.world.camera);
+        if (this.forceRender || this.world.needsRender !== false) {
+          this.renderer.render(this.world.scene, this.world.camera);
+          this.forceRender = false;
+          this.frames++;
+          this.renderer.domElement.dataset.renderedFrames = String(
+            ++this.renderedFrames,
+          );
+        }
         this.elapsed += frameTime;
-        this.frames++;
         if (this.elapsed >= 1) {
           report(
-            `${Math.round(this.frames / this.elapsed)} fps · ${this.renderer.info.render.calls} draws · DPR ${this.renderer.getPixelRatio().toFixed(1)}`,
+            `${Math.round(this.frames / this.elapsed)} fps${this.world.needsRender === false ? ' · idle' : ''} · ${this.renderer.info.render.calls} draws · DPR ${this.renderer.getPixelRatio().toFixed(1)}`,
           );
           this.elapsed = 0;
           this.frames = 0;
@@ -97,6 +105,7 @@ export class Engine {
   }
 
   private resize(): void {
+    this.forceRender = true;
     const { clientWidth: width, clientHeight: height } = this.host;
     if (!width || !height) return;
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));

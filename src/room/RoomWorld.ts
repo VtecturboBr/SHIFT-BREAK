@@ -12,6 +12,10 @@ export class RoomWorld implements World {
   readonly look = new LookModel();
   readonly screen: THREE.Mesh;
   readonly surface: MonitorSurface;
+  needsRender = true;
+  private frameDirty = true;
+  private readonly previousCamera = new THREE.Matrix4();
+  private previousAspect = 0;
   private readonly events = new AbortController();
   private dragging = false;
   private monitorMode = false;
@@ -290,6 +294,7 @@ export class RoomWorld implements World {
     material.map = texture;
     material.needsUpdate = true;
     this.surface.showFrame(true);
+    this.frameDirty = true;
   }
 
   update(dt: number): void {
@@ -321,10 +326,21 @@ export class RoomWorld implements World {
         ? 1
         : 1 - Math.exp(-14 * dt),
     );
+    if (this.camera.position.distanceTo(this.targetPosition) < 1e-6)
+      this.camera.position.copy(this.targetPosition);
+    if (this.camera.quaternion.angleTo(this.targetRotation) < 1e-6)
+      this.camera.quaternion.copy(this.targetRotation);
     this.canvas.dataset.yaw = this.look.yaw.toFixed(3);
     this.canvas.dataset.pitch = this.look.pitch.toFixed(3);
     this.scene.updateMatrixWorld(true);
     this.camera.updateMatrixWorld(true);
+    this.needsRender =
+      this.frameDirty ||
+      !this.previousCamera.equals(this.camera.matrixWorld) ||
+      this.previousAspect !== this.camera.aspect;
+    this.previousCamera.copy(this.camera.matrixWorld);
+    this.previousAspect = this.camera.aspect;
+    this.frameDirty = false;
     const ready =
       this.camera.position.distanceTo(this.targetPosition) < 0.005 &&
       this.camera.quaternion.angleTo(this.targetRotation) < 0.005;

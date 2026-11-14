@@ -7,6 +7,7 @@ import {
 } from './projection';
 import { Desktop } from '../os/Desktop';
 import { coreApps } from '../os/registry';
+import { portfolioApps } from '../os/apps/portfolioApps';
 
 export class MonitorSurface {
   readonly element = document.createElement('section');
@@ -69,17 +70,21 @@ export class MonitorSurface {
     const diagnostic =
       this.element.querySelector<HTMLElement>('.monitor-body')!;
     diagnostic.remove();
-    this.desktop = new Desktop(this.element, coreApps(diagnostic), (x, y) => {
-      const rect = this.host.getBoundingClientRect();
-      return desktopCoordinates(
-        x - rect.left,
-        y - rect.top,
-        rect.width,
-        rect.height,
-        this.camera,
-        this.screen,
-      );
-    });
+    this.desktop = new Desktop(
+      this.element,
+      [...coreApps(diagnostic), ...portfolioApps],
+      (x, y) => {
+        const rect = this.host.getBoundingClientRect();
+        return desktopCoordinates(
+          x - rect.left,
+          y - rect.top,
+          rect.width,
+          rect.height,
+          this.camera,
+          this.screen,
+        );
+      },
+    );
     this.setActive(false);
   }
 

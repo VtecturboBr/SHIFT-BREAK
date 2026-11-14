@@ -37,3 +37,13 @@ Este protótipo não é a cinemática final. Jogos, áudio e ALEF//OS completo s
 5. Fechar remove a janela e a taskbar correspondente; o foco retorna à próxima janela ou ao menu.
 6. Confirmar relógio local e dispensar uma notificação com o botão próprio.
 7. Sair do monitor durante um arraste, retornar e mover o mouse: arraste não fica preso. Repetir troca de cenas para verificar regressão e descarte de timers/listeners.
+
+## Conteúdo e acessibilidade
+
+1. Abrir Arquivos pelo menu. Navegar home → identity.txt, about_me.md e skills.json; campos pendentes devem ser explícitos.
+2. Navegar projects → shift-break → README.md/stack.json/imagem. Confirmar descrição de protótipo e captura real, com retorno por pasta/breadcrumb.
+3. Abrir Apresentação, Projetos, Galeria e Contato. Links reais devem usar URLs configuradas; currículo ausente não cria botão de download.
+4. Clicar Portfólio acessível ou abrir `?view=portfolio`. Conferir leitura em 390px, teclado e navegação por seções; nenhuma dependência de WebGL para ler conteúdo.
+5. Bloquear WebGL e recarregar o caminho principal: deve abrir o mesmo conteúdo acessível com explicação e caminho para tentar o quarto novamente.
+6. Forçar falha de imagem/rede: apresentar estado legível sem travar a janela. Quando o currículo real existir, verificar leitura e download do arquivo configurado antes de publicar.
+7. Editar texto no OS com câmera parada: cena física permanece visível sem redraw contínuo; mover câmera e redimensionar precisam redesenhá-la. O diagnóstico identifica frames reais e idle, sem atribuir FPS fictício à interface DOM.

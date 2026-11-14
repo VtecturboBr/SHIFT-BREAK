@@ -2,6 +2,7 @@ import { StateMachine } from '../core/StateMachine';
 import { Engine } from '../graphics/Engine';
 import { DiagnosticWorld } from '../graphics/DiagnosticWorld';
 import { RoomWorld } from '../room/RoomWorld';
+import { accessiblePortfolio } from '../ui/AccessiblePortfolio';
 
 type Mode = 'room' | 'monitor' | 'diagnostic' | 'alternate';
 
@@ -19,11 +20,17 @@ export class Application {
   constructor(private readonly root: HTMLElement) {}
 
   start(): void {
+    if (
+      new URLSearchParams(window.location.search).get('view') === 'portfolio'
+    ) {
+      accessiblePortfolio(this.root);
+      return;
+    }
     this.root.innerHTML = `
       <main class="world" aria-label="Quarto tridimensional"></main>
-      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.4</small></header>
-      <nav class="top-actions" aria-label="Navegação"><button data-action="room">Quarto</button><button data-action="monitor">Usar computador</button><button data-action="restore" hidden>Restaurar interface</button><button data-action="diagnostic">Diagnóstico</button></nav>
-      <section class="room-help"><p class="eyebrow">04 / OS CORE</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
+      <header class="brand"><strong>SHIFT<span>//</span>BREAK</strong><small>ALEF//OS · DEVELOPMENT 0.5</small></header>
+      <nav class="top-actions" aria-label="Navegação"><button data-action="room">Quarto</button><button data-action="monitor">Usar computador</button><button data-action="restore" hidden>Restaurar interface</button><button data-action="diagnostic">Diagnóstico</button><a href="?view=portfolio">Portfólio acessível</a></nav>
+      <section class="room-help"><p class="eyebrow">05 / PORTFOLIO SYSTEM</p><h1>Seu próximo universo.</h1><p>Arraste para olhar. Clique no monitor ou pressione E para usar o computador.</p><div class="controls"><button data-action="center">Centralizar câmera</button><button data-action="lock">Olhar livre</button><label>Sensibilidade <input aria-label="Sensibilidade" type="range" min="0.2" max="3" value="1" step="0.1"></label></div><p role="status" data-status>Preparando renderização…</p></section>
       <section class="monitor-help" hidden><span>NO COMPUTADOR · ESC PARA SAIR</span><button data-action="exit">Voltar ao quarto</button></section>
       <section class="panel" hidden><p class="eyebrow">01 / PROJECT FOUNDATION</p><h1>Diagnóstico</h1><p>Cenas independentes, sem recarregar a página.</p><button data-action="switch">Alternar cena</button><button data-action="capture">Capturar quadro no monitor</button><p data-capture-status role="status"></p></section>
       <output class="diagnostics" aria-label="Diagnóstico de renderização"></output>`;
@@ -173,23 +180,14 @@ export class Application {
   }
 
   private showError(message: string): void {
+    this.events.abort();
     this.engine?.dispose();
     this.engine = undefined;
     this.room = undefined;
-    const panel = this.root.querySelector<HTMLElement>('.panel')!;
-    this.root.querySelector<HTMLElement>('.room-help')!.hidden = true;
-    this.root.querySelector<HTMLElement>('.monitor-help')!.hidden = true;
-    panel.hidden = false;
-    panel.replaceChildren();
-    const heading = document.createElement('h1');
-    heading.textContent = message;
-    const note = document.createElement('p');
-    note.textContent =
-      'Protótipo em desenvolvimento. O conteúdo profissional ainda não foi fornecido.';
-    const retry = document.createElement('button');
-    retry.textContent = 'Tentar novamente';
-    retry.onclick = () => window.location.reload();
-    panel.append(heading, note, retry);
+    accessiblePortfolio(
+      this.root,
+      `${message} O conteúdo disponível pode ser lido no modo acessível.`,
+    );
   }
 
   dispose(): void {

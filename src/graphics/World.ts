@@ -3,6 +3,7 @@ import * as THREE from 'three';
 export interface World {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
+  needsRender?: boolean;
   update(dt: number): void;
   dispose(): void;
 }

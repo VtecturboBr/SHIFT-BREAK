@@ -9,13 +9,14 @@
 
 ## Estado dos incrementos
 
-| Incremento | Estado                                        |
-| ---------- | --------------------------------------------- |
-| 01 · 0.1.0 | Concluído e validado                          |
-| 02 · 0.2.0 | Concluído e validado                          |
-| 03 · 0.3.0 | Concluído e validado                          |
-| 04 · 0.4.0 | Concluído e validado                          |
-| 05–14      | Pendentes, escopo preservado na especificação |
+| Incremento | Estado                                                               |
+| ---------- | -------------------------------------------------------------------- |
+| 01 · 0.1.0 | Concluído e validado                                                 |
+| 02 · 0.2.0 | Concluído e validado                                                 |
+| 03 · 0.3.0 | Concluído e validado                                                 |
+| 04 · 0.4.0 | Concluído e validado                                                 |
+| 05 · 0.5.0 | Concluído e validado; dados do autor pendentes por escolha explícita |
+| 06–14      | Pendentes, escopo preservado na especificação                        |
 
 ## Incremento 01 — Project Foundation
 
@@ -62,3 +63,14 @@
 - Screenshot real revisado em `docs/evidence/04-desktop.png`.
 - Auditoria: listeners por janela são abortados ao fechar; timers e eventos globais descartados junto do desktop. Arraste é cancelado na saída, blur e visibilitychange. Conteúdo usa textContent ou templates internos estáticos.
 - Limites anteriores de oclusão, software rendering e bundle permanecem explícitos. Dados profissionais, arquivos e fallback acessível são o próximo incremento (05); jogos continuam 06–12.
+
+## Incremento 05 — Portfolio System
+
+- Schema central de identidade, apresentação, habilidades, projetos, imagens, contatos e currículo. Proprietário confirmou deixar dados pessoais claramente pendentes para preencher depois.
+- VFS readonly: identity.txt, about_me.md, skills.json, projects/ e gallery/. Explorador com pastas/breadcrumbs e viewers de texto/código/imagem; resume.pdf e leitor PDF só existem quando configurado um asset real.
+- Apps de Apresentação, Projetos, Galeria e Contato. Apenas o próprio projeto foi cadastrado com fatos verificados e captura real; sem links de contato ou currículo inventados.
+- Modo 2D acessível em `?view=portfolio`, móvel e independente de WebGL. Erro de WebGL/carregamento abre o mesmo conteúdo. Bundle inicial de leitura ~7,3 kB JS; ambiente 3D carregado separadamente (~569 kB, ainda com aviso do Vite).
+- `npm run check`: typecheck, lint, format, 9 unitários e build passaram. `npm run test:e2e`: 10 testes Chromium passaram em 35,2s, incluindo arquivos/imagens, mobile 390px, WebGL ausente e todas as regressões anteriores.
+- Refinamento de performance motivado por um timeout em DPR 2: o quarto estático agora só redesenha ao mover câmera, redimensionar ou trocar conteúdo da cena. A interface DOM e o loop de atualização continuam ativos. O teste comprova que editar/navegar no OS não cria frames WebGL extras. Diagnóstico conta frames reais e identifica idle. A suíte anterior levou 3,6 min e falhou no teardown; após a correção passou em 35,2s, sem aumentar o timeout.
+- Screenshots reais revisados: `docs/evidence/05-files.png` e `05-accessible.png`. Erros de console no cenário de WebGL bloqueado são intencionais; fallback passou.
+- Limites: currículo real e links pessoais não fornecidos, portanto visualização/download PDF não foram validados com documento do autor. Outros browsers, GPU física, zoom e oclusão por pixel continuam pendentes. Próximo: 06 Game Launcher.
