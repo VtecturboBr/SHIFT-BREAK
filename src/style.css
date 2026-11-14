@@ -1,0 +1,105 @@
+﻿:root {
+  font-family: Inter, 'Segoe UI', sans-serif;
+  color: #ececec;
+  background: #101216;
+  font-synthesis: none;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  background: #c9363e;
+  border: 1px solid #f5636a;
+  color: #fff;
+  padding: 0.8rem 1.2rem;
+  border-radius: 4px;
+}
+button:hover {
+  background: #e14d55;
+}
+:focus-visible {
+  outline: 3px solid #ffbc78;
+  outline-offset: 4px;
+}
+.world {
+  position: fixed;
+  inset: 0;
+}
+.world canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.brand {
+  position: fixed;
+  top: 32px;
+  left: 36px;
+  pointer-events: none;
+}
+.brand strong {
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -1px;
+}
+.brand span {
+  color: #fa6068;
+}
+.brand small {
+  display: block;
+  font: 10px monospace;
+  color: #c7cbd2;
+  margin-top: 7px;
+  letter-spacing: 2px;
+}
+.panel {
+  position: fixed;
+  left: 36px;
+  bottom: 64px;
+  padding: 24px;
+  width: min(420px, calc(100% - 72px));
+  background: #17191ef0;
+  border: 1px solid #393c44;
+  border-radius: 6px;
+}
+.panel h1 {
+  font-size: 27px;
+  margin: 12px 0;
+}
+.panel p {
+  line-height: 1.65;
+  color: #bfc3cc;
+}
+.eyebrow {
+  font: 11px monospace;
+  color: #ff8c92 !important;
+  letter-spacing: 2px;
+}
+.diagnostics {
+  position: fixed;
+  bottom: 20px;
+  right: 24px;
+  color: #c7cbd2;
+  font: 11px monospace;
+  background: #101216b0;
+  padding: 7px;
+}
+@media (max-width: 600px) {
+  .brand {
+    top: 20px;
+    left: 20px;
+  }
+  .panel {
+    left: 20px;
+    width: calc(100% - 40px);
+  }
+}
