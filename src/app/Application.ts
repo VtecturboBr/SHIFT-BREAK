@@ -233,11 +233,15 @@ export class Application {
         modeVersion !== this.modeVersion
       )
         return;
-      const game = new RedlineWorld(this.root, () => {
-        this.engine?.resumeWorld();
-        this.room?.setSuspended(false);
-        this.state.transition('monitor');
-      });
+      const game = new RedlineWorld(
+        this.root,
+        () => {
+          this.engine?.resumeWorld();
+          this.room?.setSuspended(false);
+          this.state.transition('monitor');
+        },
+        this.engine.softwareRendering,
+      );
       this.room.setSuspended(true);
       this.engine.suspendWorld(game);
       this.state.transition('game');

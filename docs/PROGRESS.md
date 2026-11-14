@@ -102,3 +102,14 @@
 - Arte e efeitos são provisórios, sem áudio final nem cinemática de transição para luta. Arquitetura e limites em ADR-003-REDLINE.md. Próximo incremento: 08 BREAKPOINT. Dados pessoais seguem pendentes por escolha do proprietário.
 
 - Smoke de produção: npm run test:production passou com cinco testes (31,6s), incluindo REDLINE, renderer preservado, arquivos e fallback. Sem servidor deixado rodando ou reinstalação de dependências.
+
+## Reuso solicitado — 0.7.1
+
+- Fonte: initial JOJO.zip do proprietário; pista de 3,2 km, modelos/rodas, texturas, streaming de trechos, IA, física/drift e áudio sintetizado reaproveitados. Arquivo original intacto; .git, node_modules, builds, executáveis, HUD/diretor/combate antigos não importados. Manifesto e SHA-256 em REUSED-TOUGE.md.
+- Removidos modelos/animações dos espíritos, zonas de duelo, ataques/poderes, dano espiritual e rounds infinitos. Corrida agora termina ao concluir a descida, destruir o carro ou atingir limite de 240 s. A vitória significa concluir a descida; a posição em relação ao rival é informada no resultado.
+- Substituídos o modelo de 720 m e seus testes pelos módulos reais reutilizados; 15 unitários passaram, inclusive percurso completo, drift/cooldown, física de colisão, countdown/pausa e derrota. Typecheck, lint, formatação e build passaram.
+- Primeiro teste expôs countdown lento na GPU por software. Reuso da estratégia de DPR reduzido e passo 0,08 específico da corrida, mais render sob demanda fora de movimento, fez o teste isolado passar em 22,2 s (sem aumentar timeout). Cena real inspecionada.
+- Adaptação usa o mesmo renderer e o retorno ao quarto/OS. Áudio inicia por clique, mute disponível e AudioContext é fechado na saída; descarte ampliado para sprites, pontos e instâncias da cena original. Não há música comercial.
+- Ainda faltam playtest humano completo e aferição de GPU física/cross-browser. Roteiro 08–14 e dados pessoais pendentes permanecem.
+
+- Validação final do reuso: npm run check passou com 15 unitários; npm run test:e2e passou com 14 testes (1,5 min); npm run test:production passou com cinco testes (52,6 s). O smoke novo também confirma que F/J não ativam combate e que mute funciona. Captura real revisada: docs/evidence/07-reused-touge.png. Sem servidores permanentes iniciados, push ou merge.

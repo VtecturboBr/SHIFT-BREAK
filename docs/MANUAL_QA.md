@@ -60,3 +60,7 @@ Este protótipo não é a cinemática final. Jogos, áudio e ALEF//OS completo s
 ## REDLINE
 
 Abrir Biblioteca → Iniciar DRIFT.exe. W/setas acelera, S freia, A/D esterça, Espaço drift. Completar 720 m, conferir pontuação em drift e dano nos guard-rails. Escape pausa, R reinicia. Sair restaura janelas e notas. Testar blur, aba oculta, restart após vitória/derrota e duas sessões consecutivas. Revisão de dirigibilidade por pessoa e GPU física ainda necessária.
+
+## Touge reaproveitado — 0.7.1
+
+DRIFT.exe agora tem 3,2 km, três grampos e dois túneis. Verificar contagem de largada, aceleração/freio/ré, curva + toque em Espaço para iniciar drift, soltar/contraesterçar para estabilizar e guardar pontos. F/J/K/L/Q/E não ativam combate. M e botão controlam áudio, que deve cessar ao sair. Terminar pista ou perder por dano/tempo; nenhum round infinito nem troca automática de modo. Repetir corrida e conferir notas/OS preservados. Ver REUSED-TOUGE.md para procedência.

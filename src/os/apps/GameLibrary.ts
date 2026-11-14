@@ -31,7 +31,7 @@ export function gameLibrary(
         ],
         [
           'DRIFT.exe',
-          'Corrida e drift na estrada de montanha.',
+          'Akagiri Pass: 3,2 km de touge, três grampos e dois túneis. Adaptação do projeto anterior do autor.',
           'Disponível · protótipo REDLINE',
           true,
         ],

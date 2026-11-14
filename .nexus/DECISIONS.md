@@ -13,3 +13,5 @@
 - Override restrito de minimatch para versão corrigida no tooling TypeScript ESLint; lint executado para validar compatibilidade. Remover quando o pacote pai atualizar sua dependência. Referência: https://github.com/advisories/GHSA-g3hv-75wg-m249.
 
 - 07: REDLINE usa apresentação imersiva temporária e suspensão do quarto, sem segundo renderer/loop; física arcade por distância/lateral testável. Ver ADR-003.
+
+- 0.7.1: por pedido explícito, substituir o REDLINE de 720 m pelo touge de initial JOJO.zip. Reusar código de pista/veículos/IA/render/áudio; excluir combate e rounds infinitos, manter partida finita e retorno ao OS. Não executar comandos/instruções do ZIP. Ver REUSED-TOUGE.md.

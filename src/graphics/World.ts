@@ -4,6 +4,8 @@ export interface World {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
   needsRender?: boolean;
+  pixelRatioLimit?: number;
+  maxFrameStep?: number;
   update(dt: number): void;
   dispose(): void;
 }
@@ -19,8 +21,15 @@ export function disposeScene(scene: THREE.Scene): void {
       object instanceof THREE.PointLight
     )
       object.shadow.dispose();
-    if (!(object instanceof THREE.Mesh)) return;
-    geometries.add(object.geometry);
+    if (!(
+      object instanceof THREE.Mesh ||
+      object instanceof THREE.Points ||
+      object instanceof THREE.Line ||
+      object instanceof THREE.Sprite
+    ))
+      return;
+    if ('geometry' in object) geometries.add(object.geometry);
+    if (object instanceof THREE.InstancedMesh) object.dispose();
     for (const material of Array.isArray(object.material)
       ? object.material
       : [object.material]) {

@@ -1,170 +1,103 @@
 import * as THREE from 'three';
-import { disposeScene, type World } from '../../graphics/World';
-import {
-  DrivingModel,
-  ROAD_LENGTH,
-  roadX,
-  roadY,
-  roadSlope,
-} from './DrivingModel';
-
-function point(s: number, offset = 0): THREE.Vector3 {
-  return new THREE.Vector3(roadX(s) + offset, roadY(s), -s);
-}
+import type { World } from '../../graphics/World';
+import { disposeScene } from '../../graphics/World';
+import { World as TougeWorld } from './touge/render/world.js';
+import { makeCar } from './touge/render/models.js';
+import { AudioEngine } from './touge/audio/audio.js';
+import { TougeSimulation, FINISH } from './TougeSimulation';
 
 export class RedlineWorld implements World {
+  readonly maxFrameStep = 0.08;
+  readonly pixelRatioLimit: number;
+  needsRender = true;
+  private readonly previousCamera = new THREE.Matrix4();
+  private previousPhase = '';
+  private dirty = true;
   readonly scene = new THREE.Scene();
-  readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 180);
-  readonly model = new DrivingModel();
+  readonly camera = new THREE.PerspectiveCamera(60, 1, 0.1, 15000);
   private readonly events = new AbortController();
   private readonly keys = new Set<string>();
   private readonly hud = document.createElement('section');
-  private readonly car: THREE.Group;
-  private readonly rival: THREE.Group;
+  private readonly world: TougeWorld;
+  private readonly cars = [makeCar(0xcddde1), makeCar(0x923546, true)];
+  private readonly audio = new AudioEngine();
+  private readonly look = new THREE.Vector3();
+  private cameraReady = false;
+  private trailTime = 0;
+  private trailCursor = 0;
   private readonly smoke: THREE.Mesh[] = [];
   private readonly skids: THREE.Mesh[] = [];
-  private trail = 0;
-  private trailTime = 0;
+  model = this.createSimulation();
 
-  constructor(host: HTMLElement, exit: () => void) {
-    this.scene.background = new THREE.Color(0x101925);
-    this.scene.fog = new THREE.Fog(0x101925, 30, 105);
-    this.scene.add(new THREE.HemisphereLight(0xb5d2ff, 0x20242a, 2.2));
-    const moon = new THREE.DirectionalLight(0xc2d6ff, 2.5);
-    moon.position.set(-20, 50, -30);
+  private createSimulation(): TougeSimulation {
+    return new TougeSimulation((event) => this.audio?.event(event));
+  }
+  constructor(host: HTMLElement, exit: () => void, software = false) {
+    this.pixelRatioLimit = software ? 0.7 : 1.5;
+    this.scene.fog = new THREE.FogExp2(0x12222f, 0.006);
+    this.scene.add(new THREE.HemisphereLight(0x9fbddf, 0x253c38, 2));
+    const moon = new THREE.DirectionalLight(0xb4d4ff, 2.1);
+    moon.position.set(-100, 180, 90);
     this.scene.add(moon);
-    const asphalt = new THREE.MeshStandardMaterial({
-      color: 0x253343,
-      roughness: 0.28,
-      metalness: 0.3,
-    });
-    const rail = new THREE.MeshStandardMaterial({
-      color: 0x9caeb9,
-      metalness: 0.65,
-      roughness: 0.4,
-    });
-    const white = new THREE.MeshStandardMaterial({
-      color: 0xd8cda6,
-      emissive: 0x25231a,
-    });
-    const terrain = new THREE.MeshStandardMaterial({
-      color: 0x172c30,
-      roughness: 1,
-    });
-    const vertices: number[] = [];
-    for (let s = -12; s < ROAD_LENGTH + 24; s += 3) {
-      const a = point(s, -4),
-        b = point(s, 4),
-        c = point(s + 3, -4),
-        d = point(s + 3, 4);
-      for (const p of [a, b, c, b, d, c]) vertices.push(p.x, p.y, p.z);
-      if (s % 12 === 0) {
-        const stripe = new THREE.Mesh(
-          new THREE.BoxGeometry(0.1, 0.02, 3),
-          white,
-        );
-        stripe.position.copy(point(s));
-        stripe.position.y += 0.025;
-        stripe.rotation.y = -Math.atan(roadSlope(s));
-        this.scene.add(stripe);
-      }
-      if (s % 6 === 0)
-        for (const side of [-1, 1]) {
-          const bar = new THREE.Mesh(
-            new THREE.BoxGeometry(0.12, 0.38, 6.2),
-            rail,
-          );
-          bar.position.copy(point(s, side * 4.15));
-          bar.position.y += 0.65;
-          bar.rotation.y = -Math.atan(roadSlope(s));
-          this.scene.add(bar);
-        }
-      if (s % 12 === 0)
-        for (const side of [-1, 1]) {
-          const tree = new THREE.Mesh(
-            new THREE.ConeGeometry(2.2, 9, 5),
-            terrain,
-          );
-          tree.position.copy(point(s, side * (9 + Math.abs(Math.sin(s)) * 9)));
-          tree.position.y += 3;
-          this.scene.add(tree);
-        }
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(vertices, 3),
-    );
-    geometry.computeVertexNormals();
-    this.scene.add(new THREE.Mesh(geometry, asphalt));
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(1800, 1800), terrain);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.set(0, -35, -350);
-    this.scene.add(ground);
-    for (let i = 0; i < 20; i++) {
-      const mountain = new THREE.Mesh(
-        new THREE.ConeGeometry(45 + (i % 4) * 10, 70 + (i % 3) * 20, 5),
-        terrain,
-      );
-      mountain.position.set(
-        (i % 2 ? -1 : 1) * (95 + (i % 4) * 25),
-        -10,
-        -i * 45,
-      );
-      this.scene.add(mountain);
-    }
-    this.car = this.createCar(0xbc243c);
-    this.rival = this.createCar(0x90a9bc);
-    this.scene.add(this.car, this.rival);
-    for (let i = 0; i < 32; i++) {
+    this.world = new TougeWorld(this.scene, this.model.track);
+    for (const car of this.cars) this.scene.add(car.root);
+    for (let i = 0; i < 40; i++) {
       const puff = new THREE.Mesh(
-        new THREE.SphereGeometry(0.25, 5, 4),
+        new THREE.SphereGeometry(0.22, 5, 4),
         new THREE.MeshBasicMaterial({
-          color: 0xb4bac4,
+          color: 0xa9bac6,
           transparent: true,
-          opacity: 0.18,
+          opacity: 0.2,
           depthWrite: false,
         }),
       );
       puff.visible = false;
-      this.smoke.push(puff);
       this.scene.add(puff);
-      const skid = new THREE.Mesh(
-        new THREE.BoxGeometry(0.12, 0.015, 1.2),
-        new THREE.MeshBasicMaterial({ color: 0x080d13 }),
+      this.smoke.push(puff);
+      const mark = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.18, 1.4),
+        new THREE.MeshBasicMaterial({
+          color: 0x11171c,
+          transparent: true,
+          opacity: 0.65,
+          depthWrite: false,
+        }),
       );
-      skid.visible = false;
-      this.skids.push(skid);
-      this.scene.add(skid);
+      mark.rotation.x = -Math.PI / 2;
+      mark.visible = false;
+      this.scene.add(mark);
+      this.skids.push(mark);
     }
-    const blockade = new THREE.Mesh(
-      new THREE.BoxGeometry(8, 0.9, 0.4),
-      new THREE.MeshStandardMaterial({ color: 0xc83a44 }),
-    );
-    blockade.position.copy(point(ROAD_LENGTH + 14));
-    blockade.position.y += 0.5;
-    this.scene.add(blockade);
     this.hud.className = 'redline-hud';
     this.hud.setAttribute('aria-label', 'REDLINE');
     this.hud.setAttribute('role', 'region');
-    this.hud.innerHTML = `<header><strong>REDLINE <small>DRIFT.exe</small></strong><button data-pause>Pausar</button><button data-restart>Reiniciar corrida</button><button data-exit>Sair da corrida</button></header><output class="redline-stats" aria-live="off"></output><section class="redline-message" role="status"><h1></h1><p></p><button data-start>Iniciar corrida</button></section><footer>W / ↑ acelerar · S / ↓ frear · A/D ou ←/→ direção · Espaço drift · ESC pausa · R reinicia</footer>`;
+    this.hud.innerHTML = `<header><strong>REDLINE <small>DRIFT.exe · AKAGIRI PASS</small></strong><button data-audio>Silenciar áudio</button><button data-pause>Pausar</button><button data-restart>Reiniciar corrida</button><button data-exit>Sair da corrida</button></header><output class="redline-stats" aria-live="off"></output><section class="redline-message" role="status"><h1></h1><p></p><button data-start>Iniciar corrida</button></section><footer>W / ↑ acelerar · S / ↓ frear/ré · A/D ou ←/→ direção · Espaço inicia drift · Contraesterce ou solte para estabilizar · ESC pausa · R reinicia · M áudio</footer>`;
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
       .querySelector('[data-exit]')!
       .addEventListener('click', exit, { signal });
-    this.hud
-      .querySelector('[data-start]')!
-      .addEventListener('click', () => this.model.start(), { signal });
+    this.hud.querySelector('[data-start]')!.addEventListener(
+      'click',
+      () => {
+        this.audio.start();
+        this.model.start();
+      },
+      { signal },
+    );
     this.hud
       .querySelector('[data-restart]')!
       .addEventListener('click', () => this.restart(), { signal });
     this.hud
       .querySelector('[data-pause]')!
       .addEventListener('click', () => this.pause(), { signal });
+    this.hud
+      .querySelector('[data-audio]')!
+      .addEventListener('click', () => this.audio.toggle(), { signal });
     window.addEventListener(
       'keydown',
       (event) => {
+        if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (
           [
             'KeyW',
@@ -178,12 +111,15 @@ export class RedlineWorld implements World {
             'Space',
             'Escape',
             'KeyR',
+            'KeyM',
           ].includes(event.code)
         ) {
           event.preventDefault();
-          if (event.repeat && ['Escape', 'KeyR'].includes(event.code)) return;
+          if (event.repeat && ['Escape', 'KeyR', 'KeyM'].includes(event.code))
+            return;
           if (event.code === 'Escape') this.pause();
           else if (event.code === 'KeyR') this.restart();
+          else if (event.code === 'KeyM') this.audio.toggle();
           else this.keys.add(event.code);
         }
       },
@@ -200,61 +136,14 @@ export class RedlineWorld implements World {
       },
       { signal },
     );
-    this.camera.position.copy(point(-7));
-    this.camera.position.y += 3;
     this.update(0);
   }
-
-  private createCar(color: number): THREE.Group {
-    const car = new THREE.Group();
-    const body = new THREE.Mesh(
-      new THREE.BoxGeometry(1.7, 0.48, 3.5),
-      new THREE.MeshStandardMaterial({
-        color,
-        metalness: 0.55,
-        roughness: 0.3,
-      }),
-    );
-    body.position.y = 0.45;
-    car.add(body);
-    const cabin = new THREE.Mesh(
-      new THREE.BoxGeometry(1.35, 0.45, 1.5),
-      new THREE.MeshStandardMaterial({
-        color: 0x182631,
-        metalness: 0.6,
-        roughness: 0.2,
-      }),
-    );
-    cabin.position.set(0, 0.9, 0.15);
-    car.add(cabin);
-    for (const x of [-0.86, 0.86])
-      for (const z of [-1.1, 1.1]) {
-        const wheel = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.32, 0.32, 0.2, 10),
-          new THREE.MeshStandardMaterial({ color: 0x0b1118 }),
-        );
-        wheel.rotation.z = Math.PI / 2;
-        wheel.position.set(x, 0.32, z);
-        car.add(wheel);
-      }
-    for (const x of [-0.57, 0.57]) {
-      const light = new THREE.Mesh(
-        new THREE.BoxGeometry(0.38, 0.12, 0.04),
-        new THREE.MeshBasicMaterial({ color: 0xff344e }),
-      );
-      light.position.set(x, 0.5, 1.76);
-      car.add(light);
-      const headlamp = new THREE.SpotLight(0xe3efff, 40, 45, 0.38, 0.6, 1);
-      headlamp.position.set(x, 0.65, -1.7);
-      headlamp.target.position.set(x, 0, -20);
-      car.add(headlamp, headlamp.target);
-    }
-    return car;
-  }
-
   private restart(): void {
+    this.dirty = true;
     this.keys.clear();
-    this.model.restart();
+    this.model = this.createSimulation();
+    this.world.reset(this.model.track);
+    this.cameraReady = false;
     this.trailTime = 0;
     for (const effect of [...this.smoke, ...this.skids]) effect.visible = false;
   }
@@ -262,7 +151,6 @@ export class RedlineWorld implements World {
     this.keys.clear();
     this.model.pause();
   }
-
   update(dt: number): void {
     const has = (key: string, arrow: string) =>
       this.keys.has(key) || this.keys.has(arrow);
@@ -273,67 +161,125 @@ export class RedlineWorld implements World {
         Number(has('KeyD', 'ArrowRight')) - Number(has('KeyA', 'ArrowLeft')),
       drift: this.keys.has('Space'),
     });
-    const m = this.model;
-    this.car.position.copy(point(m.distance, m.offset));
-    this.car.rotation.y =
-      -Math.atan(roadSlope(m.distance)) -
-      Math.atan2(m.lateralSpeed, Math.max(6, m.speed)) * 1.6;
-    this.rival.position.copy(point(m.rivalDistance, -1.4));
-    this.rival.rotation.y = -Math.atan(roadSlope(m.rivalDistance));
-    const cameraTarget = point(m.distance - 7, m.offset * 0.6);
-    cameraTarget.y += 3.2;
-    this.camera.position.lerp(cameraTarget, 1 - Math.exp(-7 * dt));
-    this.camera.lookAt(point(m.distance + 12, m.offset * 0.2));
-    if (m.drifting && m.elapsed - this.trailTime > 0.09) {
-      const index = this.trail++ % this.smoke.length;
-      const p = point(m.distance - 1, m.offset + (index % 2 ? -0.65 : 0.65));
-      const puff = this.smoke[index]!,
-        skid = this.skids[index]!;
-      puff.visible = true;
-      puff.position.copy(p);
-      puff.position.y += 0.5;
-      puff.scale.setScalar(1);
-      skid.visible = true;
-      skid.position.copy(p);
-      skid.position.y += 0.04;
-      skid.rotation.y = this.car.rotation.y;
-      this.trailTime = m.elapsed;
+    const sim = this.model,
+      player = sim.player;
+    this.world.update(sim);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (let i = 0; i < 2; i++) {
+      const car = i ? sim.rival : player,
+        model = this.cars[i]!,
+        p = sim.track.sample(car.s, car.lane);
+      model.root.position.set(p.x, p.y + 0.06, p.z);
+      model.root.rotation.y = p.angle + car.slip;
+      model.body.rotation.z = reduced ? 0 : -car.lateral * 0.013;
+      for (const wheel of model.wheels) {
+        wheel.pivot.rotation.y = wheel.front
+          ? car.drifting
+            ? car.drift.angle * 1.6
+            : car.steer * 0.38
+          : 0;
+        if (sim.phase === 'running') {
+          wheel.tire.rotation.x += car.speed * dt * 2.5;
+          wheel.rim.rotation.x += car.speed * dt * 2.5;
+        }
+      }
     }
-    if (m.phase === 'running')
+    if (
+      sim.phase === 'running' &&
+      player.drifting &&
+      sim.elapsed - this.trailTime > 0.08
+    ) {
+      const i = this.trailCursor++ % this.smoke.length,
+        p = sim.track.sample(
+          player.s - 1.5,
+          player.lane + (i % 2 ? -0.7 : 0.7),
+        );
+      const puff = this.smoke[i]!,
+        mark = this.skids[i]!;
+      puff.position.set(p.x, p.y + 0.5, p.z);
+      puff.scale.setScalar(1);
+      puff.visible = true;
+      mark.position.set(p.x, p.y + 0.04, p.z);
+      mark.rotation.z = p.angle;
+      mark.visible = true;
+      this.trailTime = sim.elapsed;
+    }
+    if (sim.phase === 'running')
       for (const puff of this.smoke)
         if (puff.visible) {
-          puff.position.y += dt * 0.4;
+          puff.position.y += dt * 0.5;
           puff.scale.multiplyScalar(1 + dt);
           if (puff.scale.x > 3) puff.visible = false;
         }
-    this.hud.dataset.phase = m.phase;
-    this.hud.dataset.distance = m.distance.toFixed(1);
+    const p = sim.track.sample(player.s, player.lane),
+      target = sim.track.sample(player.s + 19, player.lane * 0.55);
+    const desired = new THREE.Vector3(
+      p.x - Math.sin(p.angle) * 11.2,
+      p.y + 5.5,
+      p.z - Math.cos(p.angle) * 11.2,
+    );
+    const look = new THREE.Vector3(target.x, target.y + 1.8, target.z);
+    if (!this.cameraReady || reduced) {
+      this.camera.position.copy(desired);
+      this.look.copy(look);
+      this.cameraReady = true;
+    } else {
+      this.camera.position.lerp(desired, 1 - Math.exp(-dt * 4));
+      this.look.lerp(look, 1 - Math.exp(-dt * 5));
+    }
+    this.camera.lookAt(this.look);
+    this.camera.updateMatrixWorld();
+    this.needsRender =
+      sim.phase === 'running' ||
+      this.dirty ||
+      this.previousPhase !== sim.phase ||
+      !this.previousCamera.equals(this.camera.matrixWorld);
+    this.previousPhase = sim.phase;
+    this.previousCamera.copy(this.camera.matrixWorld);
+    this.dirty = false;
+    this.audio.update({ status: sim.phase, player }, sim.phase !== 'running');
+    this.hud.dataset.phase = sim.phase;
+    this.hud.dataset.distance = Math.max(0, player.s - 18).toFixed(1);
+    this.hud.querySelector('[data-audio]')!.textContent = this.audio.muted
+      ? 'Ativar áudio'
+      : 'Silenciar áudio';
+    const section = sim.track.section(player.s);
     this.hud.querySelector('output')!.textContent =
-      `${Math.round(m.speed * 3.6)} km/h · ${Math.round(m.distance)}/${ROAD_LENGTH} m · DRIFT ${Math.floor(m.score)} · CARRO ${m.health}% · ${m.drifting ? 'DERRAPANDO' : 'ADERÊNCIA'}`;
+      `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(player.s)}/${FINISH} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;
     const message = this.hud.querySelector<HTMLElement>('.redline-message')!;
-    message.hidden = m.phase === 'running';
+    message.hidden = sim.phase === 'running';
     message.querySelector('h1')!.textContent =
-      m.phase === 'ready'
-        ? 'A descida começa aqui.'
-        : m.phase === 'paused'
-          ? 'Corrida pausada.'
-          : m.phase === 'won'
-            ? 'REDLINE concluído.'
-            : 'Fim da tentativa.';
+      sim.phase === 'ready'
+        ? 'REDLINE · Akagiri Pass'
+        : sim.phase === 'countdown'
+          ? String(Math.max(1, Math.ceil(sim.countdown)))
+          : sim.phase === 'paused'
+            ? 'Corrida pausada.'
+            : sim.phase === 'won'
+              ? 'REDLINE concluído.'
+              : 'Fim da tentativa.';
     message.querySelector('p')!.textContent =
-      m.phase === 'ready'
-        ? 'Complete a descida. Use drift nas curvas, controle a velocidade e evite os guard-rails.'
-        : `Drift: ${Math.floor(m.score)} · Tempo: ${m.elapsed.toFixed(1)}s · Colisões: ${m.collisions}.`;
+      sim.phase === 'ready'
+        ? '3,2 km de descida, três grampos e dois túneis. Complete o percurso, preserve o carro e busque drifts controlados para superar o rival.'
+        : sim.result ||
+          `Drift: ${sim.score} · Tempo: ${sim.elapsed.toFixed(1)}s.`;
     const start = message.querySelector<HTMLButtonElement>('[data-start]')!;
-    start.hidden = m.phase === 'won' || m.phase === 'lost';
+    start.hidden = !['ready', 'paused'].includes(sim.phase);
     start.textContent =
-      m.phase === 'paused' ? 'Continuar corrida' : 'Iniciar corrida';
+      sim.phase === 'paused' ? 'Continuar corrida' : 'Iniciar corrida';
   }
-
   dispose(): void {
     this.events.abort();
     this.keys.clear();
+    this.audio.dispose();
     this.hud.remove();
+    const textures = new Set<THREE.Texture>();
+    for (const material of Object.values(this.world.m)) {
+      for (const value of Object.values(material))
+        if (value instanceof THREE.Texture) textures.add(value);
+      material.dispose();
+    }
+    textures.forEach((texture) => texture.dispose());
     disposeScene(this.scene);
   }
 }

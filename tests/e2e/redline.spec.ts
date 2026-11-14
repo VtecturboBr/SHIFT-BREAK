@@ -42,6 +42,15 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
       })
       .toBeGreaterThan(1);
     await page.keyboard.up('w');
+    await page.keyboard.press('f');
+    await page.keyboard.press('j');
+    await expect(game).toHaveAttribute('data-phase', 'running');
+    await game
+      .getByRole('button', { name: 'Silenciar áudio', exact: true })
+      .click();
+    await expect(
+      game.getByRole('button', { name: 'Ativar áudio', exact: true }),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(game).toHaveAttribute('data-phase', 'paused');
     await page.screenshot({ path: 'test-results/redline.png' });

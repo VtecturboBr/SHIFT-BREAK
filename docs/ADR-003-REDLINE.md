@@ -1,5 +1,7 @@
 # REDLINE — renderer e física
 
+Este registro descreve o protótipo inicial de 720 m, mantido no histórico. A partir de 0.7.1 ele foi substituído pelo projeto de touge de 3,2 km fornecido pelo proprietário, conforme [REUSED-TOUGE.md](REUSED-TOUGE.md). O contrato de suspensão do quarto continua válido; a física e a cena agora são as reaproveitadas.
+
 O incremento 07 usa apresentação imersiva temporária, permitida pela especificação. Engine.suspendWorld guarda o RoomWorld sem descartá-lo; resumeWorld descarta apenas a corrida e restaura o mesmo renderer/canvas e as janelas do OS. O loop continua único. dispose também libera a cena suspensa em erro/perda de contexto.
 
 O quarto fica inerte durante a corrida; a superfície DOM é escondida e os handlers do jogo pertencem a um AbortController descartado na saída. Teclas são limpas na pausa, blur, ocultação da aba e restart. Import lazy é cancelável, com verificação da versão do modo para não reabrir após sair/retornar durante o loading.

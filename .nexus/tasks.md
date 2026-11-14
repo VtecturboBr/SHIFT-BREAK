@@ -1,5 +1,7 @@
 # Tarefas executáveis
 
+- [x] Reuso solicitado pelo proprietário: substituir o protótipo DRIFT.exe pelo código de initial JOJO.zip, retirar combate/espíritos/poderes e adaptar pista, veículos, IA, áudio e corrida finita ao REDLINE. Fonte e decisões em docs/REUSED-TOUGE.md. Validar 15 unitários, regressão Chromium e produção antes do checkpoint.
+
 - [x] T01 — Fundação modular Three.js/TypeScript/Vite, estados, assets, erros, diagnósticos; evidência: npm run check e 1 e2e Chromium passaram; screenshot real em docs/evidence/01-foundation.png.
 - [x] T02 — Quarto físico, câmera sentada, mouse look limitado e sensibilidade; evidência: check com 2 unitários, 2 e2e Chromium e screenshots reais revisados em docs/evidence/02-*.png.
 - [x] T03 — UI projetada no monitor, entrada/saída, cliques, resize/oclusão e prova de quadro final; evidência: check com 6 unitários, 6 e2e Chromium, screenshots e ADR-001.

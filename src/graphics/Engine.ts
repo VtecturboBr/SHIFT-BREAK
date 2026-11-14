@@ -3,6 +3,7 @@ import type { World } from './World';
 
 export class Engine {
   readonly renderer: THREE.WebGLRenderer;
+  readonly softwareRendering: boolean;
   private world?: World;
   private suspended?: World;
   private lastTime = 0;
@@ -17,6 +18,11 @@ export class Engine {
     report: (message: string) => void,
   ) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    const gl = this.renderer.getContext();
+    const debug = gl.getExtension('WEBGL_debug_renderer_info');
+    this.softwareRendering = /swiftshader|llvmpipe|software/i.test(
+      debug ? String(gl.getParameter(debug.UNMASKED_RENDERER_WEBGL)) : '',
+    );
     this.renderer.setClearColor(0x101216);
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -36,7 +42,7 @@ export class Engine {
         return;
       }
       const frameTime = this.lastTime ? (time - this.lastTime) / 1000 : 0;
-      const dt = Math.min(frameTime, 0.05);
+      const dt = Math.min(frameTime, this.world?.maxFrameStep ?? 0.05);
       this.lastTime = time;
       if (!this.world) return;
       try {
@@ -128,7 +134,9 @@ export class Engine {
     this.forceRender = true;
     const { clientWidth: width, clientHeight: height } = this.host;
     if (!width || !height) return;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.setPixelRatio(
+      Math.min(window.devicePixelRatio || 1, this.world?.pixelRatioLimit ?? 2),
+    );
     this.renderer.setSize(width, height);
     if (this.world) {
       this.world.camera.aspect = width / height;

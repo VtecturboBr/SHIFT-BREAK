@@ -11,3 +11,5 @@ RESULTADO: VFS, conteúdo central e fallback móvel/WebGL ausente validados. Dad
 RESULTADO: ciclo do launcher validado com jogo de teste real, incluindo vitória, timeout/derrota, pause/retry, saída temporária, cancelamento lazy e retorno ao mesmo canvas sem reload. Todos os 13 e2e passaram. O primeiro jogo 3D permanece pendente.
 
 - 07: ida/volta preservou canvas e notas em duas sessões reais no Chromium. Modelo completou pista; arte provisória e playtest humano/GPU/cross-browser pendentes.
+
+- ZIP contém um projeto Three.js/Vite com código procedural, além de .git/dependências/builds excluídos da importação. Cena reaproveitada verificada no Chromium. Ajuste de DPR em software e render sob demanda resolveu lentidão em countdown/pausa nos testes isolados, sem elevar timeout.

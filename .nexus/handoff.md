@@ -1,11 +1,13 @@
-# Retomada — 0.7.0
+# Retomada — 0.7.1
 
-Branch feat/07-redline, empilhada sobre feat/06-game-launcher. Incremento 07 implementado como protótipo jogável. Nenhum push/merge/deploy autorizado ou realizado; não integrar main.
+Branch atual feat/07-reuse-touge, base feat/07-redline. O proprietário pediu reutilizar initial JOJO.zip no lugar do DRIFT.exe e remover batalhas de espíritos samurais. A implementação ativa agora usa pista, carros, física/drift, IA, mundo e áudio do arquivo, sem copiar .git, dependências, builds ou scripts executáveis. Fonte/hash em docs/REUSED-TOUGE.md.
 
-REDLINE: circuito procedural de 720 m, carro/rival, física arcade em passos fixos, aceleração/freio/esterço/drift, pontuação, limites/colisões/dano, vitória/derrota, pausa e restart. Arte e efeitos provisórios. Sem campanha/FLOW/áudio final. Teclas e controles no HUD.
+Não há mais o DrivingModel de 720 m. TougeSimulation integra os ES modules originais selecionados em src/games/redline/touge. TypeScript allowJs/checkJs=false permite preservar esse código; lint e testes continuam aplicados. Três grampos, dois túneis, pista 3,2 km. Sem Combat, makeSpirit, diretor de duelo, poderes, colapso espiritual ou rounds infinitos. Partida finita: completar descida, preservar carro e pontuar drift; rival serve de referência de desempenho e para na chegada.
 
-Engine.suspendWorld/resumeWorld preservam RoomWorld, DOM do OS e mesmo canvas, usando um só loop. RoomWorld.setSuspended bloqueia input e esconde o monitor durante apresentação imersiva temporária. dispose também libera o mundo suspenso. Import lazy tem cancelamento e invalidação por mudança de modo. Ver ADR-003-REDLINE.md.
+O quarto e o OS ainda usam suspend/resume no mesmo renderer/loop. Corrida limita DPR a 0,7 em software e 1,5 em hardware; passo máximo 0,08 apenas neste World. Pausa/contagem/ready renderizam sob demanda. Áudio procedural só começa por ação do usuário e seu AudioContext fecha ao sair. Eventos, sprites, pontos, texturas e instâncias também são descartados. Não reinstalar dependências com Vite rodando.
 
-Validação: npm run check com 14 unitários e build passou; npm run test:e2e com 14 testes passou (1,5 min). Teste de domínio completa a pista; navegador valida duas sessões, condução, pausa/restart, mesmo canvas e notas preservadas. Screenshot real em docs/evidence/07-redline.png. Consultar PROGRESS.md para smoke de produção final. Não confundir trajetória automatizada do domínio com playtest humano completo.
+Validação corrente: npm run check passou com 15 unitários incluindo percurso completo na física reaproveitada, drift sem recompensa duplicada, limites, countdown/pausa e derrota. Browser isolado validou duas sessões e notas preservadas; consultar docs/PROGRESS.md para resultado final da regressão/produção e screenshot.
 
-Próxima ação: especificar e implementar 08 BREAKPOINT em nova branch, mantendo o retorno ao quarto e a regressão do REDLINE. 09–14 e apps complementares continuam pendentes. Dados pessoais permanecem explicitamente pendentes, conforme escolha do proprietário. Quarto/arte/oclusão por amostragem, GPU física e cross-browser ainda sem validação final.
+Dados pessoais permanecem pendentes por escolha do proprietário. Sem push/merge na main ou deploy. Próximo incremento do roadmap continua 08 BREAKPOINT; não reintroduzir batalhas espirituais no DRIFT.exe. 09–14, FLOW, campanha, áudio musical final, arte final, cross-browser e GPU física continuam pendentes.
+
+Checkpoint final: check/15 unitários, 14 e2e de regressão e cinco smokes de produção passaram. Screenshot real 07-reused-touge.png revisado. F/J não ativam combate, mute e retorno ao OS foram exercitados no build estático.
