@@ -36,7 +36,8 @@ export class Vehicle {
     if (kind === 'collision') {
       this.drift.cancel(this);
       this.collisionCooldown = 0.65;
-      this.speed *= 0.77;
+      this.speed *= 0.5;
+      this.boost = 0;
       this.wallHits++;
     }
     this.onEvent({ type: 'damage', who: this.id, kind, amount });
@@ -58,8 +59,8 @@ export class Vehicle {
     const resistance =
       Math.sign(this.speed) * (this.speed * this.speed * 0.0029 + 0.9);
     this.speed +=
-      (control.throttle *
-        ((this.engine > 0 ? 6 : 10.5) + (this.boost > 0 ? 3.5 : 0)) -
+      (control.throttle * (this.engine > 0 ? 6 : 10.5) +
+        (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? 24 : 5) -
         resistance) *
       dt;

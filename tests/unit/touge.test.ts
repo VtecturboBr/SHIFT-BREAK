@@ -9,6 +9,57 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('halves speed on impact, cancels turbo and avoids repeated impact penalties during cooldown', () => {
+  const car = new TougeSimulation().player;
+  car.speed = 40;
+  car.boost = 2;
+  car.damage(5);
+  expect(car.speed).toBe(20);
+  expect(car.boost).toBe(0);
+  car.damage(5);
+  expect(car.speed).toBe(20);
+});
+it('grants a stronger mini-turbo for a longer valid drift and lets it expire', () => {
+  const speeds: number[] = [];
+  for (const perfect of [false, true]) {
+    const sim = new TougeSimulation();
+    const car = sim.player;
+    car.s = 600;
+    car.speed = 25;
+    car.drift.active = true;
+    car.drift.validTime = perfect ? 2 : 1;
+    car.drift.turn = 0.3;
+    car.drift.score = perfect ? 600 : 200;
+    car.drift.finish(car, sim.track);
+    expect(car.boost).toBe(perfect ? 2.2 : 1.3);
+    expect(car.speed).toBe(perfect ? 33 : 30);
+    car.drift.finish(car, sim.track);
+    expect(car.speed).toBe(perfect ? 33 : 30);
+    car.s = 50;
+    for (let i = 0; i < 30; i++)
+      car.update(
+        1 / 60,
+        { throttle: 0, brake: 0, steer: 0, handbrake: false },
+        sim.track,
+        i / 60,
+      );
+    speeds.push(car.speed);
+    expect(car.speed).toBeGreaterThan(perfect ? 33 : 30);
+    for (let i = 0; i < 150; i++)
+      car.update(
+        1 / 60,
+        { throttle: 0, brake: 1, steer: 0, handbrake: false },
+        sim.track,
+        i / 60,
+      );
+    expect(car.boost).toBe(0);
+  }
+  expect(speeds[1]!).toBeGreaterThan(speeds[0]!);
+  const invalid = new TougeSimulation();
+  invalid.player.drift.active = true;
+  invalid.player.drift.finish(invalid.player, invalid.track);
+  expect(invalid.player.boost).toBe(0);
+});
 it('ends drift on Space release even while steering and does not bank twice', () => {
   const sim = new TougeSimulation();
   const car = sim.player;

@@ -26,6 +26,7 @@ export class Drift {
     car.onEvent({ type: 'driftFailed', who: car.id });
   }
   finish(car, track) {
+    if (!this.active) return;
     this.active = false;
     const corner = track.section(car.s).id;
     const qualified =
@@ -50,6 +51,7 @@ export class Drift {
     this.grade = perfect ? 'DRIFT PERFEITO' : 'DRIFT CONTROLADO';
     this.feedback = 2.8;
     car.boost = Math.max(car.boost, perfect ? 2.2 : 1.3);
+    car.speed = Math.min(64, car.speed + (perfect ? 8 : 5));
     car.onEvent({
       type: 'driftBanked',
       who: car.id,

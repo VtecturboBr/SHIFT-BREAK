@@ -252,6 +252,8 @@ export class RedlineWorld implements World {
     const section = sim.track.section(player.s);
     this.hud.querySelector('output')!.textContent =
       `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(player.s)}/${FINISH} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;
+    if (player.boost > 0)
+      this.hud.querySelector('output')!.textContent += ' · MINI-TURBO';
     const message = this.hud.querySelector<HTMLElement>('.redline-message')!;
     message.hidden = sim.phase === 'running';
     message.querySelector('h1')!.textContent =
