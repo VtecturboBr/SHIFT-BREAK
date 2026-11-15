@@ -1,4 +1,14 @@
-﻿# Retomada — correções do mapa DRIFT.exe
+# Atualização: vácuo e rival adaptado
+
+Branch atual: feat/drafting-rival-racecraft, base fix/rival-passing-space (946f4ef). Rival abre uma lateral nas retas, conserva mais velocidade no drift e recebe recuperação gradual após ser ultrapassado, mantendo margem de acompanhamento com frenagem de segurança. Vácuo carrega em 1,5 s ao seguir alinhado de 5 a 42 m atrás e decai ao sair da esteira. Indicadores em RedlineWorld/redline.css; regras em TougeSimulation, Vehicle e driveAI. Detalhes em docs/PROGRESS.md.
+
+Validação: 34 unitários/build, dois testes de corrida/mapa no navegador e cinco smokes de produção aprovados. Novo tests/unit/race-assist.test.ts cobre ultrapassagem sem contato e recuperação com jogador parando. Playtest humano prolongado/GPU física pendentes. Sem merge/push/deploy. Próximo incremento maior continua 08; fechar a pista em loop foi adiado explicitamente.
+
+Desde o histórico abaixo também foram entregues drift encerrado ao soltar Espaço, mini-turbo, velocidades/aceleração recalibradas, velocímetro/carga, quatro câmeras por C, HUD ampliado e sentido inverso. Preservar essas funcionalidades e os dados pessoais pendentes.
+
+## Histórico do checkpoint anterior
+
+# Retomada — correções do mapa DRIFT.exe
 
 Branch atual `fix/touge-map`, base `feat/07-reuse-touge` (3a46e34). O pedido atual foi corrigir os problemas da auditoria do mapa. Alterações e comparações antes/depois em `docs/audits/DRIFT-MAP.md`; evidências originais preservadas em `map-evidence/` e dez capturas novas em `map-fixed-evidence/`.
 

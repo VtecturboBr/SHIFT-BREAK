@@ -22,6 +22,10 @@ export class Vehicle {
     this.driftRewarded = false;
     this.wasLeading = id === 'rival';
     this.boost = 0;
+    this.draftPower = 0;
+    this.catchupPower = 0;
+    this.recovering = false;
+    this.yieldSide = 0;
     this.drifting = false;
     this.wallHits = 0;
     this.passSide = 0;
@@ -54,14 +58,21 @@ export class Vehicle {
       this[key] = Math.max(0, this[key] - dt);
     const curve = track.curvature(this.s);
     const stability = this.sync.has('stability') || this.sync.has('focus');
-    const maxSpeed = (this.engine > 0 ? 38 : 78) + (this.boost > 0 ? 12 : 0);
+    const maxSpeed =
+      (this.engine > 0 ? 38 : 78) +
+      (this.boost > 0 ? 12 : 0) +
+      this.draftPower * 6 +
+      this.catchupPower * 10;
     const beforeSpeed = this.speed;
     const resistance =
       Math.sign(this.speed) * (this.speed * this.speed * 0.0018 + 0.9);
     this.speed +=
       (control.throttle * (this.engine > 0 ? 6 : 13) +
+        (control.throttle && !control.brake
+          ? this.draftPower * 6 + this.catchupPower * 8
+          : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
-        control.brake * (this.speed > 0 ? 24 : 5) -
+        control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -
         resistance) *
       dt;
     if (!control.throttle && !control.brake && beforeSpeed * this.speed <= 0)

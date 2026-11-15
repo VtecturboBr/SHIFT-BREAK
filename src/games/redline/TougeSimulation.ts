@@ -20,6 +20,8 @@ export class TougeSimulation {
   countdown = 3;
   elapsed = 0;
   score = 0;
+  draftCharge = 0;
+  drafting = false;
   result = '';
   private accumulator = 0;
   constructor(
@@ -34,6 +36,7 @@ export class TougeSimulation {
     };
     this.player = new Vehicle('player', new DrivingStyle(event), event);
     this.rival = new Vehicle('rival', new DrivingStyle(() => {}), event);
+    this.rival.lane = -1.65;
   }
   start(): void {
     if (this.phase === 'ready') this.phase = 'countdown';
@@ -78,6 +81,29 @@ export class TougeSimulation {
     this.elapsed += dt;
     this.player.sync.update(dt);
     this.rival.sync.update(dt);
+    const gapBefore = this.rival.s - this.player.s;
+    const p = this.track.sample(this.player.s),
+      r = this.track.sample(this.rival.s);
+    this.drafting =
+      gapBefore > 5 &&
+      gapBefore < 42 &&
+      Math.abs(this.player.lane - this.rival.lane) < 0.9 &&
+      Math.cos(p.angle - r.angle) > 0.94 &&
+      this.player.speed > 15 &&
+      input.throttle &&
+      !input.brake &&
+      !input.drift;
+    this.draftCharge = Math.max(
+      0,
+      Math.min(1, this.draftCharge + dt * (this.drafting ? 1 / 1.5 : -1.2)),
+    );
+    this.player.draftPower = this.draftCharge;
+    if (gapBefore < -4.5) this.rival.recovering = true;
+    if (gapBefore > 0) this.rival.recovering = false;
+    this.rival.catchupPower = this.rival.recovering
+      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 50))
+      : 0;
+    if (this.rival.recovering && gapBefore > -24) this.rival.boost = 0;
     this.player.update(
       dt,
       {

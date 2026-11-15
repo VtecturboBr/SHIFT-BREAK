@@ -68,6 +68,10 @@ it('pushes the rival faster on straights while braking for hairpins', () => {
   sim.rival.speed = 19;
   expect(driveAI(sim.rival, sim.player, sim.track, [], 0).throttle).toBe(1);
   sim.rival.speed = 30;
+  const drifting = driveAI(sim.rival, sim.player, sim.track, [], 0);
+  expect(drifting.brake).toBe(0);
+  expect(drifting.handbrake).toBe(true);
+  sim.rival.speed = 45;
   expect(
     driveAI(sim.rival, sim.player, sim.track, [], 0).brake,
   ).toBeGreaterThan(0);

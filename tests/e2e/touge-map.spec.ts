@@ -120,6 +120,35 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
     expect(clear).toBe(true);
     await page.screenshot({ path: `test-results/camera-${mode}.png` });
   }
+  await fixture.evaluate(async ({ world, renderer }) => {
+    const cssPath = '/src/games/redline/redline.css';
+    await import(cssPath);
+    world.hud.hidden = false;
+    world.model.draftCharge = 0.8;
+    world.model.drafting = true;
+    world.model.player.speed = 40;
+    world.model.rival.s = world.model.player.s + 20;
+    world.model.rival.speed = 42;
+    world.model.rival.recovering = false;
+    world.model.rival.catchupPower = 0;
+    world.update(0);
+    renderer.render(world.scene, world.camera);
+  });
+  await expect(
+    page.getByRole('progressbar', { name: 'Carga de vácuo', exact: true }),
+  ).toHaveJSProperty('value', 80);
+  await expect(page.locator('[data-draft]')).toHaveText('VÁCUO 80%');
+  await page.screenshot({ path: 'test-results/drafting-hud.png' });
+  await fixture.evaluate(({ world }) => {
+    world.model.draftCharge = 0;
+    world.model.drafting = false;
+    world.model.rival.recovering = true;
+    world.model.rival.catchupPower = 0.5;
+    world.update(0);
+  });
+  await expect(page.locator('[data-rival-state]')).toHaveText(
+    'Rival recuperando distância',
+  );
   await fixture.evaluate(({ world, renderer }) => {
     world.dispose();
     renderer.dispose();

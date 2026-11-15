@@ -7,8 +7,15 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   for (let d = 10; d <= Math.max(45, car.speed * 2); d += 10)
     bend = Math.max(bend, Math.abs(track.curvature(car.s + d)));
   const cruising =
-    car.id === 'rival' && !autopilot && bend < 0.004 && !car.drift.active;
+    car.id === 'rival' &&
+    !autopilot &&
+    Math.abs(curve) < 0.002 &&
+    !car.drift.active;
   const gap = other.s - car.s;
+  if (cruising && gap <= 5 && gap > -70 && !car.yieldSide)
+    car.yieldSide =
+      car.lane < -0.3 ? -1 : car.lane > 0.3 ? 1 : other.lane >= 0 ? -1 : 1;
+  if (!cruising || gap > 12 || gap < -90) car.yieldSide = 0;
   const passingLane = ROAD_EDGE - 0.35;
   if (gap < -8 || gap > 24 || Math.abs(curve) > 0.011) car.passSide = 0;
   if (
@@ -25,6 +32,8 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     lane = other.lane;
   }
   if (car.passSide) lane = car.passSide * passingLane;
+  if (car.yieldSide) lane = car.yieldSide * 1.85;
+  if (car.recovering) lane = gap < 18 ? car.lane : -0.65;
   for (const h of hazards) {
     if (h.s > car.s && h.s - car.s < Math.max(35, car.speed * 1.5))
       lane = h.lane > 0 ? -passingLane : passingLane;
@@ -38,9 +47,16 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   );
   let desired = Math.min(
     autopilot ? 50 : car.boost > 0 ? 90 : 78,
-    Math.sqrt((autopilot ? 7 : 14) / Math.max(0.002, bend)),
+    Math.sqrt((autopilot ? 7 : 26) / Math.max(0.002, bend)),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
+  if (car.catchupPower > 0 && bend < 0.004)
+    desired = 78 + car.catchupPower * 10;
+  if (car.recovering)
+    desired = Math.min(desired, Math.max(0, other.speed + (gap - 24) * 0.45));
+  const recoveryBrake =
+    car.recovering &&
+    car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 18));
   if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {
     desired = Math.min(desired, other.speed + Math.max(0, gap - 6) * 0.6);
   }
@@ -56,12 +72,17 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     cruising && Math.abs(gap) < 5 && Math.abs(car.lane - other.lane) > 1.2
       ? 0
       : cruising
-        ? clamp((lane - car.lane) * 1.8, -0.4, 0.4)
+        ? clamp(
+            (lane - car.lane) * 1.8,
+            car.yieldSide ? -1 : -0.4,
+            car.yieldSide ? 1 : 0.4,
+          )
         : (lane - car.lane) * 1.8;
   const section = track.section(car.s);
   const handbrake =
     !autopilot &&
     !emergency &&
+    !(car.recovering && gap < 24) &&
     car.speed > 16 &&
     Math.abs(curve) > (car.drift.active ? 0.004 : 0.008) &&
     Math.abs(car.lane) < ROAD_EDGE - 0.5 &&
@@ -81,8 +102,9 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
       1.8;
   return {
     throttle: !emergency && car.speed < desired ? 1 : 0,
-    brake:
-      emergency && car.speed > other.speed
+    brake: recoveryBrake
+      ? 1
+      : emergency && car.speed > other.speed
         ? 0.8
         : car.speed > desired + 3
           ? 0.35

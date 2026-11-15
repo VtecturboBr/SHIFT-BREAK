@@ -32,6 +32,9 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
       .click();
     await expect(page.locator('#app')).toHaveAttribute('data-mode', 'game');
     const game = page.getByRole('region', { name: 'REDLINE', exact: true });
+    await expect(
+      game.getByRole('progressbar', { name: 'Carga de vácuo', exact: true }),
+    ).toBeVisible();
     if (attempt === 1) {
       await game
         .getByRole('button', { name: 'Sentido: normal', exact: true })
