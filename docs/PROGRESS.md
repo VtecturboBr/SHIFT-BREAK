@@ -129,3 +129,10 @@
 - Botão Sentido: normal/inverso reinicia na direção escolhida; restart mantém essa escolha. Inverso percorre a mesma estrada de volta com elevação, curvatura, placas e chegada adaptadas.
 - Check/26 unitários e build passaram; corrida/retorno ao OS e mapa passaram no navegador. Comparação matemática dos traçados a cada 20 m e simulação completa nos dois sentidos. Inspeção de 13 posições por sentido e câmera nas laterais. Evidências: evidence/07-reverse-hairpin.png e evidence/07-reverse-finish.png.
 - Sem merge na main. Playtest humano completo e calibração em GPU física pendentes.
+
+## Câmeras selecionáveis e HUD ampliado
+
+- Branch feat/race-camera-options: quatro vistas (Perseguição, Próxima, Capô, Alta), alternadas por C ou botão no cabeçalho, sem reiniciar a corrida. A seleção permanece no restart. Proteção contra cenário mantida.
+- Velocímetro ampliado para até 330 px, afastado das bordas e acima das instruções; tamanhos adaptados para telas estreitas/baixas. Cabeçalho quebra linha quando necessário.
+- Check com 26 unitários e build passou; testes de corrida/retorno ao OS e render das quatro câmeras passaram. Teste de corrida verifica teclado e botão durante movimento. Uma rodada inicial excedeu 60 s ao repetir todas as trocas em duas sessões; cobertura das quatro vistas ficou no teste de mapa e a integração foi reduzida sem aumentar timeout.
+- Capturas revisadas: evidence/07-camera-hud.png e evidence/07-camera-hood.png. Playtest humano prolongado e GPU física pendentes. Sem merge na main.

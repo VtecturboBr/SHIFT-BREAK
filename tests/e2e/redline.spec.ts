@@ -51,6 +51,19 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
       })
       .toBeGreaterThan(1);
     await page.keyboard.up('w');
+    if (attempt === 0) {
+      await page.keyboard.press('c');
+      const camera = game.getByRole('button', {
+        name: 'Câmera: Próxima [C]',
+        exact: true,
+      });
+      await expect(camera).toBeVisible();
+      await camera.click();
+      await expect(
+        game.getByRole('button', { name: 'Câmera: Capô [C]', exact: true }),
+      ).toBeVisible();
+      await expect(game).toHaveAttribute('data-phase', 'running');
+    }
     await page.keyboard.press('f');
     await page.keyboard.press('j');
     await expect(game).toHaveAttribute('data-phase', 'running');

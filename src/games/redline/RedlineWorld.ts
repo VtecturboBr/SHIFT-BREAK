@@ -26,6 +26,9 @@ export class RedlineWorld implements World {
   private readonly audio = new AudioEngine();
   private readonly look = new THREE.Vector3();
   private cameraReady = false;
+  private cameraMode = 0;
+  private readonly cameraNames = ['Perseguição', 'Próxima', 'Capô', 'Alta'];
+  private readonly cameraButton = document.createElement('button');
   private reversed = false;
   private trailTime = 0;
   private trailCursor = 0;
@@ -94,6 +97,11 @@ export class RedlineWorld implements World {
       { signal: this.events.signal },
     );
     this.hud.querySelector('header')!.append(direction);
+    this.cameraButton.textContent = 'Câmera: Perseguição [C]';
+    this.cameraButton.addEventListener('click', () => this.changeCamera(), {
+      signal: this.events.signal,
+    });
+    this.hud.querySelector('header')!.append(this.cameraButton);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -134,14 +142,19 @@ export class RedlineWorld implements World {
             'Escape',
             'KeyR',
             'KeyM',
+            'KeyC',
           ].includes(event.code)
         ) {
           event.preventDefault();
-          if (event.repeat && ['Escape', 'KeyR', 'KeyM'].includes(event.code))
+          if (
+            event.repeat &&
+            ['Escape', 'KeyR', 'KeyM', 'KeyC'].includes(event.code)
+          )
             return;
           if (event.code === 'Escape') this.pause();
           else if (event.code === 'KeyR') this.restart();
           else if (event.code === 'KeyM') this.audio.toggle();
+          else if (event.code === 'KeyC') this.changeCamera();
           else this.keys.add(event.code);
         }
       },
@@ -159,6 +172,12 @@ export class RedlineWorld implements World {
       { signal },
     );
     this.update(0);
+  }
+  private changeCamera(): void {
+    this.cameraMode = (this.cameraMode + 1) % this.cameraNames.length;
+    this.cameraButton.textContent = `Câmera: ${this.cameraNames[this.cameraMode]} [C]`;
+    this.cameraReady = false;
+    this.dirty = true;
   }
   private restart(): void {
     this.dirty = true;
@@ -238,20 +257,31 @@ export class RedlineWorld implements World {
         player.s + 14 + Math.min(player.speed * 0.12, 9),
         player.lane * 0.35,
       );
+    const distance =
+      this.cameraMode === 1 ? 6.5 : this.cameraMode === 3 ? 15 : 11;
+    const height = this.cameraMode === 1 ? 3 : this.cameraMode === 3 ? 9 : 5.2;
     const behind = sim.track.sample(
-      Math.max(0, player.s - 11),
+      Math.max(0, player.s - distance),
       player.lane * 0.6,
     );
     const desired = new THREE.Vector3(
-      player.s < 11 ? p.x - Math.sin(p.angle) * 11 : behind.x,
-      p.y + 5.2,
-      player.s < 11 ? p.z - Math.cos(p.angle) * 11 : behind.z,
+      player.s < distance ? p.x - Math.sin(p.angle) * distance : behind.x,
+      p.y + height,
+      player.s < distance ? p.z - Math.cos(p.angle) * distance : behind.z,
     );
+    if (this.cameraMode === 2) {
+      const heading = p.angle + player.slip;
+      desired.set(
+        p.x + Math.sin(heading) * 2.5,
+        p.y + 1.3,
+        p.z + Math.cos(heading) * 2.5,
+      );
+    }
     const look = new THREE.Vector3(target.x, target.y + 1.8, target.z);
     const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
     const obstacles = this.world.cameraObstacles();
     constrainCamera(desired, anchor, obstacles);
-    if (!this.cameraReady || reduced) {
+    if (!this.cameraReady || reduced || this.cameraMode === 2) {
       this.camera.position.copy(desired);
       this.look.copy(look);
       this.cameraReady = true;

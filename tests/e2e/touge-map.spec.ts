@@ -96,6 +96,30 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
     return failures;
   });
   expect(cameraFailures).toEqual([]);
+  for (let mode = 0; mode < 4; mode++) {
+    const clear = await fixture.evaluate(({ world, renderer, THREE }, mode) => {
+      world.model.player.s = 800;
+      world.model.player.lane = 0;
+      world.cameraMode = mode;
+      world.cameraReady = false;
+      world.update(0);
+      renderer.render(world.scene, world.camera);
+      const p = world.model.track.sample(800);
+      const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
+      const direction = world.camera.position.clone().sub(anchor);
+      const ray = new THREE.Raycaster(
+        anchor,
+        direction.clone().normalize(),
+        0,
+        direction.length(),
+      );
+      return (
+        ray.intersectObjects(world.world.cameraObstacles(), true).length === 0
+      );
+    }, mode);
+    expect(clear).toBe(true);
+    await page.screenshot({ path: `test-results/camera-${mode}.png` });
+  }
   await fixture.evaluate(({ world, renderer }) => {
     world.dispose();
     renderer.dispose();
