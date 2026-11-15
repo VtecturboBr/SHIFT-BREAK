@@ -54,12 +54,12 @@ export class Vehicle {
       this[key] = Math.max(0, this[key] - dt);
     const curve = track.curvature(this.s);
     const stability = this.sync.has('stability') || this.sync.has('focus');
-    const maxSpeed = (this.engine > 0 ? 38 : 58) + (this.boost > 0 ? 6 : 0);
+    const maxSpeed = (this.engine > 0 ? 38 : 72) + (this.boost > 0 ? 8 : 0);
     const beforeSpeed = this.speed;
     const resistance =
       Math.sign(this.speed) * (this.speed * this.speed * 0.0029 + 0.9);
     this.speed +=
-      (control.throttle * (this.engine > 0 ? 6 : 10.5) +
+      (control.throttle * (this.engine > 0 ? 6 : 18) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? 24 : 5) -
         resistance) *

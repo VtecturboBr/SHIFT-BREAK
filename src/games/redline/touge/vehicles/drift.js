@@ -51,7 +51,7 @@ export class Drift {
     this.grade = perfect ? 'DRIFT PERFEITO' : 'DRIFT CONTROLADO';
     this.feedback = 2.8;
     car.boost = Math.max(car.boost, perfect ? 2.2 : 1.3);
-    car.speed = Math.min(64, car.speed + (perfect ? 8 : 5));
+    car.speed = Math.min(80, car.speed + (perfect ? 8 : 5));
     car.onEvent({
       type: 'driftBanked',
       who: car.id,
@@ -113,5 +113,26 @@ export class Drift {
   }
   get multiplier() {
     return clamp(1 + this.validTime / 2, 1, 3);
+  }
+  charge(car, track) {
+    if (
+      !this.active ||
+      !car.sync.canReward('drift') ||
+      this.lastCorner === track.section(car.s).id ||
+      Math.abs(car.lane) >= ROAD_EDGE - 0.12
+    )
+      return 0;
+    return Math.floor(
+      100 *
+        clamp(
+          Math.min(
+            this.validTime / 0.7,
+            this.turn / 0.100001,
+            this.score / 100,
+          ),
+          0,
+          1,
+        ),
+    );
   }
 }

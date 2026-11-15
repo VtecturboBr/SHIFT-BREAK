@@ -6,6 +6,7 @@ import { makeCar } from './touge/render/models.js';
 import { AudioEngine } from './touge/audio/audio.js';
 import { constrainCamera } from './touge/render/camera.js';
 import { TougeSimulation, FINISH } from './TougeSimulation';
+import { Speedometer } from './Speedometer';
 
 export class RedlineWorld implements World {
   readonly maxFrameStep = 0.08;
@@ -19,6 +20,7 @@ export class RedlineWorld implements World {
   private readonly events = new AbortController();
   private readonly keys = new Set<string>();
   private readonly hud = document.createElement('section');
+  private readonly speedometer = new Speedometer();
   private readonly world: TougeWorld;
   private readonly cars = [makeCar(0xcddde1), makeCar(0x923546, true)];
   private readonly audio = new AudioEngine();
@@ -73,6 +75,7 @@ export class RedlineWorld implements World {
     this.hud.setAttribute('aria-label', 'REDLINE');
     this.hud.setAttribute('role', 'region');
     this.hud.innerHTML = `<header><strong>REDLINE <small>DRIFT.exe · AKAGIRI PASS</small></strong><button data-audio>Silenciar áudio</button><button data-pause>Pausar</button><button data-restart>Reiniciar corrida</button><button data-exit>Sair da corrida</button></header><output class="redline-stats" aria-live="off"></output><section class="redline-message" role="status"><h1></h1><p></p><button data-start>Iniciar corrida</button></section><footer>W / ↑ acelerar · S / ↓ frear/ré · A/D ou ←/→ direção · Espaço inicia drift · Contraesterce ou solte para estabilizar · ESC pausa · R reinicia · M áudio</footer>`;
+    this.hud.append(this.speedometer.element);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -250,6 +253,11 @@ export class RedlineWorld implements World {
       ? 'Ativar áudio'
       : 'Silenciar áudio';
     const section = sim.track.section(player.s);
+    this.speedometer.update(
+      player.speed,
+      player.drift.charge(player, sim.track),
+      player.boost,
+    );
     this.hud.querySelector('output')!.textContent =
       `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(player.s)}/${FINISH} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;
     if (player.boost > 0)

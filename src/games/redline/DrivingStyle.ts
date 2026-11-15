@@ -21,6 +21,9 @@ export class DrivingStyle {
   lose(amount: number): void {
     this.energy = Math.max(0, this.energy - amount);
   }
+  canReward(action: string): boolean {
+    return !!rewards[action] && !(this.cooldowns[action]! > 0);
+  }
   reward(action: string, variation = ''): number {
     const rule = rewards[action];
     if (!rule || this.cooldowns[action]! > 0) return 0;
