@@ -21,7 +21,7 @@ export class WindWake {
   }
   update(sim: TougeSimulation, reduced: boolean): void {
     const leader = sim.player.s > sim.rival.s ? sim.player : sim.rival;
-    this.root.visible = leader.speed > 15;
+    this.root.visible = sim.drafting && leader.speed > 15;
     if (!this.root.visible) return;
     this.material.opacity = sim.drafting ? 0.7 : 0.35;
     this.root.children.forEach((object, i) => {

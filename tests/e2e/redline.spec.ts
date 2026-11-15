@@ -3,6 +3,7 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
   page,
 }) => {
   const errors: string[] = [];
+  await page.setViewportSize({ width: 1280, height: 720 });
   page.on('pageerror', (error) => errors.push(error.message));
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');

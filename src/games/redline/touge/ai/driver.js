@@ -47,24 +47,31 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   );
   let desired = Math.min(
     autopilot ? 50 : car.boost > 0 ? 100 : 88,
-    Math.sqrt((autopilot ? 7 : 26) / Math.max(0.002, bend)),
+    Math.sqrt(
+      (autopilot ? 7 : car.drift.active ? 36 : 26) / Math.max(0.002, bend),
+    ),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
   if (car.catchupPower > 0)
     desired = Math.min(
       88 + car.catchupPower * 44,
-      Math.sqrt((26 + car.catchupPower * 6) / Math.max(0.002, bend)),
+      Math.sqrt(
+        ((car.drift.active ? 36 : 26) + car.catchupPower * 6) /
+          Math.max(0.002, bend),
+      ),
     );
-  if (car.recovering)
+  const tandem = car.drift.active && other.drift.active && gap > 0 && gap < 14;
+  if (car.recovering && !tandem)
     desired = Math.min(desired, Math.max(0, other.speed + (gap - 24) * 0.75));
   const recoveryBrake =
     car.recovering &&
+    !tandem &&
     car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 18));
   if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {
     desired = Math.min(desired, other.speed + Math.max(0, gap - 6) * 0.6);
   }
   const emergency =
-    gap > 0 && gap < 5.5 && Math.abs(car.lane - other.lane) < 2.1;
+    !tandem && gap > 0 && gap < 5.5 && Math.abs(car.lane - other.lane) < 2.1;
   const compensation =
     -curve *
     car.speed *
@@ -85,7 +92,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   const handbrake =
     !autopilot &&
     !emergency &&
-    !(car.recovering && gap < 24) &&
+    !(car.recovering && gap < 24 && !tandem) &&
     car.speed > 16 &&
     Math.abs(curve) > (car.drift.active ? 0.004 : 0.008) &&
     Math.abs(car.lane) < ROAD_EDGE - 0.5 &&
@@ -100,6 +107,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     direction +
     ((car.lane + Math.sign(curve) * 0.35) * 1.1 +
       compensation * 0.07 -
+      -Math.sin(car.slip) * car.speed * 0.08 -
       car.lane * 1.5 -
       car.lateral * 0.3) /
       1.8;

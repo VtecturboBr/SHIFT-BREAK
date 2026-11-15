@@ -188,6 +188,13 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
   for (const angle of visuals.wheels) expect(angle).toBeLessThan(0);
   await expect(page.locator('.race-assist')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/wind-wake.png' });
+  const inactiveWind = await fixture.evaluate(({ world }) => {
+    world.model.drafting = false;
+    world.model.draftCharge = 1;
+    world.update(0);
+    return world.windWake.root.visible;
+  });
+  expect(inactiveWind).toBe(false);
   const rearButton = page.getByRole('button', {
     name: 'Olhar para trás [B]',
     exact: true,

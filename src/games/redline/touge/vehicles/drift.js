@@ -7,6 +7,7 @@ export class Drift {
     this.angle = 0;
     this.direction = 0;
     this.duration = 0;
+    this.offCurveTime = 0;
     this.validTime = 0;
     this.turn = 0;
     this.score = 0;
@@ -75,6 +76,7 @@ export class Drift {
       this.active = true;
       this.direction = Math.sign(control.steer);
       this.duration = 0;
+      this.offCurveTime = 0;
       this.validTime = 0;
       this.turn = 0;
       this.score = 0;
@@ -83,6 +85,7 @@ export class Drift {
     }
     if (this.active) {
       this.duration += dt;
+      this.offCurveTime = Math.abs(curve) < 0.004 ? this.offCurveTime + dt : 0;
       const counter = car.steer * this.direction < -0.15;
       const neutral = !control.handbrake && Math.abs(control.steer) < 0.2;
       this.angle = damp(
@@ -106,7 +109,11 @@ export class Drift {
           car.speed * Math.abs(this.angle) * 28 * this.multiplier * dt;
       }
       if (car.speed < 10) this.cancel(car);
-      else if (this.settle > (counter ? 0.2 : 0.38) || this.duration > 8)
+      else if (
+        this.offCurveTime > 0.75 ||
+        this.settle > (counter ? 0.2 : 0.38) ||
+        this.duration > 8
+      )
         this.finish(car, track);
     } else this.angle = damp(this.angle, 0, 7, dt);
     return this.active;

@@ -62,7 +62,7 @@ export class Vehicle {
     const maxSpeed =
       (this.engine > 0 ? 38 : 88) +
       (this.boost > 0 ? 12 : 0) +
-      this.draftPower * 6 +
+      this.draftPower * 2.5 +
       this.catchupPower * 44;
     const beforeSpeed = this.speed;
     const resistance =
@@ -70,7 +70,9 @@ export class Vehicle {
     this.speed +=
       (control.throttle * (this.engine > 0 ? 6 : 10) +
         (control.throttle && !control.brake
-          ? this.draftPower * 6 + this.catchupPower * 32 + this.launchPower * 12
+          ? this.draftPower * 2.5 +
+            this.catchupPower * 32 +
+            this.launchPower * 5
           : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -
@@ -90,6 +92,7 @@ export class Vehicle {
       ? (this.steer - this.drift.direction) * 1.8 * speedFactor -
         (this.lane - apex) * 1.1 +
         centrifugal * 0.07 +
+        -Math.sin(this.slip) * this.speed * 0.08 +
         instability
       : this.steer * 7.6 * speedFactor + centrifugal + instability;
     this.lateral = damp(
@@ -120,6 +123,10 @@ export class Vehicle {
       this.lateral *= -0.24;
     }
     if (drift) this.speed *= 1 - (control.handbrake ? 0.075 : 0.018) * dt;
-    this.s = Math.max(0, this.s + this.speed * dt);
+    this.s = Math.max(
+      0,
+      this.s +
+        this.speed * dt * (drift ? 0.82 + Math.cos(this.slip) * 0.18 : 1),
+    );
   }
 }

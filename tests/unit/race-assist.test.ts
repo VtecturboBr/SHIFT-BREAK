@@ -120,7 +120,7 @@ it('raises the player speed ceiling with drafting and fades rival recovery befor
     0,
   );
   expect(sim.player.speed).toBeGreaterThan(88);
-  expect(sim.player.speed).toBeLessThanOrEqual(94);
+  expect(sim.player.speed).toBeLessThanOrEqual(90.5);
   sim.player.s = 1240;
   sim.rival.s = 1040;
   sim.player.speed = sim.rival.speed = 70;

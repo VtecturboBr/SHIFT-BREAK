@@ -81,7 +81,7 @@ export class TougeSimulation {
     this.elapsed += dt;
     this.player.sync.update(dt);
     this.rival.sync.update(dt);
-    this.rival.launchPower = Math.max(0, 1 - this.elapsed / 5);
+    this.rival.launchPower = Math.max(0, 1 - this.elapsed / 2);
     const gapBefore = this.rival.s - this.player.s;
     const p = this.track.sample(this.player.s),
       r = this.track.sample(this.rival.s);
@@ -105,6 +105,7 @@ export class TougeSimulation {
       ? Math.max(0, Math.min(1, (-gapBefore - 24) / 20))
       : 0;
     if (this.rival.recovering && gapBefore > -24) this.rival.boost = 0;
+    this.matchDriftPace();
     this.player.update(
       dt,
       {
@@ -128,8 +129,10 @@ export class TougeSimulation {
       this.rival.s = FINISH;
       this.rival.speed = 0;
     }
+    this.matchDriftPace();
     const gap = this.player.s - this.rival.s;
     if (
+      !(this.player.drift.active && this.rival.drift.active) &&
       Math.abs(gap) < 4.45 &&
       Math.abs(this.player.lane - this.rival.lane) < 2.1
     ) {
@@ -166,5 +169,23 @@ export class TougeSimulation {
       );
     else if (this.elapsed >= 240)
       this.finish(false, 'Tempo da tentativa esgotado.');
+  }
+  private matchDriftPace(): void {
+    if (
+      !this.player.drift.active ||
+      !this.rival.drift.active ||
+      Math.abs(this.player.lane - this.rival.lane) > 3
+    )
+      return;
+    const front = this.player.s > this.rival.s ? this.player : this.rival;
+    const rear = front === this.player ? this.rival : this.player;
+    const gap = front.s - rear.s;
+    if (gap >= 14) return;
+    rear.speed = Math.min(
+      rear.speed,
+      Math.max(0, front.speed + Math.max(0, gap - 7) * 1.5),
+    );
+    rear.s = Math.min(rear.s, Math.max(0, front.s - 5.5));
+    rear.boost = 0;
   }
 }

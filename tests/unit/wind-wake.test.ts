@@ -12,6 +12,9 @@ it('places wind behind the leading car and switches the wake after an overtake',
   sim.player.s = 100;
   sim.rival.s = 120;
   sim.player.speed = sim.rival.speed = 40;
+  wake.update(sim, true);
+  expect(wake.root.visible).toBe(false);
+  sim.drafting = true;
   for (const playerLeads of [false, true]) {
     if (playerLeads) {
       sim.player.s = 140;
@@ -28,6 +31,8 @@ it('places wind behind the leading car and switches the wake after an overtake',
     expect(wake.root.children).toHaveLength(28);
   }
   sim.player.speed = 0;
+  sim.drafting = false;
+  sim.draftCharge = 1;
   wake.update(sim, false);
   expect(wake.root.visible).toBe(false);
   disposeScene(scene);
