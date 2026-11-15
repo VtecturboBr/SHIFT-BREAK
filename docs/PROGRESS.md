@@ -143,3 +143,9 @@
 - IA inicia drift em curvas adequadas, controla posição lateral e solta o freio de mão ao carregar o turbo ou sair da curva. Usa as mesmas regras de qualificação, cooldown e impulso do jogador. Fumaça e marcas de pneus agora atendem ambos os carros, compartilhando pools limitados.
 - Check com 27 unitários e build aprovado; corrida/retorno ao OS passou no navegador. Teste do rival completa os dois sentidos em menos de 135 s, com pelo menos três drifts pontuados, turbo e integridade acima de 75%. Testes de velocidade confirmam aceleração acima do ritmo antigo em reta e curva.
 - Sem merge na main. Calibração de dificuldade por playtest humano prolongado continua pendente.
+
+## Espaço previsível para ultrapassagem
+
+- Branch fix/rival-passing-space: nas retas, o rival alterna suavemente entre alvos de faixa a ±1,55 m em ciclo de 24 s. Comando lateral limitado a 0,4 m/s e sem a oscilação curta anterior nesses trechos.
+- Quando o jogador está lado a lado em outra faixa, o rival mantém posição lateral para não fechar a ultrapassagem. Trajetória de curvas/drift, frenagem e aceleração preservadas.
+- Check com 28 unitários e build passou. Teste de 40 s verifica deslocamento lento, alcance das duas faixas e manutenção de posição ao lado do jogador; regressão do rival completa ambos os sentidos com drift/turbo. Playtest manual desta mudança não realizado. Sem merge na main.

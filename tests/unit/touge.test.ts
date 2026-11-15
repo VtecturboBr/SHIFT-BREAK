@@ -9,6 +9,33 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('sweeps slowly across straight lanes and holds position when the player is alongside', () => {
+  const sim = new TougeSimulation();
+  const car = sim.rival;
+  sim.player.s = 500;
+  let min = 0,
+    max = 0;
+  for (let i = 0; i < 2400; i++) {
+    car.s = 0;
+    car.speed = 40;
+    const before = car.lane;
+    car.update(
+      1 / 60,
+      driveAI(car, sim.player, sim.track, [], i / 60),
+      sim.track,
+      i / 60,
+    );
+    expect(Math.abs(car.lane - before)).toBeLessThan(0.008);
+    min = Math.min(min, car.lane);
+    max = Math.max(max, car.lane);
+  }
+  expect(min).toBeLessThan(-1.3);
+  expect(max).toBeGreaterThan(1.3);
+  car.s = sim.player.s = 0;
+  car.lane = -1.4;
+  car.lateral = car.steer = 0;
+  expect(driveAI(car, sim.player, sim.track, [], 12).steer).toBe(0);
+});
 it('runs the rival through both courses with banked drifts, turbo and controlled damage', () => {
   for (const reversed of [false, true]) {
     const events: Record<string, unknown>[] = [];

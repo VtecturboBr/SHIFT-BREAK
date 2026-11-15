@@ -6,6 +6,8 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   let bend = Math.abs(curve);
   for (let d = 10; d <= Math.max(45, car.speed * 2); d += 10)
     bend = Math.max(bend, Math.abs(track.curvature(car.s + d)));
+  const cruising =
+    car.id === 'rival' && !autopilot && bend < 0.004 && !car.drift.active;
   const gap = other.s - car.s;
   const passingLane = ROAD_EDGE - 0.35;
   if (gap < -8 || gap > 24 || Math.abs(curve) > 0.011) car.passSide = 0;
@@ -18,7 +20,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   ) {
     car.passSide = other.lane > 0 ? -1 : 1;
   }
-  let lane = -0.55;
+  let lane = cruising ? -1.55 * Math.cos((time * Math.PI) / 12) : -0.55;
   if (gap > 0 && gap < 24) {
     lane = other.lane;
   }
@@ -29,7 +31,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   }
   lane = clamp(
     lane +
-      Math.sin(time * 0.8 + (car.id === 'player' ? 0 : 4)) *
+      (cruising ? 0 : Math.sin(time * 0.8 + (car.id === 'player' ? 0 : 4))) *
         (autopilot ? 0.15 : 0.08),
     -passingLane,
     passingLane,
@@ -49,6 +51,13 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     car.speed *
     car.speed *
     (car.sync.has('stability') || car.sync.has('focus') ? 0.11 : 0.19);
+  // Hold the lane alongside the player rather than sweeping into an overtake.
+  const lateralTarget =
+    cruising && Math.abs(gap) < 5 && Math.abs(car.lane - other.lane) > 1.2
+      ? 0
+      : cruising
+        ? clamp((lane - car.lane) * 1.8, -0.4, 0.4)
+        : (lane - car.lane) * 1.8;
   const section = track.section(car.s);
   const handbrake =
     !autopilot &&
@@ -80,11 +89,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
           : 0,
     steer: handbrake
       ? clamp(driftSteer, -1, 1)
-      : clamp(
-          ((lane - car.lane) * 1.8 - car.lateral * 0.25 + compensation) / 7.6,
-          -1,
-          1,
-        ),
+      : clamp((lateralTarget - car.lateral * 0.25 + compensation) / 7.6, -1, 1),
     handbrake,
   };
 }
