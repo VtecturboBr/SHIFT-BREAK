@@ -33,3 +33,5 @@ O DRIFT.exe preserva os 3,2 km do touge original do proprietário e acrescenta o
 Biblioteca de jogos → Iniciar DRIFT.exe. W/↑ acelera, S/↓ freia, A/D ou setas esterçam, Espaço segura o drift e soltar concede o turbo quando qualificado. C alterna quatro câmeras; segurar B olha para trás, e o botão alterna a visão. L ou o botão Faróis liga/desliga os faróis do jogador; o rival mantém os seus ligados. As lanternas ficam mais fortes ao frear. M controla áudio, ESC pausa e R reinicia. Trocar o sentido reinicia a corrida. Arte e calibração seguem em protótipo; 08–14 e a campanha permanecem pendentes.
 
 Para dar ré, freie até parar, solte S/↓ e pressione novamente. Chegar em segundo lugar conta como derrota.
+
+Turbo normal aparece em ciano e perfeito em dourado, com nome e aviso para soltar Espaço. A suspensão reage visualmente a aceleração, frenagem e rampas. “Mixagem de som” pausa a corrida para ajustar motores, pneus/efeitos e ambiente; M silencia tudo. Volumes são preservados localmente. Fontes sonoras, testes e limites em [docs/RACE_FEEL.md](docs/RACE_FEEL.md).

@@ -8,6 +8,9 @@ import { constrainCamera } from './touge/render/camera.js';
 import { TougeSimulation } from './TougeSimulation';
 import { Speedometer } from './Speedometer';
 import { WindWake } from './WindWake';
+import { Suspension } from './Suspension';
+import { TurboVisual } from './TurboVisual';
+import { environmentAt } from './touge/audio/mix.js';
 
 export class RedlineWorld implements World {
   readonly maxFrameStep = 0.08;
@@ -25,7 +28,10 @@ export class RedlineWorld implements World {
   private readonly windWake = new WindWake();
   private readonly world: TougeWorld;
   private readonly cars = [makeCar(0xcddde1), makeCar(0x923546, true)];
+  private readonly suspension = [new Suspension(), new Suspension()];
+  private readonly turboVisuals = this.cars.map((car) => new TurboVisual(car));
   private readonly audio = new AudioEngine();
+  private readonly audioForward = new THREE.Vector3();
   private readonly look = new THREE.Vector3();
   private cameraReady = false;
   private readonly desiredCamera = new THREE.Vector3();
@@ -138,6 +144,41 @@ export class RedlineWorld implements World {
       signal: this.events.signal,
     });
     this.hud.querySelector('header')!.append(this.lightsButton);
+    const mixPanel = document.createElement('details');
+    mixPanel.className = 'redline-mix';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Mixagem de som';
+    mixPanel.append(summary);
+    for (const [channel, label] of [
+      ['motors', 'Motores'],
+      ['effects', 'Pneus e efeitos'],
+      ['ambient', 'Ambiente'],
+    ] as const) {
+      const row = document.createElement('label');
+      row.textContent = label;
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = '0';
+      slider.max = '100';
+      slider.step = '1';
+      slider.value = String(Math.round(this.audio.mix[channel] * 100));
+      slider.setAttribute('aria-label', label);
+      slider.addEventListener(
+        'input',
+        () => this.audio.setVolume(channel, Number(slider.value) / 100),
+        { signal: this.events.signal },
+      );
+      row.append(slider);
+      mixPanel.append(row);
+    }
+    mixPanel.addEventListener(
+      'toggle',
+      () => {
+        if (mixPanel.open) this.pause();
+      },
+      { signal: this.events.signal },
+    );
+    this.hud.append(mixPanel);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -163,7 +204,14 @@ export class RedlineWorld implements World {
     window.addEventListener(
       'keydown',
       (event) => {
-        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (
+          event.ctrlKey ||
+          event.metaKey ||
+          event.altKey ||
+          (event.target instanceof HTMLInputElement &&
+            !['KeyM', 'Escape'].includes(event.code))
+        )
+          return;
         if (
           [
             'KeyW',
@@ -224,6 +272,8 @@ export class RedlineWorld implements World {
     this.dirty = true;
   }
   private restart(): void {
+    this.audio.reset();
+    for (const suspension of this.suspension) suspension.reset();
     this.lookBack = false;
     this.dirty = true;
     this.keys.clear();
@@ -276,7 +326,21 @@ export class RedlineWorld implements World {
       model.brakeLight.intensity = braking ? 3 : 0;
       for (const glow of model.tailGlows)
         glow.material.opacity = braking ? 0.65 : 0.12;
-      model.body.rotation.z = reduced ? 0 : -car.lateral * 0.013;
+      this.suspension[i]!.update(
+        sim.phase === 'running' ? dt : 0,
+        car,
+        sim.track,
+        model,
+        reduced,
+      );
+      this.turboVisuals[i]!.update(
+        sim.phase === 'running' ? dt : 0,
+        car.drift.turboState(car, sim.track).level,
+        car.boost,
+        car.boostLevel,
+        reduced,
+        model,
+      );
       for (const wheel of model.wheels) {
         wheel.pivot.rotation.y = wheel.front
           ? car.drifting
@@ -378,7 +442,20 @@ export class RedlineWorld implements World {
     this.previousPhase = sim.phase;
     this.previousCamera.copy(this.camera.matrixWorld);
     this.dirty = false;
-    this.audio.update({ status: sim.phase, player }, sim.phase !== 'running');
+    this.camera.getWorldDirection(this.audioForward);
+    this.audio.update(
+      {
+        status: sim.phase,
+        dt,
+        player,
+        rival: sim.rival,
+        camera: this.camera.position,
+        forward: this.audioForward,
+        rivalPosition: this.cars[1]!.root.position,
+        environment: environmentAt(sim.track, player.s),
+      },
+      sim.phase === 'paused',
+    );
     this.hudElapsed += dt;
     if (dt > 0 && this.hudElapsed < 0.1 && this.hudPhase === sim.phase) return;
     this.hudElapsed = 0;
@@ -393,6 +470,8 @@ export class RedlineWorld implements World {
       player.speed,
       player.drift.charge(player, sim.track),
       player.boost,
+      player.drift.turboState(player, sim.track).level,
+      player.boostLevel,
     );
     this.hud.querySelector('output')!.textContent =
       `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(Math.max(0, player.s - sim.track.startLine))}/${Math.round(sim.track.length)} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;

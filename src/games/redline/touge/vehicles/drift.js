@@ -16,6 +16,42 @@ export class Drift {
     this.lastCorner = null;
     this.grade = '';
     this.feedback = 0;
+    this.announced = 0;
+  }
+  turboState(car, track) {
+    if (
+      !this.active ||
+      !car.sync.canReward('drift') ||
+      this.lastCorner === track.section(car.s).id ||
+      Math.abs(car.lane) >= ROAD_EDGE - 0.12
+    )
+      return { level: 0, progress: 0 };
+    const normal =
+      this.validTime >= 1.2 && this.turn > 0.1 && this.score >= 100;
+    const perfect =
+      normal &&
+      this.validTime >= 3 &&
+      this.score > 420 &&
+      Math.abs(car.lane) < ROAD_EDGE - 0.4;
+    const progress =
+      Math.abs(car.lane) >= ROAD_EDGE - 0.4
+        ? 0
+        : Math.floor(
+            100 *
+              clamp(
+                Math.min(
+                  this.validTime / 3,
+                  this.turn / 0.100001,
+                  this.score / 420.000001,
+                ),
+                0,
+                1,
+              ),
+          );
+    return {
+      level: perfect ? 2 : normal ? 1 : 0,
+      progress: perfect ? 100 : Math.min(99, progress),
+    };
   }
   cancel(car) {
     if (!this.active) return;
@@ -28,21 +64,14 @@ export class Drift {
   }
   finish(car, track) {
     if (!this.active) return;
+    const { level } = this.turboState(car, track);
     this.active = false;
     const corner = track.section(car.s).id;
-    const qualified =
-      this.validTime >= 1.2 &&
-      this.turn > 0.1 &&
-      this.score >= 100 &&
-      Math.abs(car.lane) < ROAD_EDGE - 0.12;
-    if (!qualified || this.lastCorner === corner) {
+    if (!level) {
       this.score = 0;
       return;
     }
-    const perfect =
-      this.validTime >= 3 &&
-      this.score > 420 &&
-      Math.abs(car.lane) < ROAD_EDGE - 0.4;
+    const perfect = level === 2;
     const reward = car.sync.reward('drift', perfect ? 'perfect' : 'good');
     if (!reward) {
       this.score = 0;
@@ -52,6 +81,7 @@ export class Drift {
     this.grade = perfect ? 'DRIFT PERFEITO' : 'DRIFT CONTROLADO';
     this.feedback = 2.8;
     car.boost = Math.max(car.boost, perfect ? 2.2 : 1.3);
+    car.boostLevel = level;
     car.speed = Math.min(100, car.speed + (perfect ? 8 : 5));
     car.onEvent({
       type: 'driftBanked',
@@ -60,6 +90,7 @@ export class Drift {
       points: Math.round(this.score),
       sync: reward,
       perfect,
+      level,
     });
   }
   update(dt, car, control, track, curve) {
@@ -81,6 +112,7 @@ export class Drift {
       this.turn = 0;
       this.score = 0;
       this.settle = 0;
+      this.announced = 0;
       car.onEvent({ type: 'driftStart', who: car.id });
     }
     if (this.active) {
@@ -108,6 +140,13 @@ export class Drift {
         this.score +=
           car.speed * Math.abs(this.angle) * 28 * this.multiplier * dt;
       }
+      const { level } = this.turboState(car, track);
+      for (let tier = 1; tier <= level; tier++) {
+        if (!(this.announced & (1 << tier))) {
+          this.announced |= 1 << tier;
+          car.onEvent({ type: 'turboReady', who: car.id, level: tier });
+        }
+      }
       if (car.speed < 10) this.cancel(car);
       else if (
         this.offCurveTime > 0.75 ||
@@ -122,24 +161,6 @@ export class Drift {
     return clamp(1 + this.validTime / 2, 1, 3);
   }
   charge(car, track) {
-    if (
-      !this.active ||
-      !car.sync.canReward('drift') ||
-      this.lastCorner === track.section(car.s).id ||
-      Math.abs(car.lane) >= ROAD_EDGE - 0.4
-    )
-      return 0;
-    return Math.floor(
-      100 *
-        clamp(
-          Math.min(
-            this.validTime / 3,
-            this.turn / 0.100001,
-            this.score / 420.000001,
-          ),
-          0,
-          1,
-        ),
-    );
+    return this.turboState(car, track).progress;
   }
 }

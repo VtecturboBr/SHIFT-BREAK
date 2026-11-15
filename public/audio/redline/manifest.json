@@ -1,0 +1,46 @@
+[
+  {
+    "file": "engine-low.wav",
+    "author": "RichieMcMullen",
+    "source": "https://freesound.org/people/RichieMcMullen/sounds/386793/",
+    "download": "https://cdn.freesound.org/previews/386/386793_7236624-hq.mp3",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "modifications": "Mono PCM16 24 kHz; seek 2s; output 4s before crossfade; pitch x1; loudness -24 LUFS; 80ms wrap crossfade",
+    "sha256": "d07c2642542abc009a3b2402e64c76a4112199b987241591851ca8956e4bc590",
+    "bytes": 188204
+  },
+  {
+    "file": "engine-high.wav",
+    "author": "RichieMcMullen",
+    "source": "https://freesound.org/people/RichieMcMullen/sounds/386793/",
+    "download": "https://cdn.freesound.org/previews/386/386793_7236624-hq.mp3",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "modifications": "Mono PCM16 24 kHz; seek 2s; output 4s before crossfade; pitch x1.6; loudness -24 LUFS; 80ms wrap crossfade",
+    "sha256": "d5343b92491ad1acfc777480c1fad1673979e414d72e991de5fef70ab05e0602",
+    "bytes": 188204
+  },
+  {
+    "file": "tires.wav",
+    "author": "loganzsound",
+    "source": "https://freesound.org/people/loganzsound/sounds/774264/",
+    "download": "https://cdn.freesound.org/previews/774/774264_16682330-hq.mp3",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "modifications": "Mono PCM16 24 kHz; seek 0.1s; output 0.8s before crossfade; pitch x1; loudness -24 LUFS; 80ms wrap crossfade",
+    "sha256": "188d6b939beaf5bde2c828557893a8d9ca3d2edb2e3c5e60d3c09f6f70c77868",
+    "bytes": 34604
+  },
+  {
+    "file": "wind.wav",
+    "author": "Luke.RUSTLTD",
+    "source": "https://opengameart.org/content/wind1",
+    "download": "https://opengameart.org/sites/default/files/wind1.wav",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "modifications": "Mono PCM16 24 kHz; seek 10s; output 6s before crossfade; pitch x1; loudness -24 LUFS; 80ms wrap crossfade",
+    "sha256": "a2ca68fff0bb0fc9cc8993acf472cf61a792bbf3f9ea095115d4fa656e1522a1",
+    "bytes": 284204
+  }
+]

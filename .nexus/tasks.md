@@ -29,3 +29,7 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 - [x] NIGHT-01 — Rampas: normal do pavimento orienta o carro inclusive no drift; gravidade e distância sobre a superfície entram na física; marcas de pneus acompanham a inclinação.
 - [x] NIGHT-02 — Rival prepara e conclui ultrapassagem após perder a liderança, com faixa oposta, potência residual de recuperação e frenagem ao se aproximar no mesmo corredor. Regressão nos dois sentidos e proteção ao jogador parado.
 - [x] NIGHT-03 — Freio luminoso para os dois carros e ambiente noturno com faróis alternáveis por L/botão, estado acessível e preferência preservada no reinício. Verificações/evidências em docs/PROGRESS.md.
+
+- [x] FEEL-01 — Compartilhar critérios de turbo entre recompensa, HUD e efeitos; preservar dois níveis e balanceamento; ciano/dourado, avisos únicos, partículas reutilizáveis e escapamento.
+- [x] FEEL-02 — Molas visuais da carroceria e quatro rodas, sem mudança de aderência, com limites, pausa/reset e movimento reduzido.
+- [x] FEEL-03 — Áudio híbrido local CC0, motor espacial do rival, ambientes nos dois sentidos, controles persistentes, fallback e descarte durante carregamento. Manifesto e detalhes em docs/RACE_FEEL.md.

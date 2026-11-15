@@ -11,7 +11,14 @@ export class Speedometer {
     }).join('');
     this.element.innerHTML = `<svg viewBox="0 0 240 240" aria-hidden="true"><circle class="dial" cx="120" cy="120" r="111"/>${ticks}<g class="speed-needle"><path d="M117 139 L120 30 L123 139 Z"/><circle cx="120" cy="120" r="7"/></g></svg><div class="speed-reading"><b data-speed>0</b><span>km/h</span></div><div class="drift-charge"><span data-charge>DRIFT 0%</span><progress max="100" value="0" aria-label="Carga de drift para mini-turbo"></progress><small data-hint>Segure Espaço na curva</small></div>`;
   }
-  update(speed: number, charge: number, boost: number): void {
+  update(
+    speed: number,
+    charge: number,
+    boost: number,
+    available = 0,
+    active = 0,
+  ): void {
+    this.element.dataset.turbo = String(boost > 0 ? active : available);
     const kmh = Math.round(Math.abs(speed) * 3.6);
     this.element.querySelector('[data-speed]')!.textContent = String(kmh);
     this.element.style.setProperty(
@@ -19,12 +26,16 @@ export class Speedometer {
       `${-135 + Math.min(kmh / 420, 1) * 270}deg`,
     );
     this.element.querySelector('[data-charge]')!.textContent =
-      boost > 0 ? 'MINI-TURBO' : `DRIFT ${charge}%`;
+      boost > 0
+        ? `TURBO ${active === 2 ? 'PERFEITO' : 'NORMAL'}`
+        : available > 0
+          ? `TURBO ${available === 2 ? 'PERFEITO' : 'NORMAL'} PRONTO`
+          : `DRIFT ${charge}%`;
     this.element.querySelector('progress')!.value = charge;
     this.element.querySelector('[data-hint]')!.textContent =
       boost > 0
         ? `${boost.toFixed(1)} s`
-        : charge === 100
+        : available > 0
           ? 'Solte Espaço para impulsionar'
           : 'Segure Espaço na curva';
   }

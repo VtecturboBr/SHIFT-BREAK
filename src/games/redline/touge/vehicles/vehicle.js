@@ -24,6 +24,7 @@ export class Vehicle {
     this.driftRewarded = false;
     this.wasLeading = id === 'rival';
     this.boost = 0;
+    this.boostLevel = 0;
     this.draftPower = 0;
     this.catchupPower = 0;
     this.launchPower = 0;
@@ -45,6 +46,7 @@ export class Vehicle {
       this.collisionCooldown = 0.65;
       this.speed *= 0.5;
       this.boost = 0;
+      this.boostLevel = 0;
       this.wallHits++;
     }
     this.onEvent({ type: 'damage', who: this.id, kind, amount });

@@ -1,0 +1,90 @@
+{
+  "baselineCommit": "691b975",
+  "method": "Chromium SwiftShader; 960x640 DPR 0.5; no audio context; fixed course positions; physics disabled equally; visual update + synchronous GPU completion; 12 warmup + 30 frames per run; 3 alternating rounds. Not a physical GPU FPS benchmark.",
+  "baseline": {
+    "medianMs": 12.599999999937912,
+    "p95Ms": 20.03333333336438,
+    "meanMs": 13.883333333333333,
+    "calls": 339,
+    "geometries": 150,
+    "textures": 9,
+    "programs": 16
+  },
+  "candidate": {
+    "medianMs": 12.033333333209157,
+    "p95Ms": 18.00000000015522,
+    "meanMs": 13.24555555555659,
+    "calls": 339,
+    "geometries": 150,
+    "textures": 9,
+    "programs": 16
+  },
+  "runs": [
+    {
+      "name": "baseline",
+      "round": 0,
+      "medianMs": 13,
+      "p95Ms": 21.399999999906868,
+      "meanMs": 14.259999999993791,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    },
+    {
+      "name": "candidate",
+      "round": 0,
+      "medianMs": 12.299999999813735,
+      "p95Ms": 15.800000000279397,
+      "meanMs": 13.270000000003105,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    },
+    {
+      "name": "baseline",
+      "round": 1,
+      "medianMs": 12.299999999813735,
+      "p95Ms": 19.5,
+      "meanMs": 13.383333333333333,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    },
+    {
+      "name": "candidate",
+      "round": 1,
+      "medianMs": 12,
+      "p95Ms": 19.399999999906868,
+      "meanMs": 13.43666666666977,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    },
+    {
+      "name": "baseline",
+      "round": 2,
+      "medianMs": 12.5,
+      "p95Ms": 19.200000000186265,
+      "meanMs": 14.006666666672876,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    },
+    {
+      "name": "candidate",
+      "round": 2,
+      "medianMs": 11.799999999813735,
+      "p95Ms": 18.800000000279397,
+      "meanMs": 13.029999999996896,
+      "calls": 339,
+      "geometries": 150,
+      "textures": 9,
+      "programs": 16
+    }
+  ]
+}

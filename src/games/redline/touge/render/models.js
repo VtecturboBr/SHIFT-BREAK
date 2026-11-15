@@ -81,7 +81,7 @@ export function makeCar(color, rival = false) {
     for (const z of [-1.32, 1.32]) {
       const pivot = new THREE.Group();
       pivot.position.set(x, 0.43, z);
-      body.add(pivot);
+      root.add(pivot);
       const tire = new THREE.Mesh(cylinderGeo, black);
       tire.rotation.z = Math.PI / 2;
       tire.scale.set(0.41, 0.25, 0.41);
@@ -110,6 +110,9 @@ export function makeCar(color, rival = false) {
   const brakeLight = new THREE.PointLight(0xff1735, 0, 5, 2);
   brakeLight.position.set(0, 0.7, -2.3);
   root.add(brakeLight);
+  const exhaust = [-0.65, 0.65].map((x) =>
+    glow(body, 0x53edff, 0.8, [x, 0.43, -2.24], 0),
+  );
   const shadow = new THREE.Mesh(
     new THREE.CircleGeometry(1, 24),
     new THREE.MeshBasicMaterial({
@@ -133,5 +136,6 @@ export function makeCar(color, rival = false) {
     tailGlows,
     brakeLight,
     underglow,
+    exhaust,
   };
 }
