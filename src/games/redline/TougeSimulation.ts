@@ -1,4 +1,4 @@
-import { Track, FINISH, ROAD_EDGE } from './touge/world/track.js';
+import { Track, FINISH, roadEdge } from './touge/world/track.js';
 import { Vehicle } from './touge/vehicles/vehicle.js';
 import { driveAI } from './touge/ai/driver.js';
 import { DrivingStyle } from './DrivingStyle';
@@ -108,12 +108,18 @@ export class TougeSimulation {
       const correction =
         (2.1 - Math.abs(this.player.lane - this.rival.lane)) / 2 + 0.001;
       this.player.lane = Math.max(
-        -ROAD_EDGE,
-        Math.min(ROAD_EDGE, this.player.lane + side * correction),
+        -roadEdge(this.player.slip),
+        Math.min(
+          roadEdge(this.player.slip),
+          this.player.lane + side * correction,
+        ),
       );
       this.rival.lane = Math.max(
-        -ROAD_EDGE,
-        Math.min(ROAD_EDGE, this.rival.lane - side * correction),
+        -roadEdge(this.rival.slip),
+        Math.min(
+          roadEdge(this.rival.slip),
+          this.rival.lane - side * correction,
+        ),
       );
       if (Math.abs(this.player.speed - this.rival.speed) > 4) {
         this.player.damage(3);

@@ -4,6 +4,7 @@ import { disposeScene } from '../../graphics/World';
 import { World as TougeWorld } from './touge/render/world.js';
 import { makeCar } from './touge/render/models.js';
 import { AudioEngine } from './touge/audio/audio.js';
+import { constrainCamera } from './touge/render/camera.js';
 import { TougeSimulation, FINISH } from './TougeSimulation';
 
 export class RedlineWorld implements World {
@@ -219,6 +220,9 @@ export class RedlineWorld implements World {
       p.z - Math.cos(p.angle) * 11.2,
     );
     const look = new THREE.Vector3(target.x, target.y + 1.8, target.z);
+    const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
+    const obstacles = this.world.cameraObstacles();
+    constrainCamera(desired, anchor, obstacles);
     if (!this.cameraReady || reduced) {
       this.camera.position.copy(desired);
       this.look.copy(look);
@@ -227,6 +231,8 @@ export class RedlineWorld implements World {
       this.camera.position.lerp(desired, 1 - Math.exp(-dt * 4));
       this.look.lerp(look, 1 - Math.exp(-dt * 5));
     }
+    // Constrain the interpolated position too: smoothing can cross a wall.
+    constrainCamera(this.camera.position, anchor, obstacles);
     this.camera.lookAt(this.look);
     this.camera.updateMatrixWorld();
     this.needsRender =

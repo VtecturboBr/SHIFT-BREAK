@@ -113,3 +113,12 @@
 - Ainda faltam playtest humano completo e aferição de GPU física/cross-browser. Roteiro 08–14 e dados pessoais pendentes permanecem.
 
 - Validação final do reuso: npm run check passou com 15 unitários; npm run test:e2e passou com 14 testes (1,5 min); npm run test:production passou com cinco testes (52,6 s). O smoke novo também confirma que F/J não ativam combate e que mute funciona. Captura real revisada: docs/evidence/07-reused-touge.png. Sem servidores permanentes iniciados, push ou merge.
+
+## Correções do mapa — fix/touge-map
+
+- Corrigidos os cruzamentos dos retornos que tornavam a altura do terreno ambígua. Preservados 3,2 km, três grampos e dois túneis. Varredura de 8005 pontos da malha efetiva: zero invasões, contra 1020 antes; altura máxima relativa agora −1,36 m. Teste de afastamento/nearest evita regressão do traçado.
+- Rails dos dois lados e limite pelo envelope girado do carro, incluindo espelhos; aplicado também à separação dos veículos. Câmera restringida por raycast contra terreno, muros e túneis/portais, antes e depois da interpolação.
+- Avisos 150 m antes de cada grampo, velocidade sugerida explícita, chevrons e nome da reta final corrigido. Túneis legíveis sem novas luzes dinâmicas; streaming inclui trechos próximos em planta e margem de descarte.
+- `npm run check`: tipos, lint, formatação, 20 unitários e build passaram. `npm run test:e2e`: 15 testes passaram (2,1 min). `npm run test:production`: cinco testes passaram (55,1 s), incluindo duas sessões DRIFT.exe e preservação de notas/OS. Uma rodada preliminar foi interrompida por reload do Vite durante edição; repetição estável integralmente aprovada.
+- Dez capturas reais revisadas; teste também inspeciona 180 estados da câmera nas laterais com interpolação ativa. Relatório e comparação antes/depois em [audits/DRIFT-MAP.md](audits/DRIFT-MAP.md). Inspeção por posicionamento, sem afirmar playtest humano completo.
+- Sem novas dependências, push, merge ou deploy. Pendentes calibração por piloto humano, GPU física e outros browsers; aviso de bundle >500 kB permanece. Próximo incremento do roadmap: 08.

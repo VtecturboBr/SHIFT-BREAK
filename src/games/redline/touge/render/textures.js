@@ -103,6 +103,9 @@ export function createWorldMaterials() {
     }),
     tunnel: new THREE.MeshStandardMaterial({
       color: 0x7e8582,
+      // Approximate ambient bounce without adding per-lamp lights.
+      emissive: 0x39454c,
+      emissiveIntensity: 0.5,
       map: stone,
       roughness: 1,
       side: THREE.DoubleSide,

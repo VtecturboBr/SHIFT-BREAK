@@ -1,5 +1,7 @@
 # Tarefas executáveis
 
+- [x] Correções da auditoria do mapa: afastar retornos e eliminar invasões do terreno; alinhar colisão/barreiras, proteger câmera, padronizar placas, melhorar túneis e continuidade espacial. Evidência: 20 unitários, 15 e2e, cinco smokes de produção e capturas antes/depois em `docs/audits/DRIFT-MAP.md`. Branch `fix/touge-map`, sem merge na main.
+
 - [x] Reuso solicitado pelo proprietário: substituir o protótipo DRIFT.exe pelo código de initial JOJO.zip, retirar combate/espíritos/poderes e adaptar pista, veículos, IA, áudio e corrida finita ao REDLINE. Fonte e decisões em docs/REUSED-TOUGE.md. Validar 15 unitários, regressão Chromium e produção antes do checkpoint.
 
 - [x] T01 — Fundação modular Three.js/TypeScript/Vite, estados, assets, erros, diagnósticos; evidência: npm run check e 1 e2e Chromium passaram; screenshot real em docs/evidence/01-foundation.png.

@@ -1,5 +1,5 @@
 import { clamp, damp } from '../core/math.js';
-import { ROAD_EDGE } from '../world/track.js';
+import { ROAD_EDGE, roadEdge } from '../world/track.js';
 import { Drift } from './drift.js';
 
 export class Vehicle {
@@ -99,7 +99,7 @@ export class Vehicle {
       Math.abs(this.lane) < ROAD_EDGE - 0.4
     )
       this.sync.reward('speed');
-    const edge = ROAD_EDGE;
+    const edge = roadEdge(this.slip);
     if (Math.abs(this.lane) > edge) {
       this.lane = clamp(this.lane, -edge, edge);
       if (Math.abs(this.lateral) > 1.1)

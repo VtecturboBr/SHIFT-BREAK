@@ -1,7 +1,20 @@
 import { clamp, lerp, random } from '../core/math.js';
 
 export const ROAD_WIDTH = 6;
-export const ROAD_EDGE = ROAD_WIDTH / 2 - 1.05;
+export const BARRIER_LANE = ROAD_WIDTH / 2 + 0.5;
+export const BARRIER_THICKNESS = 0.12;
+// Includes mirrors; the longitudinal extent also matters while drifting.
+export const CAR_HALF_WIDTH = 1.12;
+export const CAR_HALF_LENGTH = 2.23;
+export const ROAD_EDGE = BARRIER_LANE - BARRIER_THICKNESS / 2 - CAR_HALF_WIDTH;
+export function roadEdge(slip = 0) {
+  return (
+    BARRIER_LANE -
+    BARRIER_THICKNESS / 2 -
+    (CAR_HALF_WIDTH * Math.abs(Math.cos(slip)) +
+      CAR_HALF_LENGTH * Math.abs(Math.sin(slip)))
+  );
+}
 export const FINISH = 3200;
 export const TRACK_STEP = 2;
 const CELL = 32;
@@ -28,26 +41,33 @@ export class Track {
       heading += turn;
     };
     add(130, 'straight');
-    add(80, 'bend', -0.14, 'Curva da encosta');
+    add(80, 'bend', bend / 2, 'Curva da encosta');
     add(210, 'straight', 0, 'Reta da encosta');
-    add(100, 'bend', -bend, 'Entrada Karasu');
+    add(100, 'bend', -bend / 2, 'Entrada Karasu');
     add(20, 'straight');
+    // Alternate switchbacks across the slope; branches must not cross in X/Z.
     add(180, 'hairpin', Math.PI - heading, 'KARASU · GRAMPO 01');
-    add(180, 'forest', 0.15);
-    add(120, 'tunnel', -0.15, 'Túnel Shiro');
+    add(180, 'forest', -0.15);
+    add(120, 'tunnel', 0.15, 'Túnel Shiro');
     add(240, 'straight', 0, 'Linha Shiro');
-    add(100, 'bend', bend);
+    add(100, 'bend', -bend);
     add(100, 'straight');
     add(180, 'hairpin', -heading, 'TSUBAKI · GRAMPO 02');
-    add(160, 'forest', -0.12);
+    add(160, 'forest', 0.12);
     add(260, 'straight', 0, 'Linha dos cedros');
-    add(120, 'tunnel', 0.12, 'Túnel Kage');
-    add(120, 'bend', -0.25);
+    add(120, 'tunnel', -0.12, 'Túnel Kage');
+    add(120, 'bend', 0.25);
     add(180, 'hairpin', Math.PI - heading, 'KAGE · GRAMPO 03');
-    add(200, 'forest', 0.1);
-    add(260, 'straight', 0, 'Reta final');
-    add(160, 'bend', -0.1);
-    add(3000, 'straight');
+    add(200, 'forest', -0.1);
+    add(260, 'straight', 0, 'Linha da chegada');
+    add(160, 'bend', 0.1, 'Última curva');
+    add(3000, 'straight', 0, 'Reta final');
+    this.warnings = this.sections
+      .filter((p) => p.type === 'hairpin')
+      .map((section) => ({
+        s: section.start - 150,
+        section,
+      }));
     this.points = [{ x: 0, y: 120, z: 0, angle: 0, curve: 0, s: 0 }];
     this.grid = new Map();
     this.indexPoint(this.points[0]);

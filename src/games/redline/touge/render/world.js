@@ -1,9 +1,15 @@
 import * as THREE from 'three';
-import { random, lerp } from '../core/math.js';
-import { ROAD_WIDTH, FINISH } from '../world/track.js';
+import { random, lerp, clamp } from '../core/math.js';
+import {
+  ROAD_WIDTH,
+  FINISH,
+  BARRIER_LANE,
+  BARRIER_THICKNESS,
+} from '../world/track.js';
 import { box, glow } from './models.js';
 import { roadRibbon, roadSpan, retainingWall } from './road-geometry.js';
 import { createWorldMaterials } from './textures.js';
+import { createTerrainGeometry } from './terrain.js';
 
 const CHUNK = 96;
 const dummy = new THREE.Object3D();
@@ -107,40 +113,20 @@ export class World {
     );
   }
   createTerrain() {
-    this.track.ensure(FINISH + 800);
-    const points = this.track.points;
-    const minX =
-      Math.floor((Math.min(...points.map((p) => p.x)) - 110) / 8) * 8;
-    const maxX = Math.ceil((Math.max(...points.map((p) => p.x)) + 110) / 8) * 8;
-    const minZ =
-      Math.floor((Math.min(...points.map((p) => p.z)) - 110) / 8) * 8;
-    const maxZ = Math.ceil((Math.max(...points.map((p) => p.z)) + 110) / 8) * 8;
-    const nx = Math.ceil((maxX - minX) / 8),
-      nz = Math.ceil((maxZ - minZ) / 8);
-    const positions = [],
-      uvs = [],
-      indices = [];
-    for (let z = 0; z <= nz; z++)
-      for (let x = 0; x <= nx; x++) {
-        const wx = minX + x * 8,
-          wz = minZ + z * 8;
-        positions.push(wx, this.track.terrainHeight(wx, wz), wz);
-        uvs.push(wx / 12, wz / 12);
-        if (x < nx && z < nz) {
-          const a = z * (nx + 1) + x;
-          indices.push(a, a + nx + 1, a + 1, a + 1, a + nx + 1, a + nx + 2);
-        }
-      }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positions, 3),
+    this.terrain = new THREE.Mesh(
+      createTerrainGeometry(this.track),
+      this.m.terrain,
     );
-    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-    geo.setIndex(indices);
-    geo.computeVertexNormals();
-    this.terrain = new THREE.Mesh(geo, this.m.terrain);
     this.scene.add(this.terrain);
+    this.chunkBounds = [];
+    for (let start = 0; start < FINISH + 600; start += CHUNK) {
+      const box = new THREE.Box2();
+      for (let s = start; s <= start + CHUNK; s += 8) {
+        const p = this.track.sample(s);
+        box.expandByPoint(new THREE.Vector2(p.x, p.z));
+      }
+      this.chunkBounds.push(box);
+    }
   }
   strip(group, start, end, left, right, height, material, crossSteps = 1) {
     group.add(
@@ -201,9 +187,12 @@ export class World {
         6,
       );
     }
-    group.add(
-      new THREE.Mesh(retainingWall(track, start, end, -w - 0.85), m.wall),
+    const wall = new THREE.Mesh(
+      retainingWall(track, start, end, -w - 0.85),
+      m.wall,
     );
+    wall.userData.cameraObstacle = true;
+    group.add(wall);
     this.strip(group, start, end, -w - 0.87, -w - 0.62, () => 2.68, m.shoulder);
     this.strip(group, start, end, -w - 0.58, -w - 0.45, () => -0.015, m.pole);
     this.strip(group, start, end, -0.055, 0.055, () => 0.03, m.yellow);
@@ -217,9 +206,8 @@ export class World {
       branches = [],
       bolts = [];
     for (let s = start; s < end; s += 2) {
-      const sideList = track.section(s).type === 'hairpin' ? [-1, 1] : [1];
-      for (const side of sideList) {
-        const lane = side * (w + 0.5),
+      for (const side of [-1, 1]) {
+        const lane = side * BARRIER_LANE,
           p = track.sample(s + 1, lane);
         for (const y of [0.74, 0.91, 1.055])
           rail.push(
@@ -229,7 +217,7 @@ export class World {
               Math.min(s + 2.02, end),
               lane,
               y,
-              0.12,
+              BARRIER_THICKNESS,
               y === 0.91 ? 0.16 : 0.055,
             ),
           );
@@ -316,7 +304,13 @@ export class World {
     instances(group, pineGeo, m.pine, pines, true);
     instances(group, rockGeo, m.rock, rocks);
     for (let s = start + 44; s < end; s += 64) this.lamp(group, s);
-    if (index % 2 === 0) this.sign(group, start + 35);
+    for (const warning of track.warnings)
+      if (warning.s >= start && warning.s < end)
+        this.sign(group, warning.s, warning.section);
+    for (const section of track.sections.filter((s) => s.type === 'hairpin')) {
+      for (let s = section.start + 40; s < section.end - 20; s += 30)
+        if (s >= start && s < end) this.chevron(group, s, section.turn);
+    }
     for (const section of track.sections.filter(
       (s) => s.type === 'tunnel' && s.start < end && s.end > start,
     )) {
@@ -345,10 +339,7 @@ export class World {
     glow(lamp, 0xffc78b, 3, [-2.4, 6.9, 0], 0.2);
     group.add(lamp);
   }
-  sign(group, s) {
-    const next = this.track.sections.find(
-      (p) => p.type === 'hairpin' && p.start > s && p.start < s + 220,
-    );
+  sign(group, s, next) {
     const p = this.track.sample(s, 4.1),
       sign = new THREE.Group();
     sign.position.set(p.x, p.y, p.z);
@@ -368,7 +359,7 @@ export class World {
     ctx.font = 'bold 50px sans-serif';
     ctx.fillText(next ? (next.turn > 0 ? '↶' : '↷') : '峠  注意', 128, 65);
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(next ? 'HAIRPIN · 30' : 'AKAGIRI PASS', 128, 111);
+    ctx.fillText('GRAMPO · 30 km/h', 128, 111);
     ctx.font = '17px sans-serif';
     ctx.fillText(
       next ? `${Math.round(next.start - s)} m · 急カーブ` : '赤霧峠 · 40',
@@ -384,6 +375,23 @@ export class World {
     );
     mesh.position.y = 2.5;
     sign.add(mesh);
+    group.add(sign);
+  }
+  chevron(group, s, turn) {
+    const p = this.track.sample(s, Math.sign(turn) * BARRIER_LANE);
+    const sign = new THREE.Group();
+    sign.position.set(p.x, p.y + 1.7, p.z);
+    sign.rotation.y = p.angle;
+    box(sign, [1.1, 0.65, 0.08], [0, 0, 0], this.m.pole);
+    for (const side of [-1, 1]) {
+      const bar = box(
+        sign,
+        [0.12, 0.39, 0.1],
+        [0, side * 0.12, -0.01],
+        this.m.warning,
+      );
+      bar.rotation.z = (Math.sign(turn) * side * Math.PI) / 4;
+    }
     group.add(sign);
   }
   tunnel(group, start, end) {
@@ -419,7 +427,19 @@ export class World {
     geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeVertexNormals();
-    group.add(new THREE.Mesh(geo, this.m.tunnel));
+    const shell = new THREE.Mesh(geo, this.m.tunnel);
+    shell.userData.cameraObstacle = true;
+    group.add(shell);
+    for (const side of [-1, 1])
+      this.strip(
+        group,
+        start,
+        end,
+        side * (w - 0.1),
+        side * (w - 0.25),
+        () => 0.04,
+        this.m.warning,
+      );
     for (let s = Math.ceil(start / 16) * 16; s < end; s += 16) {
       const p = this.track.sample(s);
       const lamp = box(
@@ -436,6 +456,7 @@ export class World {
       portal = new THREE.Group();
     portal.position.set(p.x, p.y, p.z);
     portal.rotation.set(-Math.atan(p.grade), p.angle, 0, 'YXZ');
+    portal.userData.cameraObstacle = true;
     for (const side of [-1, 1])
       box(portal, [0.8, 2.65, 1.6], [side * 4.15, 1.1, 0], this.m.wall);
     const shape = new THREE.Shape();
@@ -482,13 +503,33 @@ export class World {
   update(sim) {
     const min = Math.max(0, Math.floor((sim.player.s - 150) / CHUNK)),
       max = Math.floor((sim.player.s + 600) / CHUNK);
-    for (let i = min; i <= max; i++)
-      if (!this.chunks.has(i)) this.createChunk(i);
+    const needed = new Set();
+    for (let i = min; i <= max; i++) needed.add(i);
+    const p = this.track.sample(sim.player.s);
+    this.chunkBounds.forEach((bounds, i) => {
+      const distance = Math.hypot(
+        p.x - clamp(p.x, bounds.min.x, bounds.max.x),
+        p.z - clamp(p.z, bounds.min.y, bounds.max.y),
+      );
+      if (distance < (this.chunks.has(i) ? 192 : 160)) needed.add(i);
+    });
+    for (const i of needed) if (!this.chunks.has(i)) this.createChunk(i);
     for (const [i, group] of this.chunks)
-      if (i < min || i > max + 1) {
+      if (!needed.has(i)) {
         this.disposeGroup(group);
         this.chunks.delete(i);
       }
+  }
+
+  cameraObstacles() {
+    const obstacles = [this.terrain];
+    for (const group of this.chunks.values()) {
+      group.updateMatrixWorld(true);
+      group.traverse((object) => {
+        if (object.userData.cameraObstacle) obstacles.push(object);
+      });
+    }
+    return obstacles;
   }
 
   disposeGroup(group) {
