@@ -18,6 +18,6 @@ Somente módulos de código selecionados foram importados para `src/games/redlin
 - HUD, resultados e ajuda pertencem a REDLINE/DRIFT.exe. Sair volta ao quarto e ao OS, sem reload. O renderer, loop e ciclo de suspensão são os do projeto atual; o renderer/composer e o RAF originais não foram copiados.
 - O código JavaScript original selecionado foi mantido como ES modules, formatado e verificado por lint/testes; o adaptador e a simulação de integração são TypeScript. `allowJs` habilita essa interoperabilidade sem converter o projeto antigo inteiro.
 
-Artefatos anteriores do protótipo de 720 m continuam apenas no histórico e nas evidências antigas. A implementação ativa e os testes usam os módulos reaproveitados de 3,2 km.
+Artefatos anteriores do protótipo de 720 m continuam apenas no histórico e nas evidências antigas. Os módulos reaproveitados preservam os 3,2 km originais; a implementação ativa acrescenta uma extensão própria que fecha o circuito de 6,87 km, conforme [AKAGIRI_LOOP.md](AKAGIRI_LOOP.md). O ZIP original permanece intacto.
 
 Ainda requer playtest humano completo e aferição em GPU física. A trilha musical e as transições de campanha permanecem para os incrementos posteriores; não foi acrescentada música comercial.

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { FINISH } from '../world/track.js';
 
 export function createTerrainGeometry(track) {
-  track.ensure(FINISH + 800);
+  track.ensure(track.length ?? FINISH + 800);
   const points = track.points;
   const minX = Math.floor((Math.min(...points.map((p) => p.x)) - 110) / 8) * 8;
   const maxX = Math.ceil((Math.max(...points.map((p) => p.x)) + 110) / 8) * 8;

@@ -26,8 +26,8 @@ O build estático é gerado em `dist/`. Veja [progresso](docs/PROGRESS.md) e [pl
 
 Conteúdo: [guia](docs/CONTENT_GUIDE.md). Git: [branches empilhadas](docs/BRANCHES.md). Retomada: [.nexus/handoff.md](.nexus/handoff.md). Testes manuais e limitações: [QA](docs/MANUAL_QA.md), [monitor](docs/ADR-001-MONITOR.md), [jogos](docs/ADR-002-GAME-LIFECYCLE.md).
 
-## REDLINE 0.7.0
+## REDLINE — Akagiri Loop
 
-Atualização 0.7.1: o DRIFT.exe agora reaproveita o projeto antigo de touge do proprietário. São 3,2 km de Akagiri Pass com carros/rodas animadas, três grampos, dois túneis e áudio sintetizado (M para silenciar). Combate espiritual, samurais, poderes e rounds infinitos foram removidos. A corrida termina na chegada ou por dano/tempo; sair preserva quarto e OS. Procedência e alterações: [REUSED-TOUGE.md](docs/REUSED-TOUGE.md).
+O DRIFT.exe preserva os 3,2 km do touge original do proprietário e acrescenta o Retorno da Garganta, formando um circuito de **6,87 km**. Há oito novos grampos consecutivos, barragem, vertedouro seco e galeria semiaberta. Uma volta completa, nos sentidos normal e inverso, com largada e chegada na mesma linha. O limite é de dez minutos; sair preserva quarto e OS. Combate espiritual continua removido. Veja [circuito, arquitetura e evidências](docs/AKAGIRI_LOOP.md) e [procedência do reuso](docs/REUSED-TOUGE.md).
 
-Incremento 07 disponível em protótipo: Biblioteca de jogos → Iniciar DRIFT.exe. W/↑ acelera, S/↓ freia, A/D ou setas esterça, Espaço drift, ESC pausa e R reinicia. Sair da corrida restaura o quarto e o OS preservados. Ver docs/ADR-003-REDLINE.md. A arte é provisória; 08–14 e a campanha permanecem pendentes.
+Biblioteca de jogos → Iniciar DRIFT.exe. W/↑ acelera, S/↓ freia, A/D ou setas esterçam, Espaço segura o drift e soltar concede o turbo quando qualificado. C alterna quatro câmeras; segurar B olha para trás, e o botão alterna a visão. M controla áudio, ESC pausa e R reinicia. Trocar o sentido reinicia a corrida. Arte e calibração seguem em protótipo; 08–14 e a campanha permanecem pendentes.

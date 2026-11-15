@@ -56,7 +56,49 @@ export class World {
     this.decor = new THREE.Group();
     scene.add(this.decor);
     this.createSky();
+    this.createDamLandmark();
     this.createTerrain();
+  }
+  createDamLandmark() {
+    if (!this.track.closed) return;
+    const point = this.track.points[Math.floor(5200 / 2)];
+    const minZ = Math.min(...this.track.points.map((p) => p.z));
+    const water = new THREE.Mesh(
+      new THREE.PlaneGeometry(240, 90),
+      this.m.water,
+    );
+    water.rotation.x = -Math.PI / 2;
+    water.position.set(point.x, 123, minZ - 50);
+    this.decor.add(water);
+    box(this.decor, [260, 30, 5], [point.x, 126, minZ - 3], this.m.concrete);
+    for (let x = -100; x <= 100; x += 40) {
+      box(
+        this.decor,
+        [7, 40, 13],
+        [point.x + x, 113, minZ - 9],
+        this.m.concrete,
+      );
+      box(this.decor, [22, 18, 1], [point.x + x, 113, minZ - 12], this.m.pole);
+    }
+    for (const side of [-1, 1]) {
+      const x = point.x + side * 95;
+      box(this.decor, [9, 46, 10], [x, 151, minZ - 20], this.m.concrete);
+      box(
+        this.decor,
+        [30, 25, 2],
+        [x - side * 20, 134, minZ - 15],
+        this.m.pole,
+      );
+      box(this.decor, [2, 1, 3], [x, 174.5, minZ - 20], this.m.warning);
+    }
+    box(this.decor, [200, 1.5, 4], [point.x, 172, minZ - 20], this.m.pole);
+    for (let x = -80; x <= 80; x += 20)
+      box(
+        this.decor,
+        [1, 0.2, 2],
+        [point.x + x, 171, minZ - 20],
+        this.m.warning,
+      );
   }
   createSky() {
     const sky = new THREE.Mesh(
@@ -119,9 +161,17 @@ export class World {
     );
     this.scene.add(this.terrain);
     this.chunkBounds = [];
-    for (let start = 0; start < FINISH + 600; start += CHUNK) {
+    for (
+      let start = 0;
+      start < (this.track.length ?? FINISH + 600);
+      start += CHUNK
+    ) {
       const box = new THREE.Box2();
-      for (let s = start; s <= start + CHUNK; s += 8) {
+      for (
+        let s = start;
+        s <= Math.min(start + CHUNK, this.track.length ?? Infinity);
+        s += 8
+      ) {
         const p = this.track.sample(s);
         box.expandByPoint(new THREE.Vector2(p.x, p.z));
       }
@@ -139,7 +189,7 @@ export class World {
   createChunk(index) {
     const group = new THREE.Group(),
       start = index * CHUNK,
-      end = start + CHUNK,
+      end = Math.min(start + CHUNK, this.track.length ?? Infinity),
       w = ROAD_WIDTH / 2;
     const track = this.track,
       rng = random(track.seed + index * 337),
@@ -173,6 +223,7 @@ export class World {
         side * near,
         side * far,
         (s, lane) => {
+          if (track.section(s).sector === 'dam') return -24;
           const p = track.sample(s, lane),
             t = (Math.abs(lane) - near) / (far - near);
           const outer = track.sample(s, side * far);
@@ -187,13 +238,24 @@ export class World {
         6,
       );
     }
-    const wall = new THREE.Mesh(
-      retainingWall(track, start, end, -w - 0.85),
-      m.wall,
-    );
-    wall.userData.cameraObstacle = true;
-    group.add(wall);
-    this.strip(group, start, end, -w - 0.87, -w - 0.62, () => 2.68, m.shoulder);
+    const sector = track.section((start + end) / 2).sector;
+    if (sector !== 'dam') {
+      const wall = new THREE.Mesh(
+        retainingWall(track, start, end, -w - 0.85),
+        ['spillway', 'gallery'].includes(sector) ? m.concrete : m.wall,
+      );
+      wall.userData.cameraObstacle = true;
+      group.add(wall);
+      this.strip(
+        group,
+        start,
+        end,
+        -w - 0.87,
+        -w - 0.62,
+        () => 2.68,
+        m.shoulder,
+      );
+    }
     this.strip(group, start, end, -w - 0.58, -w - 0.45, () => -0.015, m.pole);
     this.strip(group, start, end, -0.055, 0.055, () => 0.03, m.yellow);
     const rail = [],
@@ -252,6 +314,8 @@ export class World {
         side = rng() > 0.5 ? 1 : -1;
       const lane = side * (9 + rng() * 37),
         p = track.sample(s, lane);
+      if (['dam', 'spillway', 'gallery'].includes(track.section(s).sector))
+        continue;
       if (track.nearest(p.x, p.z).distance < 8) continue;
       const y = track.terrainHeight(p.x, p.z),
         h = 5.5 + rng() * 6.5;
@@ -304,6 +368,15 @@ export class World {
     instances(group, pineGeo, m.pine, pines, true);
     instances(group, rockGeo, m.rock, rocks);
     for (let s = start + 44; s < end; s += 64) this.lamp(group, s);
+    for (const section of track.sections.filter(
+      (s) => s.start < end && s.end > start,
+    ))
+      this.industrial(
+        group,
+        Math.max(start, section.start),
+        Math.min(end, section.end),
+        section.sector,
+      );
     for (const warning of track.warnings)
       if (warning.s >= start && warning.s < end)
         this.sign(group, warning.s, warning.section);
@@ -324,9 +397,82 @@ export class World {
       if (section.end >= start && section.end < end)
         this.portal(group, section.end, section.name);
     }
-    if (FINISH >= start && FINISH < end) this.finish(group);
+    const line = track.startLine ?? FINISH;
+    if (line >= start && line < end) this.finish(group);
     this.scene.add(group);
     this.chunks.set(index, group);
+  }
+  industrial(group, start, end, sector) {
+    const m = this.m,
+      track = this.track;
+    if (sector === 'gorge') {
+      const rocks = [];
+      for (let s = Math.ceil(start / 16) * 16; s < end; s += 16)
+        for (const side of [-1, 1]) {
+          const p = track.sample(s, side * 12);
+          rocks.push({
+            p: [p.x, p.y + 5, p.z],
+            scale: [4.5, 16, 10],
+            angle: p.angle,
+          });
+        }
+      const mesh = instances(group, rockGeo, m.rock, rocks);
+      if (mesh) mesh.userData.cameraObstacle = true;
+    }
+    if (!['dam', 'spillway', 'gallery'].includes(sector)) return;
+    for (const side of [-1, 1]) {
+      this.strip(
+        group,
+        start,
+        end,
+        side * 3.9,
+        side * 5.2,
+        () => 0.1,
+        m.concrete,
+      );
+      if (sector === 'spillway') {
+        const wall = new THREE.Mesh(
+          retainingWall(track, start, end, side * 4.3, -1, 9),
+          m.concrete,
+        );
+        wall.userData.cameraObstacle = true;
+        group.add(wall);
+      }
+    }
+    const supports = [],
+      beams = [],
+      lamps = [];
+    for (let s = Math.ceil(start / 16) * 16; s < end; s += 16) {
+      for (const side of [-1, 1]) {
+        const p = track.sample(s, side * (sector === 'dam' ? 5.8 : 4.8));
+        const height = sector === 'dam' ? 26 : sector === 'spillway' ? 10 : 7.5;
+        supports.push({
+          p: [p.x, p.y + (sector === 'dam' ? -height / 2 : height / 2), p.z],
+          scale: [1.1, height, 1.2],
+          angle: p.angle,
+        });
+        const light = track.sample(s, side * 3.65);
+        lamps.push({
+          p: [light.x, light.y + 1.8, light.z],
+          scale: [0.12, 0.5, 0.3],
+          angle: light.angle,
+        });
+      }
+      if (sector === 'gallery') {
+        beams.push(roadSpan(track, s, Math.min(s + 1.2, end), 0, 7.3, 11, 0.5));
+        const roof = new THREE.Mesh(
+          roadRibbon(track, s, Math.min(s + 10, end), -5.1, 5.1, () => 7.5, 2),
+          m.concrete,
+        );
+        roof.userData.cameraObstacle = true;
+        group.add(roof);
+      }
+    }
+    const columns = instances(group, cube, m.concrete, supports);
+    if (columns) columns.userData.cameraObstacle = true;
+    const roofBeams = instances(group, cube, m.pole, beams);
+    if (roofBeams) roofBeams.userData.cameraObstacle = true;
+    instances(group, cube, m.warning, lamps);
   }
   lamp(group, s) {
     const p = this.track.sample(s, -4.05),
@@ -359,10 +505,16 @@ export class World {
     ctx.font = 'bold 50px sans-serif';
     ctx.fillText(next ? (next.turn > 0 ? '↶' : '↷') : '峠  注意', 128, 65);
     ctx.font = 'bold 20px sans-serif';
-    ctx.fillText('GRAMPO · 30 km/h', 128, 111);
+    ctx.fillText(
+      next?.sequenceCount === 8 ? '8 GRAMPOS · 30 km/h' : 'GRAMPO · 30 km/h',
+      128,
+      111,
+    );
     ctx.font = '17px sans-serif';
     ctx.fillText(
-      next ? `${Math.round(next.start - s)} m · 急カーブ` : '赤霧峠 · 40',
+      next
+        ? `${Math.round(this.track.wrap ? this.track.wrap(next.start - s) : next.start - s)} m · 急カーブ`
+        : '赤霧峠 · 40',
       128,
       156,
     );
@@ -487,13 +639,40 @@ export class World {
     group.add(portal);
   }
   finish(group) {
-    const p = this.track.sample(FINISH),
+    const p = this.track.sample(this.track.startLine ?? FINISH),
       gate = new THREE.Group();
     gate.position.set(p.x, p.y, p.z);
     gate.rotation.set(-Math.atan(p.grade), p.angle, 0, 'YXZ');
     for (const side of [-1, 1])
       box(gate, [0.22, 7, 0.22], [side * 3.6, 3.5, 0], this.m.pole);
     box(gate, [7.5, 0.65, 0.25], [0, 6.5, 0], this.m.warning);
+    const canvas = document.createElement('canvas');
+    canvas.width = 768;
+    canvas.height = 96;
+    const c = canvas.getContext('2d');
+    c.fillStyle = '#15232c';
+    c.fillRect(0, 0, 768, 96);
+    c.fillStyle = '#fff0c2';
+    c.font = 'bold 40px monospace';
+    c.textAlign = 'center';
+    c.fillText('AKAGIRI LOOP', 384, 43);
+    c.font = '22px monospace';
+    c.fillText('LARGADA // CHEGADA', 384, 80);
+    const banner = new THREE.Mesh(
+      new THREE.PlaneGeometry(7.2, 0.9),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.CanvasTexture(canvas),
+        side: THREE.DoubleSide,
+      }),
+    );
+    banner.position.set(0, 6.5, -0.15);
+    banner.material.side = THREE.FrontSide;
+    banner.rotation.y = Math.PI;
+    gate.add(banner);
+    const backBanner = banner.clone();
+    backBanner.rotation.y = 0;
+    backBanner.position.z = 0.15;
+    gate.add(backBanner);
     for (let x = -3; x < 3; x++)
       for (let z = 0; z < 2; z++)
         if ((x + z) % 2 === 0)
@@ -504,14 +683,21 @@ export class World {
     const min = Math.max(0, Math.floor((sim.player.s - 150) / CHUNK)),
       max = Math.floor((sim.player.s + 600) / CHUNK);
     const needed = new Set();
-    for (let i = min; i <= max; i++) needed.add(i);
+    if (!this.track.closed) for (let i = min; i <= max; i++) needed.add(i);
     const p = this.track.sample(sim.player.s);
     this.chunkBounds.forEach((bounds, i) => {
       const distance = Math.hypot(
         p.x - clamp(p.x, bounds.min.x, bounds.max.x),
         p.z - clamp(p.z, bounds.min.y, bounds.max.y),
       );
-      if (distance < (this.chunks.has(i) ? 192 : 160)) needed.add(i);
+      const routeDistance = this.track.localGap
+        ? this.track.localGap(sim.player.s, i * CHUNK + CHUNK / 2)
+        : Infinity;
+      if (
+        distance < (this.chunks.has(i) ? 192 : 160) ||
+        (routeDistance > -198 && routeDistance < 648)
+      )
+        needed.add(i);
     });
     for (const i of needed) if (!this.chunks.has(i)) this.createChunk(i);
     for (const [i, group] of this.chunks)

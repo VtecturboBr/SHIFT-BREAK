@@ -1,8 +1,13 @@
-import { Track, FINISH, roadEdge } from './touge/world/track.js';
+import { roadEdge } from './touge/world/track.js';
+import {
+  LoopTrack as Track,
+  LOOP_LENGTH,
+  START_LINE,
+} from './touge/world/loop-track.js';
 import { Vehicle } from './touge/vehicles/vehicle.js';
 import { driveAI } from './touge/ai/driver.js';
 import { DrivingStyle } from './DrivingStyle';
-export { FINISH } from './touge/world/track.js';
+export const FINISH = LOOP_LENGTH + START_LINE;
 export interface RaceInput {
   throttle: boolean;
   brake: boolean;
@@ -12,6 +17,10 @@ export interface RaceInput {
 
 export class TougeSimulation {
   track = new Track(1707);
+  get finishDistance(): number {
+    return this.track.length + this.track.startLine;
+  }
+  rivalFinished = false;
   player: Vehicle;
   rival: Vehicle;
   phase: 'ready' | 'countdown' | 'running' | 'paused' | 'won' | 'lost' =
@@ -82,10 +91,12 @@ export class TougeSimulation {
     this.player.sync.update(dt);
     this.rival.sync.update(dt);
     this.rival.launchPower = Math.max(0, 1 - this.elapsed / 2);
-    const gapBefore = this.rival.s - this.player.s;
+    const raceGap = this.rival.s - this.player.s;
+    const gapBefore = this.track.localGap(this.player.s, this.rival.s);
     const p = this.track.sample(this.player.s),
       r = this.track.sample(this.rival.s);
     this.drafting =
+      !this.rivalFinished &&
       gapBefore > 5 &&
       gapBefore < 42 &&
       Math.abs(this.player.lane - this.rival.lane) < 0.9 &&
@@ -99,12 +110,12 @@ export class TougeSimulation {
       Math.min(1, this.draftCharge + dt * (this.drafting ? 1 / 1.5 : -1.2)),
     );
     this.player.draftPower = this.draftCharge;
-    if (gapBefore < -4.5) this.rival.recovering = true;
-    if (gapBefore > 0) this.rival.recovering = false;
+    if (raceGap < -4.5) this.rival.recovering = true;
+    if (raceGap > 0) this.rival.recovering = false;
     this.rival.catchupPower = this.rival.recovering
-      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 20))
+      ? Math.max(0, Math.min(1, (-raceGap - 24) / 20))
       : 0;
-    if (this.rival.recovering && gapBefore > -24) this.rival.boost = 0;
+    if (this.rival.recovering && raceGap > -24) this.rival.boost = 0;
     this.matchDriftPace();
     this.player.update(
       dt,
@@ -119,19 +130,28 @@ export class TougeSimulation {
       this.track,
       this.elapsed,
     );
-    this.rival.update(
-      dt,
-      driveAI(this.rival, this.player, this.track, [], this.elapsed),
-      this.track,
-      this.elapsed,
-    );
-    if (this.rival.s >= FINISH) {
-      this.rival.s = FINISH;
-      this.rival.speed = 0;
+    if (!this.rivalFinished) {
+      this.rival.update(
+        dt,
+        driveAI(this.rival, this.player, this.track, [], this.elapsed),
+        this.track,
+        this.elapsed,
+      );
+      if (this.rival.s >= this.finishDistance) {
+        this.rivalFinished = true;
+        this.rival.drift.active = this.rival.drifting = false;
+      }
+    } else {
+      this.rival.speed = Math.max(0, this.rival.speed - 15 * dt);
+      this.rival.s = Math.min(
+        this.finishDistance + 70,
+        this.rival.s + this.rival.speed * dt,
+      );
     }
     this.matchDriftPace();
-    const gap = this.player.s - this.rival.s;
+    const gap = this.track.localGap(this.rival.s, this.player.s);
     if (
+      !this.rivalFinished &&
       !(this.player.drift.active && this.rival.drift.active) &&
       Math.abs(gap) < 4.45 &&
       Math.abs(this.player.lane - this.rival.lane) < 2.1
@@ -160,32 +180,34 @@ export class TougeSimulation {
     }
     if (this.player.health <= 0)
       this.finish(false, 'Carro sem condições de continuar.');
-    else if (this.player.s >= FINISH)
+    else if (this.player.s >= this.finishDistance)
       this.finish(
         true,
-        this.rival.s < FINISH
+        !this.rivalFinished
           ? 'Chegada em primeiro lugar.'
           : 'Descida concluída. Tente superar o rival.',
       );
-    else if (this.elapsed >= 240)
+    else if (this.elapsed >= 600)
       this.finish(false, 'Tempo da tentativa esgotado.');
   }
   private matchDriftPace(): void {
     if (
+      this.rivalFinished ||
       !this.player.drift.active ||
       !this.rival.drift.active ||
       Math.abs(this.player.lane - this.rival.lane) > 3
     )
       return;
-    const front = this.player.s > this.rival.s ? this.player : this.rival;
+    const localGap = this.track.localGap(this.player.s, this.rival.s);
+    const front = localGap < 0 ? this.player : this.rival;
     const rear = front === this.player ? this.rival : this.player;
-    const gap = front.s - rear.s;
+    const gap = Math.abs(localGap);
     if (gap >= 14) return;
     rear.speed = Math.min(
       rear.speed,
       Math.max(0, front.speed + Math.max(0, gap - 7) * 1.5),
     );
-    rear.s = Math.min(rear.s, Math.max(0, front.s - 5.5));
+    rear.s -= Math.max(0, 5.5 - gap);
     rear.boost = 0;
   }
 }

@@ -11,7 +11,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     !autopilot &&
     Math.abs(curve) < 0.002 &&
     !car.drift.active;
-  const gap = other.s - car.s;
+  const gap = track.localGap ? track.localGap(car.s, other.s) : other.s - car.s;
   if (cruising && gap <= 5 && gap > -70 && !car.yieldSide)
     car.yieldSide =
       car.lane < -0.3 ? -1 : car.lane > 0.3 ? 1 : other.lane >= 0 ? -1 : 1;
@@ -96,7 +96,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     car.speed > 16 &&
     Math.abs(curve) > (car.drift.active ? 0.004 : 0.008) &&
     Math.abs(car.lane) < ROAD_EDGE - 0.5 &&
-    section.end - car.s > car.speed * 0.12 &&
+    section.end - (track.wrap ? track.wrap(car.s) : car.s) > car.speed * 0.12 &&
     (car.drift.active
       ? car.drift.validTime < 3.2
       : car.sync.canReward('drift') &&

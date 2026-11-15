@@ -124,7 +124,7 @@ export class Vehicle {
     }
     if (drift) this.speed *= 1 - (control.handbrake ? 0.075 : 0.018) * dt;
     this.s = Math.max(
-      0,
+      track.closed ? -Infinity : 0,
       this.s +
         this.speed * dt * (drift ? 0.82 + Math.cos(this.slip) * 0.18 : 1),
     );

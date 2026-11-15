@@ -21,7 +21,7 @@ it('places wind behind the leading car and switches the wake after an overtake',
       sim.player.lane = 1.1;
     }
     wake.update(sim, true);
-    const leader = playerLeads ? sim.player : sim.rival;
+    const leader = sim.rival;
     const expected = sim.track.sample(leader.s - 3, leader.lane - 0.65);
     const line = wake.root.children[0] as THREE.Line;
     const position = line.geometry.getAttribute('position');

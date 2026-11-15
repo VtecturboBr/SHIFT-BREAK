@@ -31,7 +31,7 @@ export function gameLibrary(
         ],
         [
           'DRIFT.exe',
-          'Akagiri Pass: 3,2 km de touge, três grampos e dois túneis. Adaptação do projeto anterior do autor.',
+          'Akagiri Loop: 6,9 km de touge, onze grampos, barragem e vertedouro seco. Uma volta completa nos dois sentidos.',
           'Disponível · protótipo REDLINE',
           true,
         ],

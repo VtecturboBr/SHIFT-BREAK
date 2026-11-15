@@ -56,12 +56,13 @@ it('runs the rival through both courses with banked drifts, turbo and controlled
     sim.start();
     let turbo = false;
     let drifting = false;
-    for (let i = 0; i < 12000 && sim.rival.s < FINISH; i++) {
+    for (let i = 0; i < 36000 && !sim.rivalFinished; i++) {
       sim.update(1 / 60, idle);
       turbo ||= sim.rival.boost > 0;
       drifting ||= sim.rival.drifting;
     }
-    expect(sim.rival.s).toBe(FINISH);
+    expect(sim.rivalFinished).toBe(true);
+    expect(sim.rival.s).toBeGreaterThanOrEqual(FINISH);
     expect(sim.rival.health).toBeGreaterThan(75);
     expect(drifting).toBe(true);
     expect(turbo).toBe(true);
@@ -69,7 +70,7 @@ it('runs the rival through both courses with banked drifts, turbo and controlled
       events.filter((e) => e.type === 'driftBanked' && e.who === 'rival')
         .length,
     ).toBeGreaterThanOrEqual(3);
-    expect(sim.elapsed).toBeLessThan(135);
+    expect(sim.elapsed).toBeLessThan(600);
   }
 });
 it('pushes the rival faster on straights while braking for hairpins', () => {
@@ -92,13 +93,13 @@ it('pushes the rival faster on straights while braking for hairpins', () => {
 it('runs the same road backwards with reversed corners, grades and a finite finish', () => {
   const forward = new Track(),
     reverse = new Track(1707, true);
-  for (let s = 0; s <= FINISH; s += 20) {
-    const a = forward.sample(FINISH - s),
+  for (let s = 0; s <= 3200; s += 20) {
+    const a = forward.sample(3200 - s),
       b = reverse.sample(s);
     expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeLessThan(0.01);
     expect(b.y).toBeCloseTo(a.y);
     expect(b.grade).toBeCloseTo(-a.grade);
-    expect(reverse.curvature(s)).toBeCloseTo(-forward.curvature(FINISH - s));
+    expect(reverse.curvature(s)).toBeCloseTo(-forward.curvature(3200 - s));
   }
   const sim = new TougeSimulation(() => {}, true);
   sim.start();
@@ -237,7 +238,7 @@ it('ends drift on Space release even while steering and does not bank twice', ()
 });
 it('reuses the original finite track, hairpins and tunnels without combat sections', () => {
   const track = new Track(1707);
-  expect(FINISH).toBe(3200);
+  expect(new TougeSimulation().track.length).toBeGreaterThan(6500);
   expect(track.sections.filter((s) => s.type === 'hairpin')).toHaveLength(3);
   expect(track.sections.filter((s) => s.type === 'tunnel')).toHaveLength(2);
   expect(track.sections.some((s) => s.type === 'duel')).toBe(false);
@@ -257,7 +258,7 @@ it('completes the real course using racing inputs, with no forced mode changes o
   }
   expect(sim.phase).toBe('won');
   expect(sim.player.s).toBeGreaterThanOrEqual(FINISH);
-  expect(sim.rival.s).toBeLessThanOrEqual(FINISH);
+  expect(sim.rival.s).toBeLessThanOrEqual(FINISH + 70);
   expect('combat' in sim).toBe(false);
   expect('mode' in sim).toBe(false);
 });
@@ -277,7 +278,7 @@ it('freezes countdown and movement on pause, and has damage and time loss condit
   expect(sim.phase).toBe('lost');
   const timeout = new TougeSimulation();
   timeout.phase = 'running';
-  timeout.elapsed = 240;
+  timeout.elapsed = 600;
   timeout.update(1 / 60, idle);
   expect(timeout.phase).toBe('lost');
 });

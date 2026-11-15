@@ -20,3 +20,8 @@
 08–14 continuam obrigatórios e devem ser decompostos na ordem da especificação após 07. Apps complementares (terminal/settings/música/achievements) ainda pendentes; não confundir o MVP com ALEF//OS/SHIFT//BREAK 1.0 completo.
 
 Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisado. Próxima tarefa: T08 — decompor BREAKPOINT, preservando renderer/retorno do quarto e regressões.
+
+- [x] LOOP-01 — Preservar os 3,2 km originais, construir retorno e fechar posição/direção/curvatura/inclinação. Verificado por testes da geometria periódica, raio, folga e malha de terreno.
+- [x] LOOP-02 — Uma volta completa, faixa compartilhada aos 34 m, sentido inverso, progressão acumulada e margem local na emenda. Verificados fim de corrida, proximidade/contato/vácuo e rival já finalizado.
+- [x] LOOP-03 — Streaming circular, cenário da garganta/barragem/vertedouro/galeria, materiais procedurais e descarte. Inspeção visual dos dois sentidos e teste de recursos após reinício.
+- [x] LOOP-04 — Regressão e entrega: check/49 unitários/build, 18 e2e e cinco smokes de produção aprovados. docs/AKAGIRI_LOOP.md e docs/evidence/loop/. Branch feat/akagiri-loop; sem merge na main. Playtest humano/GPU física explicitamente pendentes.

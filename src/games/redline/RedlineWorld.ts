@@ -5,7 +5,7 @@ import { World as TougeWorld } from './touge/render/world.js';
 import { makeCar } from './touge/render/models.js';
 import { AudioEngine } from './touge/audio/audio.js';
 import { constrainCamera } from './touge/render/camera.js';
-import { TougeSimulation, FINISH } from './TougeSimulation';
+import { TougeSimulation } from './TougeSimulation';
 import { Speedometer } from './Speedometer';
 import { WindWake } from './WindWake';
 
@@ -281,15 +281,8 @@ export class RedlineWorld implements World {
     const distance =
       this.cameraMode === 1 ? 6.5 : this.cameraMode === 3 ? 15 : 7.5;
     const height = this.cameraMode === 1 ? 3 : this.cameraMode === 3 ? 9 : 3.4;
-    const behind = sim.track.sample(
-      Math.max(0, player.s - distance),
-      player.lane * 0.6,
-    );
-    const desired = new THREE.Vector3(
-      player.s < distance ? p.x - Math.sin(p.angle) * distance : behind.x,
-      p.y + height,
-      player.s < distance ? p.z - Math.cos(p.angle) * distance : behind.z,
-    );
+    const behind = sim.track.sample(player.s - distance, player.lane * 0.6);
+    const desired = new THREE.Vector3(behind.x, p.y + height, behind.z);
     if (this.cameraMode === 2) {
       const heading = p.angle + player.slip;
       desired.set(
@@ -304,10 +297,7 @@ export class RedlineWorld implements World {
     if (lookingBack !== this.wasLookingBack) this.cameraReady = false;
     this.wasLookingBack = lookingBack;
     if (lookingBack) {
-      const rear = sim.track.sample(
-        Math.max(0, player.s - 18),
-        player.lane * 0.35,
-      );
+      const rear = sim.track.sample(player.s - 18, player.lane * 0.35);
       desired.set(
         p.x + Math.sin(p.angle) * 7.5,
         p.y + 3.4,
@@ -359,7 +349,7 @@ export class RedlineWorld implements World {
       player.boost,
     );
     this.hud.querySelector('output')!.textContent =
-      `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(player.s)}/${FINISH} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;
+      `${Math.round(player.speed * 3.6)} km/h · ${Math.floor(Math.max(0, player.s - sim.track.startLine))}/${Math.round(sim.track.length)} m · DRIFT ${sim.score} · CARRO ${Math.ceil(player.health)}% · RIVAL ${Math.round(sim.rival.s - player.s)} m · ${section.name || 'AKAGIRI PASS'}${player.drifting ? ' · DERRAPANDO' : ''}`;
     if (player.boost > 0)
       this.hud.querySelector('output')!.textContent += ' · MINI-TURBO';
     const message = this.hud.querySelector<HTMLElement>('.redline-message')!;
@@ -376,12 +366,12 @@ export class RedlineWorld implements World {
               : 'Fim da tentativa.';
     message.querySelector('p')!.textContent =
       sim.phase === 'ready'
-        ? '3,2 km de descida, três grampos e dois túneis. Complete o percurso, preserve o carro e busque drifts controlados para superar o rival.'
+        ? 'Akagiri Loop: uma volta pela montanha, Escada dos Oito, barragem e vertedouro. Cruze a largada e complete o circuito.'
         : sim.result ||
           `Drift: ${sim.score} · Tempo: ${sim.elapsed.toFixed(1)}s.`;
     if (sim.phase === 'ready' && this.reversed)
       message.querySelector('p')!.textContent =
-        'Sentido inverso: 3,2 km de subida, três grampos e dois túneis. Complete o percurso e supere o rival. Trocar o sentido reinicia a corrida.';
+        'Sentido inverso: uma volta completa pela subida e descida de Akagiri Loop. A largada e a chegada usam a mesma linha. Trocar o sentido reinicia a corrida.';
     const start = message.querySelector<HTMLButtonElement>('[data-start]')!;
     start.hidden = !['ready', 'paused'].includes(sim.phase);
     start.textContent =

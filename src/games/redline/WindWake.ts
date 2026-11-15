@@ -20,8 +20,8 @@ export class WindWake {
     }
   }
   update(sim: TougeSimulation, reduced: boolean): void {
-    const leader = sim.player.s > sim.rival.s ? sim.player : sim.rival;
-    this.root.visible = sim.drafting && leader.speed > 15;
+    const leader = sim.rival;
+    this.root.visible = sim.drafting && !sim.rivalFinished && leader.speed > 15;
     if (!this.root.visible) return;
     this.material.opacity = sim.drafting ? 0.7 : 0.35;
     this.root.children.forEach((object, i) => {
@@ -29,7 +29,7 @@ export class WindWake {
       const positions = line.geometry.getAttribute('position');
       const distance = 3 + ((i * 1.1 + (reduced ? 0 : sim.elapsed * 24)) % 26);
       for (let j = 0; j < 4; j++) {
-        const s = Math.max(0, leader.s - distance - j * 1.1);
+        const s = leader.s - distance - j * 1.1;
         const lane =
           leader.lane + (i % 2 ? 1 : -1) * (0.65 + (i % 4) * 0.2 + j * 0.08);
         const p = sim.track.sample(s, lane);

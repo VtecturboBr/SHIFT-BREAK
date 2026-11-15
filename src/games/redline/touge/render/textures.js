@@ -14,7 +14,11 @@ function texture(kind) {
         ? [71 + n, 76 + n, 79 + n]
         : kind === 'stone'
           ? [84 + n, 89 + n, 81 + n]
-          : [44 + n * 0.6, 57 + n, 39 + n * 0.5];
+          : kind === 'concrete'
+            ? [103 + n * 0.4, 110 + n * 0.4, 113 + n * 0.4]
+            : kind === 'water'
+              ? [108 + n, 132 + n, 148 + n]
+              : [44 + n * 0.6, 57 + n, 39 + n * 0.5];
     pixels.data.set([...rgb, 255], i);
   }
   c.putImageData(pixels, 0, 0);
@@ -31,6 +35,27 @@ function texture(kind) {
         y += 8 + rng() * 16;
         c.lineTo(x, y);
       }
+      c.stroke();
+    }
+  } else if (kind === 'concrete') {
+    c.strokeStyle = '#293b4555';
+    c.lineWidth = 1;
+    for (let x = 0; x < 256; x += 128)
+      for (let y = 0; y < 256; y += 128) {
+        c.strokeRect(x, y, 128, 128);
+        for (const dx of [8, 120])
+          for (const dy of [8, 120]) {
+            c.fillStyle = '#26333b88';
+            c.fillRect(x + dx, y + dy, 2, 2);
+          }
+      }
+  } else if (kind === 'water') {
+    c.strokeStyle = '#b1e6ee66';
+    c.lineWidth = 1;
+    for (let y = 0; y < 256; y += 9) {
+      c.beginPath();
+      for (let x = 0; x <= 256; x += 4)
+        c.lineTo(x, y + Math.sin(x / 13 + y) * 2);
       c.stroke();
     }
   } else if (kind === 'stone') {
@@ -53,8 +78,26 @@ function texture(kind) {
 export function createWorldMaterials() {
   const road = texture('road'),
     stone = texture('stone'),
-    earth = texture('earth');
+    earth = texture('earth'),
+    concrete = texture('concrete'),
+    water = texture('water');
   return {
+    concrete: new THREE.MeshStandardMaterial({
+      color: 0xc0c4c6,
+      map: concrete,
+      bumpMap: concrete,
+      bumpScale: 0.03,
+      emissive: 0x131c23,
+      emissiveIntensity: 0.2,
+      roughness: 0.95,
+      side: THREE.DoubleSide,
+    }),
+    water: new THREE.MeshStandardMaterial({
+      color: 0x3b7380,
+      map: water,
+      roughness: 0.3,
+      metalness: 0.25,
+    }),
     road: new THREE.MeshStandardMaterial({
       map: road,
       roughness: 0.8,
