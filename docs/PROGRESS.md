@@ -136,3 +136,10 @@
 - Velocímetro ampliado para até 330 px, afastado das bordas e acima das instruções; tamanhos adaptados para telas estreitas/baixas. Cabeçalho quebra linha quando necessário.
 - Check com 26 unitários e build passou; testes de corrida/retorno ao OS e render das quatro câmeras passaram. Teste de corrida verifica teclado e botão durante movimento. Uma rodada inicial excedeu 60 s ao repetir todas as trocas em duas sessões; cobertura das quatro vistas ficou no teste de mapa e a integração foi reduzida sem aumentar timeout.
 - Capturas revisadas: evidence/07-camera-hud.png e evidence/07-camera-hood.png. Playtest humano prolongado e GPU física pendentes. Sem merge na main.
+
+## Rival com drift e ritmo aumentado
+
+- Branch feat/rival-drifting: alvo de reta aumentado de 70 para 78 m/s, chegando a 90 m/s com turbo. Limite por curvatura aumentado de coeficiente 10,5 para 14, preservando antecipação/frenagem.
+- IA inicia drift em curvas adequadas, controla posição lateral e solta o freio de mão ao carregar o turbo ou sair da curva. Usa as mesmas regras de qualificação, cooldown e impulso do jogador. Fumaça e marcas de pneus agora atendem ambos os carros, compartilhando pools limitados.
+- Check com 27 unitários e build aprovado; corrida/retorno ao OS passou no navegador. Teste do rival completa os dois sentidos em menos de 135 s, com pelo menos três drifts pontuados, turbo e integridade acima de 75%. Testes de velocidade confirmam aceleração acima do ritmo antigo em reta e curva.
+- Sem merge na main. Calibração de dificuldade por playtest humano prolongado continua pendente.

@@ -30,7 +30,7 @@ export class RedlineWorld implements World {
   private readonly cameraNames = ['Perseguição', 'Próxima', 'Capô', 'Alta'];
   private readonly cameraButton = document.createElement('button');
   private reversed = false;
-  private trailTime = 0;
+  private trailTime = [0, 0];
   private trailCursor = 0;
   private readonly smoke: THREE.Mesh[] = [];
   private readonly skids: THREE.Mesh[] = [];
@@ -185,7 +185,7 @@ export class RedlineWorld implements World {
     this.model = this.createSimulation();
     this.world.reset(this.model.track);
     this.cameraReady = false;
-    this.trailTime = 0;
+    this.trailTime.fill(0);
     for (const effect of [...this.smoke, ...this.skids]) effect.visible = false;
   }
   private pause(): void {
@@ -225,25 +225,24 @@ export class RedlineWorld implements World {
         }
       }
     }
-    if (
-      sim.phase === 'running' &&
-      player.drifting &&
-      sim.elapsed - this.trailTime > 0.08
-    ) {
-      const i = this.trailCursor++ % this.smoke.length,
-        p = sim.track.sample(
-          player.s - 1.5,
-          player.lane + (i % 2 ? -0.7 : 0.7),
-        );
-      const puff = this.smoke[i]!,
-        mark = this.skids[i]!;
-      puff.position.set(p.x, p.y + 0.5, p.z);
-      puff.scale.setScalar(1);
-      puff.visible = true;
-      mark.position.set(p.x, p.y + 0.04, p.z);
-      mark.rotation.z = p.angle;
-      mark.visible = true;
-      this.trailTime = sim.elapsed;
+    for (const [carIndex, car] of [player, sim.rival].entries()) {
+      if (
+        sim.phase === 'running' &&
+        car.drifting &&
+        sim.elapsed - this.trailTime[carIndex]! > 0.08
+      ) {
+        const i = this.trailCursor++ % this.smoke.length,
+          p = sim.track.sample(car.s - 1.5, car.lane + (i % 2 ? -0.7 : 0.7));
+        const puff = this.smoke[i]!,
+          mark = this.skids[i]!;
+        puff.position.set(p.x, p.y + 0.5, p.z);
+        puff.scale.setScalar(1);
+        puff.visible = true;
+        mark.position.set(p.x, p.y + 0.04, p.z);
+        mark.rotation.z = p.angle;
+        mark.visible = true;
+        this.trailTime[carIndex] = sim.elapsed;
+      }
     }
     if (sim.phase === 'running')
       for (const puff of this.smoke)

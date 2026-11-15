@@ -9,12 +9,37 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('runs the rival through both courses with banked drifts, turbo and controlled damage', () => {
+  for (const reversed of [false, true]) {
+    const events: Record<string, unknown>[] = [];
+    const sim = new TougeSimulation((event) => events.push(event), reversed);
+    sim.start();
+    let turbo = false;
+    let drifting = false;
+    for (let i = 0; i < 12000 && sim.rival.s < FINISH; i++) {
+      sim.update(1 / 60, idle);
+      turbo ||= sim.rival.boost > 0;
+      drifting ||= sim.rival.drifting;
+    }
+    expect(sim.rival.s).toBe(FINISH);
+    expect(sim.rival.health).toBeGreaterThan(75);
+    expect(drifting).toBe(true);
+    expect(turbo).toBe(true);
+    expect(
+      events.filter((e) => e.type === 'driftBanked' && e.who === 'rival')
+        .length,
+    ).toBeGreaterThanOrEqual(3);
+    expect(sim.elapsed).toBeLessThan(135);
+  }
+});
 it('pushes the rival faster on straights while braking for hairpins', () => {
   const sim = new TougeSimulation();
   sim.rival.s = 1050;
-  sim.rival.speed = 60;
+  sim.rival.speed = 75;
   expect(driveAI(sim.rival, sim.player, sim.track, [], 0).throttle).toBe(1);
   sim.rival.s = 600;
+  sim.rival.speed = 19;
+  expect(driveAI(sim.rival, sim.player, sim.track, [], 0).throttle).toBe(1);
   sim.rival.speed = 30;
   expect(
     driveAI(sim.rival, sim.player, sim.track, [], 0).brake,

@@ -35,8 +35,8 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     passingLane,
   );
   let desired = Math.min(
-    autopilot ? 50 : 70,
-    Math.sqrt((autopilot ? 7 : 10.5) / Math.max(0.002, bend)),
+    autopilot ? 50 : car.boost > 0 ? 90 : 78,
+    Math.sqrt((autopilot ? 7 : 14) / Math.max(0.002, bend)),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
   if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {
@@ -49,6 +49,27 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     car.speed *
     car.speed *
     (car.sync.has('stability') || car.sync.has('focus') ? 0.11 : 0.19);
+  const section = track.section(car.s);
+  const handbrake =
+    !autopilot &&
+    !emergency &&
+    car.speed > 16 &&
+    Math.abs(curve) > (car.drift.active ? 0.004 : 0.008) &&
+    Math.abs(car.lane) < ROAD_EDGE - 0.5 &&
+    section.end - car.s > car.speed * 0.12 &&
+    (car.drift.active
+      ? car.drift.validTime < 3.2
+      : car.sync.canReward('drift') &&
+        car.drift.lastCorner !== section.id &&
+        car.speed > 18);
+  const direction = car.drift.active ? car.drift.direction : -Math.sign(curve);
+  const driftSteer =
+    direction +
+    ((car.lane + Math.sign(curve) * 0.35) * 1.1 +
+      compensation * 0.07 -
+      car.lane * 1.5 -
+      car.lateral * 0.3) /
+      1.8;
   return {
     throttle: !emergency && car.speed < desired ? 1 : 0,
     brake:
@@ -57,11 +78,13 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
         : car.speed > desired + 3
           ? 0.35
           : 0,
-    steer: clamp(
-      ((lane - car.lane) * 1.8 - car.lateral * 0.25 + compensation) / 7.6,
-      -1,
-      1,
-    ),
-    handbrake: false,
+    steer: handbrake
+      ? clamp(driftSteer, -1, 1)
+      : clamp(
+          ((lane - car.lane) * 1.8 - car.lateral * 0.25 + compensation) / 7.6,
+          -1,
+          1,
+        ),
+    handbrake,
   };
 }
