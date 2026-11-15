@@ -14,11 +14,11 @@ it('shows charge only when all drift requirements are met and reaches the higher
     car = sim.player;
   car.s = 600;
   car.drift.active = true;
-  car.drift.validTime = 0.35;
+  car.drift.validTime = 1.5;
   car.drift.turn = 0.2;
-  car.drift.score = 200;
+  car.drift.score = 600;
   expect(car.drift.charge(car, sim.track)).toBe(50);
-  car.drift.validTime = 1;
+  car.drift.validTime = 3;
   expect(car.drift.charge(car, sim.track)).toBe(100);
   car.drift.cancel(car);
   expect(car.drift.charge(car, sim.track)).toBe(0);
@@ -31,8 +31,33 @@ it('shows charge only when all drift requirements are met and reaches the higher
       sim.track,
       i / 60,
     );
+    if (i === 59) {
+      expect(car.speed).toBeLessThan(13);
+      expect(car.speed).toBeGreaterThan(10);
+    }
   }
-  expect(car.speed).toBeCloseTo(72);
+  expect(car.speed).toBeCloseTo(78);
+  car.boost = 2.2;
+  for (let i = 0; i < 120; i++) {
+    car.s = 0;
+    car.update(
+      1 / 60,
+      { throttle: 1, brake: 0, steer: 0, handbrake: false },
+      sim.track,
+      i / 60,
+    );
+  }
+  expect(car.speed).toBeCloseTo(90);
+  for (let i = 0; i < 30; i++) {
+    car.s = 0;
+    car.update(
+      1 / 60,
+      { throttle: 1, brake: 0, steer: 0, handbrake: false },
+      sim.track,
+      i / 60,
+    );
+  }
+  expect(car.speed).toBeLessThanOrEqual(78);
 });
 it('halves speed on impact, cancels turbo and avoids repeated impact penalties during cooldown', () => {
   const car = new TougeSimulation().player;
@@ -52,7 +77,7 @@ it('grants a stronger mini-turbo for a longer valid drift and lets it expire', (
     car.s = 600;
     car.speed = 25;
     car.drift.active = true;
-    car.drift.validTime = perfect ? 2 : 1;
+    car.drift.validTime = perfect ? 3.2 : 1.3;
     car.drift.turn = 0.3;
     car.drift.score = perfect ? 600 : 200;
     car.drift.finish(car, sim.track);
