@@ -122,3 +122,10 @@
 - `npm run check`: tipos, lint, formatação, 20 unitários e build passaram. `npm run test:e2e`: 15 testes passaram (2,1 min). `npm run test:production`: cinco testes passaram (55,1 s), incluindo duas sessões DRIFT.exe e preservação de notas/OS. Uma rodada preliminar foi interrompida por reload do Vite durante edição; repetição estável integralmente aprovada.
 - Dez capturas reais revisadas; teste também inspeciona 180 estados da câmera nas laterais com interpolação ativa. Relatório e comparação antes/depois em [audits/DRIFT-MAP.md](audits/DRIFT-MAP.md). Inspeção por posicionamento, sem afirmar playtest humano completo.
 - Sem novas dependências, push, merge ou deploy. Pendentes calibração por piloto humano, GPU física e outros browsers; aviso de bundle >500 kB permanece. Próximo incremento do roadmap: 08.
+
+## Rival, câmera e sentido inverso
+
+- Branch feat/rival-camera-reverse: rival busca 70 m/s nas retas, com frenagem antecipada e limite por curvatura. Câmera segue o traçado atrás do carro e antecipa curvas conforme a velocidade, preservando raycast e redução de movimento.
+- Botão Sentido: normal/inverso reinicia na direção escolhida; restart mantém essa escolha. Inverso percorre a mesma estrada de volta com elevação, curvatura, placas e chegada adaptadas.
+- Check/26 unitários e build passaram; corrida/retorno ao OS e mapa passaram no navegador. Comparação matemática dos traçados a cada 20 m e simulação completa nos dois sentidos. Inspeção de 13 posições por sentido e câmera nas laterais. Evidências: evidence/07-reverse-hairpin.png e evidence/07-reverse-finish.png.
+- Sem merge na main. Playtest humano completo e calibração em GPU física pendentes.

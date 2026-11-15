@@ -24,7 +24,9 @@ export class TougeSimulation {
   private accumulator = 0;
   constructor(
     private emit: (event: Record<string, unknown>) => void = () => {},
+    reversed = false,
   ) {
+    this.track = new Track(1707, reversed);
     const event = (e: Record<string, unknown>) => {
       if (e.type === 'driftBanked' && e.who === 'player')
         this.score += Number(e.points);

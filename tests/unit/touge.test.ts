@@ -9,6 +9,41 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('pushes the rival faster on straights while braking for hairpins', () => {
+  const sim = new TougeSimulation();
+  sim.rival.s = 1050;
+  sim.rival.speed = 60;
+  expect(driveAI(sim.rival, sim.player, sim.track, [], 0).throttle).toBe(1);
+  sim.rival.s = 600;
+  sim.rival.speed = 30;
+  expect(
+    driveAI(sim.rival, sim.player, sim.track, [], 0).brake,
+  ).toBeGreaterThan(0);
+});
+it('runs the same road backwards with reversed corners, grades and a finite finish', () => {
+  const forward = new Track(),
+    reverse = new Track(1707, true);
+  for (let s = 0; s <= FINISH; s += 20) {
+    const a = forward.sample(FINISH - s),
+      b = reverse.sample(s);
+    expect(Math.hypot(a.x - b.x, a.z - b.z)).toBeLessThan(0.01);
+    expect(b.y).toBeCloseTo(a.y);
+    expect(b.grade).toBeCloseTo(-a.grade);
+    expect(reverse.curvature(s)).toBeCloseTo(-forward.curvature(FINISH - s));
+  }
+  const sim = new TougeSimulation(() => {}, true);
+  sim.start();
+  for (let i = 0; i < 18000 && !['won', 'lost'].includes(sim.phase); i++) {
+    const c = driveAI(sim.player, sim.rival, sim.track, [], sim.elapsed);
+    sim.update(1 / 60, {
+      throttle: c.throttle > 0,
+      brake: c.brake > 0,
+      steer: c.steer,
+      drift: false,
+    });
+  }
+  expect(sim.phase).toBe('won');
+});
 it('shows charge only when all drift requirements are met and reaches the higher speed limit', () => {
   const sim = new TougeSimulation(),
     car = sim.player;

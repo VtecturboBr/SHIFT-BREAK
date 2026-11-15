@@ -35,8 +35,8 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     passingLane,
   );
   let desired = Math.min(
-    autopilot ? 40 : 45,
-    Math.sqrt((autopilot ? 7 : 8.5) / Math.max(0.003, bend)),
+    autopilot ? 50 : 70,
+    Math.sqrt((autopilot ? 7 : 10.5) / Math.max(0.002, bend)),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
   if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {

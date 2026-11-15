@@ -26,6 +26,7 @@ export class RedlineWorld implements World {
   private readonly audio = new AudioEngine();
   private readonly look = new THREE.Vector3();
   private cameraReady = false;
+  private reversed = false;
   private trailTime = 0;
   private trailCursor = 0;
   private readonly smoke: THREE.Mesh[] = [];
@@ -33,7 +34,10 @@ export class RedlineWorld implements World {
   model = this.createSimulation();
 
   private createSimulation(): TougeSimulation {
-    return new TougeSimulation((event) => this.audio?.event(event));
+    return new TougeSimulation(
+      (event) => this.audio?.event(event),
+      this.reversed,
+    );
   }
   constructor(host: HTMLElement, exit: () => void, software = false) {
     this.pixelRatioLimit = software ? 0.7 : 1.5;
@@ -76,6 +80,20 @@ export class RedlineWorld implements World {
     this.hud.setAttribute('role', 'region');
     this.hud.innerHTML = `<header><strong>REDLINE <small>DRIFT.exe · AKAGIRI PASS</small></strong><button data-audio>Silenciar áudio</button><button data-pause>Pausar</button><button data-restart>Reiniciar corrida</button><button data-exit>Sair da corrida</button></header><output class="redline-stats" aria-live="off"></output><section class="redline-message" role="status"><h1></h1><p></p><button data-start>Iniciar corrida</button></section><footer>W / ↑ acelerar · S / ↓ frear/ré · A/D ou ←/→ direção · Espaço inicia drift · Contraesterce ou solte para estabilizar · ESC pausa · R reinicia · M áudio</footer>`;
     this.hud.append(this.speedometer.element);
+    const direction = document.createElement('button');
+    direction.textContent = 'Sentido: normal';
+    direction.addEventListener(
+      'click',
+      () => {
+        this.reversed = !this.reversed;
+        direction.textContent = this.reversed
+          ? 'Sentido: inverso'
+          : 'Sentido: normal';
+        this.restart();
+      },
+      { signal: this.events.signal },
+    );
+    this.hud.querySelector('header')!.append(direction);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -216,11 +234,18 @@ export class RedlineWorld implements World {
           if (puff.scale.x > 3) puff.visible = false;
         }
     const p = sim.track.sample(player.s, player.lane),
-      target = sim.track.sample(player.s + 19, player.lane * 0.55);
+      target = sim.track.sample(
+        player.s + 14 + Math.min(player.speed * 0.12, 9),
+        player.lane * 0.35,
+      );
+    const behind = sim.track.sample(
+      Math.max(0, player.s - 11),
+      player.lane * 0.6,
+    );
     const desired = new THREE.Vector3(
-      p.x - Math.sin(p.angle) * 11.2,
-      p.y + 5.5,
-      p.z - Math.cos(p.angle) * 11.2,
+      player.s < 11 ? p.x - Math.sin(p.angle) * 11 : behind.x,
+      p.y + 5.2,
+      player.s < 11 ? p.z - Math.cos(p.angle) * 11 : behind.z,
     );
     const look = new THREE.Vector3(target.x, target.y + 1.8, target.z);
     const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
@@ -231,7 +256,7 @@ export class RedlineWorld implements World {
       this.look.copy(look);
       this.cameraReady = true;
     } else {
-      this.camera.position.lerp(desired, 1 - Math.exp(-dt * 4));
+      this.camera.position.lerp(desired, 1 - Math.exp(-dt * 7));
       this.look.lerp(look, 1 - Math.exp(-dt * 5));
     }
     // Constrain the interpolated position too: smoothing can cross a wall.
@@ -279,6 +304,9 @@ export class RedlineWorld implements World {
         ? '3,2 km de descida, três grampos e dois túneis. Complete o percurso, preserve o carro e busque drifts controlados para superar o rival.'
         : sim.result ||
           `Drift: ${sim.score} · Tempo: ${sim.elapsed.toFixed(1)}s.`;
+    if (sim.phase === 'ready' && this.reversed)
+      message.querySelector('p')!.textContent =
+        'Sentido inverso: 3,2 km de subida, três grampos e dois túneis. Complete o percurso e supere o rival. Trocar o sentido reinicia a corrida.';
     const start = message.querySelector<HTMLButtonElement>('[data-start]')!;
     start.hidden = !['ready', 'paused'].includes(sim.phase);
     start.textContent =

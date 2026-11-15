@@ -31,32 +31,42 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
     world.camera.updateProjectionMatrix();
     return { world, renderer, THREE };
   });
-  for (const s of [620, 900, 920, 1020, 1550, 2060, 2080, 2180, 2390, 3180]) {
-    const result = await fixture.evaluate(({ world, renderer, THREE }, s) => {
-      world.model.player.s = s;
-      world.model.rival.s = s + 12;
-      world.model.phase = 'paused';
-      world.cameraReady = false;
-      world.update(0);
-      renderer.render(world.scene, world.camera);
-      const p = world.model.track.sample(s);
-      const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
-      const direction = world.camera.position.clone().sub(anchor);
-      const distance = direction.length();
-      const ray = new THREE.Raycaster(
-        anchor,
-        direction.normalize(),
-        0,
-        distance,
-      );
-      const blocked =
-        ray.intersectObjects(world.world.cameraObstacles(), true).length > 0;
-      return { blocked, distance, chunks: world.world.chunks.size };
-    }, s);
-    expect(result.blocked, `camera at ${s} m`).toBe(false);
-    expect(result.distance).toBeGreaterThan(2);
-    expect(result.chunks).toBeLessThan(25);
-    await page.screenshot({ path: `test-results/map-fixed/${s}.png` });
+  for (const reversed of [false, true]) {
+    await fixture.evaluate(({ world }, reversed) => {
+      world.reversed = reversed;
+      world.restart();
+    }, reversed);
+    for (const s of [
+      620, 800, 900, 920, 1020, 1550, 1650, 2060, 2080, 2180, 2390, 2570, 3180,
+    ]) {
+      const result = await fixture.evaluate(({ world, renderer, THREE }, s) => {
+        world.model.player.s = s;
+        world.model.rival.s = s + 12;
+        world.model.phase = 'paused';
+        world.cameraReady = false;
+        world.update(0);
+        renderer.render(world.scene, world.camera);
+        const p = world.model.track.sample(s);
+        const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
+        const direction = world.camera.position.clone().sub(anchor);
+        const distance = direction.length();
+        const ray = new THREE.Raycaster(
+          anchor,
+          direction.normalize(),
+          0,
+          distance,
+        );
+        const blocked =
+          ray.intersectObjects(world.world.cameraObstacles(), true).length > 0;
+        return { blocked, distance, chunks: world.world.chunks.size };
+      }, s);
+      expect(result.blocked, `camera at ${s} m`).toBe(false);
+      expect(result.distance).toBeGreaterThan(2);
+      expect(result.chunks).toBeLessThan(25);
+      await page.screenshot({
+        path: `test-results/map-fixed/${reversed ? 'reverse-' : ''}${s}.png`,
+      });
+    }
   }
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   const cameraFailures = await fixture.evaluate(({ world, THREE }) => {

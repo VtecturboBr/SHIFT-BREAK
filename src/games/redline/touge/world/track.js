@@ -20,10 +20,12 @@ export const TRACK_STEP = 2;
 const CELL = 32;
 
 export class Track {
-  constructor(seed = 1707) {
+  constructor(seed = 1707, reversed = false) {
     this.seed = seed;
+    this.reversed = reversed;
     const rng = random(seed);
     const bend = 0.28 + rng() * 0.06;
+    /** @type {Array<{id:number,start:number,end:number,length:number,type:string,turn:number,name:string}>} */
     this.sections = [];
     let start = 0,
       heading = 0;
@@ -62,19 +64,57 @@ export class Track {
     add(260, 'straight', 0, 'Linha da chegada');
     add(160, 'bend', 0.1, 'Última curva');
     add(3000, 'straight', 0, 'Reta final');
+    if (reversed) {
+      const forward = new Track(seed);
+      const end = forward.sample(FINISH);
+      this.sections = forward.sections
+        .filter((p) => p.start < FINISH)
+        .reverse()
+        .map((p) => ({
+          ...p,
+          start: FINISH - Math.min(FINISH, p.end),
+          end: FINISH - p.start,
+          length: Math.min(FINISH, p.end) - p.start,
+          turn: -p.turn,
+          name: p.type === 'straight' ? '' : p.name,
+        }));
+      this.sections.push({
+        id: 99,
+        start: FINISH,
+        end: FINISH + 3000,
+        length: 3000,
+        type: 'straight',
+        turn: 0,
+        name: '',
+      });
+      this.origin = { ...end, angle: end.angle + Math.PI, s: 0, curve: 0 };
+    }
     this.warnings = this.sections
       .filter((p) => p.type === 'hairpin')
       .map((section) => ({
         s: section.start - 150,
         section,
       }));
-    this.points = [{ x: 0, y: 120, z: 0, angle: 0, curve: 0, s: 0 }];
+    this.points = [
+      this.origin || { x: 0, y: 120, z: 0, angle: 0, curve: 0, s: 0 },
+    ];
     this.grid = new Map();
     this.indexPoint(this.points[0]);
   }
 
   section(s) {
-    return this.sections.find((p) => s < p.end) || this.sections.at(-1);
+    return (
+      this.sections.find((p) => s < p.end) ||
+      this.sections.at(-1) || {
+        id: -1,
+        start: 0,
+        end: Infinity,
+        length: Infinity,
+        type: 'straight',
+        turn: 0,
+        name: '',
+      }
+    );
   }
   curvature(s) {
     const p = this.section(Math.max(0, s));
@@ -82,9 +122,11 @@ export class Track {
     return ((2 * p.turn) / p.length) * Math.sin(t * Math.PI) ** 2;
   }
   elevation(s) {
+    if (this.reversed) s = FINISH - s;
     return 120 - s * 0.035 + Math.sin(s / 250) * 1.2;
   }
   grade(s) {
+    if (this.reversed) return -(-0.035 + Math.cos((FINISH - s) / 250) * 0.0048);
     return -0.035 + Math.cos(s / 250) * 0.0048;
   }
   indexPoint(p) {
