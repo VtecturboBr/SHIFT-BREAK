@@ -9,6 +9,27 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('ends drift on Space release even while steering and does not bank twice', () => {
+  const sim = new TougeSimulation();
+  const car = sim.player;
+  car.s = 600;
+  car.speed = 27;
+  const control = { throttle: 0, brake: 0, steer: -1, handbrake: true };
+  car.update(1 / 60, control, sim.track, 0);
+  expect(car.drifting).toBe(true);
+  car.drift.validTime = 2;
+  car.drift.turn = 0.3;
+  car.drift.score = 600;
+  control.handbrake = false;
+  car.update(1 / 60, control, sim.track, 1);
+  expect(car.drifting).toBe(false);
+  expect(car.drift.active).toBe(false);
+  const score = sim.score;
+  expect(score).toBeGreaterThan(0);
+  car.update(1 / 60, control, sim.track, 2);
+  expect(car.drifting).toBe(false);
+  expect(sim.score).toBe(score);
+});
 it('reuses the original finite track, hairpins and tunnels without combat sections', () => {
   const track = new Track(1707);
   expect(FINISH).toBe(3200);

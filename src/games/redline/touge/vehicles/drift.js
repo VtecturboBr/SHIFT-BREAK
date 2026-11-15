@@ -63,6 +63,7 @@ export class Drift {
     this.feedback = Math.max(0, this.feedback - dt);
     const pressed = control.handbrake && !this.held;
     this.held = !!control.handbrake;
+    if (this.active && !control.handbrake) this.finish(car, track);
     if (
       pressed &&
       !this.active &&
