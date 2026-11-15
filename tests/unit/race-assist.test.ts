@@ -82,7 +82,7 @@ it('opens a real passing corridor without crossing in front of the overtaking pl
   expect(sim.player.health).toBe(100);
   expect(sim.rival.health).toBe(100);
 });
-it('gives a trailing rival recovery power but brakes to preserve a following gap even if the player stops', () => {
+it('recovers and safely passes a stopping player when the straight is free', () => {
   const sim = race();
   sim.player.s = 1100;
   sim.rival.s = 1060;
@@ -93,10 +93,11 @@ it('gives a trailing rival recovery power but brakes to preserve a following gap
   expect(sim.rival.catchupPower).toBeGreaterThan(0);
   for (let i = 0; i < 600; i++) {
     sim.update(1 / 60, { ...coast, brake: sim.player.speed > 0 });
-    expect(sim.player.s - sim.rival.s).toBeGreaterThan(12);
+    expect(sim.player.health).toBe(100);
+    expect(sim.rival.health).toBe(100);
   }
   expect(sim.rival.catchupPower).toBe(0);
-  expect(sim.rival.speed).toBeLessThan(1);
+  expect(sim.rival.s).toBeGreaterThan(sim.player.s + 8);
   expect(sim.player.health).toBe(100);
 });
 it('freezes assistance on pause and resets it with a fresh session', () => {

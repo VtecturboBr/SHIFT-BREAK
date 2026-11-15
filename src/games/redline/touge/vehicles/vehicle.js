@@ -11,6 +11,7 @@ export class Vehicle {
     this.lane = 0;
     this.speed = 0;
     this.braking = false;
+    this.reverseArmed = true;
     this.lateral = 0;
     this.steer = 0;
     this.slip = 0;
@@ -68,6 +69,8 @@ export class Vehicle {
       this.draftPower * 2.5 +
       this.catchupPower * 44;
     const beforeSpeed = this.speed;
+    if (!control.brake) this.reverseArmed = true;
+    else if (beforeSpeed > 0.5) this.reverseArmed = false;
     const resistance =
       Math.sign(this.speed) * (this.speed * this.speed * 0.001 + 0.9);
     this.speed +=
@@ -85,6 +88,8 @@ export class Vehicle {
     if (!control.throttle && !control.brake && beforeSpeed * this.speed <= 0)
       this.speed = 0;
     this.speed = clamp(this.speed, -5, maxSpeed);
+    if (this.id === 'rival' || (control.brake && !this.reverseArmed))
+      this.speed = Math.max(0, this.speed);
     const speedFactor = clamp(Math.abs(this.speed) / 28, 0, 1);
     this.steer = damp(this.steer, control.steer, 9, dt);
     const drift = this.drift.update(dt, this, control, track, curve);

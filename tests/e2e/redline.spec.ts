@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', async ({
   page,
 }) => {
+  // Two complete software-rendered launches were already taking 59 s before this change.
+  test.setTimeout(90_000);
   const errors: string[] = [];
   await page.setViewportSize({ width: 1280, height: 720 });
   page.on('pageerror', (error) => errors.push(error.message));

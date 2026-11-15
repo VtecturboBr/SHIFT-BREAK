@@ -17,14 +17,16 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
       car.lane < -0.3 ? -1 : car.lane > 0.3 ? 1 : other.lane >= 0 ? -1 : 1;
   if (!cruising || gap > 12 || gap < -90) car.yieldSide = 0;
   const passingLane = ROAD_EDGE - 0.08;
-  const canPass = other.speed > 15 && !other.braking && bend < 0.008;
-  if (gap < -8 || gap > 50 || !canPass) car.passSide = 0;
+  const canPass = bend < 0.008 && !car.drift.active && !other.drift.active;
+  // Finish clearing the other car before merging, even if it starts braking.
+  if (gap < -8 || gap > 50 || (!canPass && Math.abs(gap) > 8)) car.passSide = 0;
   if (
     !car.passSide &&
     gap > 0 &&
     gap < 45 &&
     (car.recovering || car.speed > other.speed + 0.6) &&
-    canPass
+    canPass &&
+    bend < 0.002
   ) {
     car.passSide = other.lane > 0 ? -1 : 1;
     car.yieldSide = 0;
@@ -62,6 +64,10 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
           Math.max(0.002, bend),
       ),
     );
+  const sameCorridor =
+    Math.abs(car.lane - other.lane) <
+    2.1 +
+      2.23 * (Math.abs(Math.sin(car.slip)) + Math.abs(Math.sin(other.slip)));
   const tandem = car.drift.active && other.drift.active && gap > 0 && gap < 14;
   const following = car.recovering && !tandem && !car.passSide;
   if (following)
@@ -74,13 +80,12 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     (!tandem &&
       (car.recovering || car.passSide) &&
       gap > 0 &&
-      Math.abs(car.lane - other.lane) < 2.1 &&
-      car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 7)));
-  if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {
+      sameCorridor &&
+      car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 10)));
+  if (gap > 0 && gap < 11 && sameCorridor) {
     desired = Math.min(desired, other.speed + Math.max(0, gap - 6) * 0.6);
   }
-  const emergency =
-    !tandem && gap > 0 && gap < 5.5 && Math.abs(car.lane - other.lane) < 2.1;
+  const emergency = !tandem && gap > 0 && gap < 7 && sameCorridor;
   const compensation =
     -curve *
     car.speed *
@@ -90,7 +95,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   const lateralTarget =
     cruising &&
     Math.abs(gap) < 5 &&
-    Math.abs(car.lane - other.lane) > (car.passSide ? 2.1 : 1.2)
+    Math.abs(car.lane - other.lane) > (car.passSide ? 2.3 : 1.2)
       ? 0
       : cruising
         ? clamp(
@@ -103,7 +108,6 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   const handbrake =
     !autopilot &&
     !emergency &&
-    !(car.recovering && gap < 24 && !tandem) &&
     car.speed > 16 &&
     Math.abs(curve) > (car.drift.active ? 0.004 : 0.008) &&
     Math.abs(car.lane) < ROAD_EDGE - 0.5 &&

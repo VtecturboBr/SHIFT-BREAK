@@ -1,4 +1,5 @@
 import { roadEdge } from './touge/world/track.js';
+import { carsOverlap } from './touge/vehicles/contact.js';
 import {
   LoopTrack as Track,
   LOOP_LENGTH,
@@ -153,16 +154,29 @@ export class TougeSimulation {
       );
     }
     this.matchDriftPace();
-    const gap = this.track.localGap(this.rival.s, this.player.s);
+    const playerPosition = this.track.sample(this.player.s, this.player.lane);
+    const rivalPosition = this.track.sample(this.rival.s, this.rival.lane);
     if (
       !this.rivalFinished &&
       !(this.player.drift.active && this.rival.drift.active) &&
-      Math.abs(gap) < 4.45 &&
-      Math.abs(this.player.lane - this.rival.lane) < 2.1
+      carsOverlap(
+        playerPosition.x - rivalPosition.x,
+        playerPosition.z - rivalPosition.z,
+        r.angle + this.rival.slip,
+        p.angle + this.player.slip,
+      )
     ) {
       const side = this.player.lane < this.rival.lane ? -1 : 1;
-      const correction =
-        (2.1 - Math.abs(this.player.lane - this.rival.lane)) / 2 + 0.001;
+      const lateralExtent = (slip: number) =>
+        0.99 * Math.abs(Math.cos(slip)) + 2.23 * Math.abs(Math.sin(slip));
+      const correction = Math.max(
+        0.001,
+        (lateralExtent(this.player.slip) +
+          lateralExtent(this.rival.slip) -
+          Math.abs(this.player.lane - this.rival.lane)) /
+          2 +
+          0.001,
+      );
       this.player.lane = Math.max(
         -roadEdge(this.player.slip),
         Math.min(
@@ -186,7 +200,7 @@ export class TougeSimulation {
       this.finish(false, 'Carro sem condições de continuar.');
     else if (this.player.s >= this.finishDistance)
       this.finish(
-        true,
+        !this.rivalFinished,
         !this.rivalFinished
           ? 'Chegada em primeiro lugar.'
           : 'Descida concluída. Tente superar o rival.',
@@ -213,7 +227,8 @@ export class TougeSimulation {
       Math.max(0, front.speed + Math.max(0, gap - 7) * 1.5),
     );
     if (rear.speed < beforeSpeed) rear.braking = true;
-    rear.s -= Math.max(0, 5.5 - gap);
+    // Repair an existing overlap gradually rather than teleporting backwards.
+    rear.s -= Math.min(0.06, Math.max(0, 5.5 - gap));
     rear.boost = 0;
   }
 }

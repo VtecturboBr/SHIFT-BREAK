@@ -10,4 +10,6 @@ Branch feat/akagiri-loop: plano do circuito implementado. Check/49 unitários/bu
 
 ## Checkpoint atual — rampas, ultrapassagem e noite
 
+Atualização posterior: branch fix/drift-race-audit corrige a auditoria de IA, classificação, contato orientado, tandem e freio/ré; reutiliza vetores e reduz atualização do HUD. Check/57 unitários/build aprovado. Detalhes e limites em docs/PROGRESS.md; recursos opcionais não implementados. Sem merge/push/deploy.
+
 Branch fix/grade-overtakes-night-lights, base 0c6e2a0. Rampas afetam orientação e velocidade, rival prepara e conclui novas ultrapassagens, ambos têm luz de freio, noite mais escura e faróis do jogador alternáveis por L/botão. Check com 52 unitários/build aprovado; 18 cenários de navegador cobertos pela suíte e reexecução da integração/mapa; cinco testes do build de produção aprovados. Evidências e resultados detalhados em docs/PROGRESS.md. Sem merge/push/deploy; calibração humana em GPU física pendente.

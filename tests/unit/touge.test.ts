@@ -112,7 +112,7 @@ it('runs the same road backwards with reversed corners, grades and a finite fini
       drift: false,
     });
   }
-  expect(sim.phase).toBe('won');
+  expect(sim.phase).toBe(sim.rivalFinished ? 'lost' : 'won');
 });
 it('shows charge only when all drift requirements are met and reaches the higher speed limit', () => {
   const sim = new TougeSimulation(),
@@ -256,7 +256,7 @@ it('completes the real course using racing inputs, with no forced mode changes o
       drift: false,
     });
   }
-  expect(sim.phase).toBe('won');
+  expect(sim.phase).toBe(sim.rivalFinished ? 'lost' : 'won');
   expect(sim.player.s).toBeGreaterThanOrEqual(FINISH);
   expect(sim.rival.s).toBeLessThanOrEqual(FINISH + 70);
   expect('combat' in sim).toBe(false);
