@@ -1,8 +1,28 @@
 import { expect, it } from 'vitest';
 import { TougeSimulation } from '../../src/games/redline/TougeSimulation';
+import { driveAI } from '../../src/games/redline/touge/ai/driver.js';
 
 const gas = { throttle: true, brake: false, steer: 0, drift: false };
 const coast = { ...gas, throttle: false };
+it('closes a large lead against a moving player on the real course', () => {
+  const sim = new TougeSimulation();
+  sim.phase = 'running';
+  sim.player.s = 200;
+  sim.rival.s = 40;
+  sim.player.speed = 60;
+  sim.rival.speed = 50;
+  for (let i = 0; i < 1200; i++) {
+    const c = driveAI(sim.player, sim.rival, sim.track, [], sim.elapsed);
+    sim.update(1 / 60, {
+      throttle: c.throttle > 0,
+      brake: c.brake > 0,
+      steer: c.steer,
+      drift: c.handbrake,
+    });
+  }
+  expect(sim.player.s - sim.rival.s).toBeLessThan(100);
+  expect(sim.player.health).toBe(100);
+});
 function race() {
   const sim = new TougeSimulation();
   sim.phase = 'running';
@@ -106,7 +126,7 @@ it('raises the player speed ceiling with drafting and fades rival recovery befor
   sim.player.speed = sim.rival.speed = 70;
   sim.update(1 / 60, gas);
   expect(sim.rival.catchupPower).toBe(1);
-  expect(sim.rival.speed).toBeGreaterThan(70.1);
+  expect(sim.rival.speed).toBeGreaterThan(70.3);
   sim.rival.s = sim.player.s - 23;
   sim.rival.boost = 2;
   sim.update(1 / 60, gas);

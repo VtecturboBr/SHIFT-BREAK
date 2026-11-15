@@ -27,6 +27,10 @@ export class RedlineWorld implements World {
   private readonly audio = new AudioEngine();
   private readonly look = new THREE.Vector3();
   private cameraReady = false;
+  private lookBack = false;
+  private wasLookingBack = false;
+  private readonly rearButton = document.createElement('button');
+  private readonly chaseOffset = new THREE.Vector3();
   private cameraMode = 0;
   private readonly cameraNames = ['Perseguição', 'Próxima', 'Capô', 'Alta'];
   private readonly cameraButton = document.createElement('button');
@@ -108,6 +112,17 @@ export class RedlineWorld implements World {
       signal: this.events.signal,
     });
     this.hud.querySelector('header')!.append(this.cameraButton);
+    this.rearButton.textContent = 'Olhar para trás [B]';
+    this.rearButton.setAttribute('aria-pressed', 'false');
+    this.rearButton.addEventListener(
+      'click',
+      () => {
+        this.lookBack = !this.lookBack;
+        this.dirty = true;
+      },
+      { signal: this.events.signal },
+    );
+    this.hud.querySelector('header')!.append(this.rearButton);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -149,6 +164,7 @@ export class RedlineWorld implements World {
             'KeyR',
             'KeyM',
             'KeyC',
+            'KeyB',
           ].includes(event.code)
         ) {
           event.preventDefault();
@@ -186,6 +202,7 @@ export class RedlineWorld implements World {
     this.dirty = true;
   }
   private restart(): void {
+    this.lookBack = false;
     this.dirty = true;
     this.keys.clear();
     this.model = this.createSimulation();
@@ -195,6 +212,7 @@ export class RedlineWorld implements World {
     for (const effect of [...this.smoke, ...this.skids]) effect.visible = false;
   }
   private pause(): void {
+    this.lookBack = false;
     this.keys.clear();
     this.model.pause();
   }
@@ -263,8 +281,8 @@ export class RedlineWorld implements World {
         player.lane * 0.35,
       );
     const distance =
-      this.cameraMode === 1 ? 6.5 : this.cameraMode === 3 ? 15 : 11;
-    const height = this.cameraMode === 1 ? 3 : this.cameraMode === 3 ? 9 : 5.2;
+      this.cameraMode === 1 ? 6.5 : this.cameraMode === 3 ? 15 : 7.5;
+    const height = this.cameraMode === 1 ? 3 : this.cameraMode === 3 ? 9 : 3.4;
     const behind = sim.track.sample(
       Math.max(0, player.s - distance),
       player.lane * 0.6,
@@ -283,13 +301,37 @@ export class RedlineWorld implements World {
       );
     }
     const look = new THREE.Vector3(target.x, target.y + 1.8, target.z);
+    const lookingBack = this.lookBack || this.keys.has('KeyB');
+    this.rearButton.setAttribute('aria-pressed', String(lookingBack));
+    if (lookingBack !== this.wasLookingBack) this.cameraReady = false;
+    this.wasLookingBack = lookingBack;
+    if (lookingBack) {
+      const rear = sim.track.sample(
+        Math.max(0, player.s - 18),
+        player.lane * 0.35,
+      );
+      desired.set(
+        p.x + Math.sin(p.angle) * 7.5,
+        p.y + 3.4,
+        p.z + Math.cos(p.angle) * 7.5,
+      );
+      look.set(rear.x, rear.y + 1.4, rear.z);
+    }
     const anchor = new THREE.Vector3(p.x, p.y + 1.8, p.z);
     const obstacles = this.world.cameraObstacles();
     constrainCamera(desired, anchor, obstacles);
     if (!this.cameraReady || reduced || this.cameraMode === 2) {
       this.camera.position.copy(desired);
+      this.chaseOffset.copy(desired).sub(anchor);
       this.look.copy(look);
       this.cameraReady = true;
+    } else if (this.cameraMode === 0 || lookingBack) {
+      this.chaseOffset.lerp(
+        desired.clone().sub(anchor),
+        1 - Math.exp(-dt * 10),
+      );
+      this.camera.position.copy(anchor).add(this.chaseOffset);
+      this.look.copy(look);
     } else {
       this.camera.position.lerp(desired, 1 - Math.exp(-dt * 7));
       this.look.lerp(look, 1 - Math.exp(-dt * 5));

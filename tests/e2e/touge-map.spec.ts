@@ -96,6 +96,43 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
     return failures;
   });
   expect(cameraFailures).toEqual([]);
+  const chaseDistance = await fixture.evaluate(({ world }) => {
+    world.model.player.s = 1050;
+    world.model.player.lane = 0;
+    world.cameraMode = 0;
+    world.cameraReady = false;
+    let maximum = 0;
+    for (let frame = 0; frame < 120; frame++) {
+      world.model.player.s += 1.3;
+      world.update(1 / 60);
+      const p = world.model.track.sample(world.model.player.s);
+      maximum = Math.max(
+        maximum,
+        Math.hypot(
+          world.camera.position.x - p.x,
+          world.camera.position.z - p.z,
+        ),
+      );
+    }
+    return maximum;
+  });
+  expect(chaseDistance).toBeLessThan(9);
+  await page.keyboard.down('b');
+  await fixture.evaluate(({ world, renderer }) => {
+    world.update(0);
+    renderer.render(world.scene, world.camera);
+  });
+  await fixture.evaluate(({ world }) => {
+    if (world.rearButton.getAttribute('aria-pressed') !== 'true')
+      throw new Error('Rear view did not activate');
+  });
+  await page.screenshot({ path: 'test-results/rear-view.png' });
+  await page.keyboard.up('b');
+  await fixture.evaluate(({ world }) => {
+    world.update(0);
+    if (world.rearButton.getAttribute('aria-pressed') !== 'false')
+      throw new Error('Rear view did not release');
+  });
   for (let mode = 0; mode < 4; mode++) {
     const clear = await fixture.evaluate(({ world, renderer, THREE }, mode) => {
       world.model.player.s = 800;
@@ -149,6 +186,16 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
   await expect(page.locator('[data-rival-state]')).toHaveText(
     'Rival recuperando distância',
   );
+  const rearButton = page.getByRole('button', {
+    name: 'Olhar para trás [B]',
+    exact: true,
+  });
+  await rearButton.click();
+  await fixture.evaluate(({ world }) => world.update(0));
+  await expect(rearButton).toHaveAttribute('aria-pressed', 'true');
+  await rearButton.click();
+  await fixture.evaluate(({ world }) => world.update(0));
+  await expect(rearButton).toHaveAttribute('aria-pressed', 'false');
   await fixture.evaluate(({ world, renderer }) => {
     world.dispose();
     renderer.dispose();

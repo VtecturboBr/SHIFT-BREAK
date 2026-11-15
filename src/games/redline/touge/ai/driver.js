@@ -50,10 +50,13 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     Math.sqrt((autopilot ? 7 : 26) / Math.max(0.002, bend)),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
-  if (car.catchupPower > 0 && bend < 0.004)
-    desired = 78 + car.catchupPower * 10;
+  if (car.catchupPower > 0)
+    desired = Math.min(
+      78 + car.catchupPower * 28,
+      Math.sqrt((26 + car.catchupPower * 6) / Math.max(0.002, bend)),
+    );
   if (car.recovering)
-    desired = Math.min(desired, Math.max(0, other.speed + (gap - 24) * 0.45));
+    desired = Math.min(desired, Math.max(0, other.speed + (gap - 24) * 0.75));
   const recoveryBrake =
     car.recovering &&
     car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 18));

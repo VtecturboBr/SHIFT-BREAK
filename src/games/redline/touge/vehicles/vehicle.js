@@ -62,14 +62,14 @@ export class Vehicle {
       (this.engine > 0 ? 38 : 78) +
       (this.boost > 0 ? 12 : 0) +
       this.draftPower * 6 +
-      this.catchupPower * 10;
+      this.catchupPower * 28;
     const beforeSpeed = this.speed;
     const resistance =
       Math.sign(this.speed) * (this.speed * this.speed * 0.0018 + 0.9);
     this.speed +=
       (control.throttle * (this.engine > 0 ? 6 : 13) +
         (control.throttle && !control.brake
-          ? this.draftPower * 6 + this.catchupPower * 8
+          ? this.draftPower * 6 + this.catchupPower * 20
           : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -

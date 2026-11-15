@@ -158,3 +158,11 @@
 - Ao ficar atrás, rival recebe recuperação gradual se a distância exceder 24 m. Ajuda cai perto do jogador; controle busca margem de 24 m, com frenagem de segurança e cancelamento de turbo perto dessa margem. Não teleporta, nem usa a recuperação para forçar ultrapassagem. HUD informa recuperação/manutenção de distância.
 - Check com 34 unitários e build aprovado; dois testes de corrida/mapa no navegador e cinco smokes de produção aprovados. Testes cobrem vácuo válido/inválido, carga/decadência, limite extra, ultrapassagem sem contato, recuperação com jogador freando até parar, pausa/reset e regressão dos dois sentidos.
 - evidence/07-drafting-gameplay.png é captura do jogo integrado; evidence/07-drafting-hud.png demonstra carga em estado fixado na fixture de inspeção visual, sem representar uma corrida humana. Ambas revisadas. Calibração por playtest humano prolongado/GPU física continua pendente. Sem merge na main.
+
+## Recuperação reforçada, perseguição próxima e visão traseira
+
+- Branch fix/recovery-chase-rear-view: recuperação do rival aumenta até +28 m/s de limite e +20 m/s² de aceleração (antes +10/+8), com potência total a 54 m de distância em vez de 74 m. Limite de curva cresce gradualmente durante recuperação. Margem-alvo de 24 m, corte de boost perto do jogador e frenagem de segurança preservados.
+- Perseguição com distância nominal de 7,5 m e altura de 3,4 m. Suavização do deslocamento relativo ao carro evita acumular atraso de posição em alta velocidade. Não é uma reprodução exata de Forza; mantém as quatro câmeras e proteção contra cenário.
+- Segurar B olha para trás; soltar restaura a vista escolhida. Botão Olhar para trás [B] alterna a visão, com aria-pressed. Pausa/blur/restart limpam a visão traseira.
+- Check com 35 unitários e build passou; testes de mapa/câmeras/visão traseira e corrida/retorno ao OS passaram no navegador. Teste novo reduz vantagem inicial de 160 m para menos de 100 m em 20 s contra jogador em movimento no percurso real; frenagem com jogador parando continua validada. Câmera acompanha deslocamento a 78 m/s sem ultrapassar 9 m de afastamento horizontal.
+- Capturas reais revisadas: evidence/07-close-chase.png e evidence/07-rear-view.png. Playtest humano prolongado/GPU física permanecem pendentes. Sem merge na main.

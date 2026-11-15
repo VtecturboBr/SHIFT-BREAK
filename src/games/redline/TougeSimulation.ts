@@ -101,7 +101,7 @@ export class TougeSimulation {
     if (gapBefore < -4.5) this.rival.recovering = true;
     if (gapBefore > 0) this.rival.recovering = false;
     this.rival.catchupPower = this.rival.recovering
-      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 50))
+      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 30))
       : 0;
     if (this.rival.recovering && gapBefore > -24) this.rival.boost = 0;
     this.player.update(
