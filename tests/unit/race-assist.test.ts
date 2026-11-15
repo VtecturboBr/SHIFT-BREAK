@@ -111,7 +111,7 @@ it('freezes assistance on pause and resets it with a fresh session', () => {
 });
 it('raises the player speed ceiling with drafting and fades rival recovery before close pursuit', () => {
   const sim = race();
-  sim.player.speed = 83;
+  sim.player.speed = 93;
   sim.player.draftPower = 1;
   sim.player.update(
     1 / 60,
@@ -119,8 +119,8 @@ it('raises the player speed ceiling with drafting and fades rival recovery befor
     sim.track,
     0,
   );
-  expect(sim.player.speed).toBeGreaterThan(78);
-  expect(sim.player.speed).toBeLessThanOrEqual(84);
+  expect(sim.player.speed).toBeGreaterThan(88);
+  expect(sim.player.speed).toBeLessThanOrEqual(94);
   sim.player.s = 1240;
   sim.rival.s = 1040;
   sim.player.speed = sim.rival.speed = 70;

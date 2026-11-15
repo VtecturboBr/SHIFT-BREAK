@@ -81,6 +81,7 @@ export class TougeSimulation {
     this.elapsed += dt;
     this.player.sync.update(dt);
     this.rival.sync.update(dt);
+    this.rival.launchPower = Math.max(0, 1 - this.elapsed / 5);
     const gapBefore = this.rival.s - this.player.s;
     const p = this.track.sample(this.player.s),
       r = this.track.sample(this.rival.s);
@@ -101,7 +102,7 @@ export class TougeSimulation {
     if (gapBefore < -4.5) this.rival.recovering = true;
     if (gapBefore > 0) this.rival.recovering = false;
     this.rival.catchupPower = this.rival.recovering
-      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 30))
+      ? Math.max(0, Math.min(1, (-gapBefore - 24) / 20))
       : 0;
     if (this.rival.recovering && gapBefore > -24) this.rival.boost = 0;
     this.player.update(

@@ -171,21 +171,23 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
     world.update(0);
     renderer.render(world.scene, world.camera);
   });
-  await expect(
-    page.getByRole('progressbar', { name: 'Carga de vácuo', exact: true }),
-  ).toHaveJSProperty('value', 80);
-  await expect(page.locator('[data-draft]')).toHaveText('VÁCUO 80%');
-  await page.screenshot({ path: 'test-results/drafting-hud.png' });
-  await fixture.evaluate(({ world }) => {
-    world.model.draftCharge = 0;
-    world.model.drafting = false;
-    world.model.rival.recovering = true;
-    world.model.rival.catchupPower = 0.5;
+  const visuals = await fixture.evaluate(({ world }) => {
+    world.model.player.steer = 1;
+    world.model.player.drifting = false;
     world.update(0);
+    return {
+      wind: world.windWake.root.visible,
+      count: world.windWake.root.children.length,
+      wheels: world.cars[0].wheels
+        .filter((w: { front: boolean }) => w.front)
+        .map((w: { pivot: { rotation: { y: number } } }) => w.pivot.rotation.y),
+    };
   });
-  await expect(page.locator('[data-rival-state]')).toHaveText(
-    'Rival recuperando distância',
-  );
+  expect(visuals.wind).toBe(true);
+  expect(visuals.count).toBe(28);
+  for (const angle of visuals.wheels) expect(angle).toBeLessThan(0);
+  await expect(page.locator('.race-assist')).toHaveCount(0);
+  await page.screenshot({ path: 'test-results/wind-wake.png' });
   const rearButton = page.getByRole('button', {
     name: 'Olhar para trás [B]',
     exact: true,

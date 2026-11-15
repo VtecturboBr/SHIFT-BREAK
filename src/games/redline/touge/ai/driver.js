@@ -46,13 +46,13 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     passingLane,
   );
   let desired = Math.min(
-    autopilot ? 50 : car.boost > 0 ? 90 : 78,
+    autopilot ? 50 : car.boost > 0 ? 100 : 88,
     Math.sqrt((autopilot ? 7 : 26) / Math.max(0.002, bend)),
   );
   if (gap > 30 && bend < 0.006) desired += 2;
   if (car.catchupPower > 0)
     desired = Math.min(
-      78 + car.catchupPower * 28,
+      88 + car.catchupPower * 44,
       Math.sqrt((26 + car.catchupPower * 6) / Math.max(0.002, bend)),
     );
   if (car.recovering)

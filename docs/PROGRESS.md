@@ -166,3 +166,11 @@
 - Segurar B olha para trás; soltar restaura a vista escolhida. Botão Olhar para trás [B] alterna a visão, com aria-pressed. Pausa/blur/restart limpam a visão traseira.
 - Check com 35 unitários e build passou; testes de mapa/câmeras/visão traseira e corrida/retorno ao OS passaram no navegador. Teste novo reduz vantagem inicial de 160 m para menos de 100 m em 20 s contra jogador em movimento no percurso real; frenagem com jogador parando continua validada. Câmera acompanha deslocamento a 78 m/s sem ultrapassar 9 m de afastamento horizontal.
 - Capturas reais revisadas: evidence/07-close-chase.png e evidence/07-rear-view.png. Playtest humano prolongado/GPU física permanecem pendentes. Sem merge na main.
+
+## Vento na esteira e nova calibração de velocidade
+
+- Branch feat/wind-wake-and-race-tuning: aceleração normal reduzida de 13 para 10 m/s²; limite normal de 78 para 88 m/s (aproximadamente 317 km/h), turbo até 100 m/s e vácuo adicionando até 6 m/s. Resistência ajustada para que a velocidade final seja atingível com aceleração mais lenta. Velocímetro atualizado para escala até 420 km/h.
+- Corrigido sinal visual de esterço das rodas dianteiras fora do drift; contrasterço durante drift preservado. Teste inspeciona as rotações do modelo no browser.
+- Recuperação do rival aumentada para até +44 m/s de limite e +32 m/s² de aceleração extra, com potência total a 44 m; margem de acompanhamento, corte próximo e frenagem de segurança preservados. Largada tem aceleração extra decrescente por cinco segundos após GO, sem movimento durante countdown.
+- Removidos painel, barra e mensagens de vácuo do HUD. WindWake renderiza 28 rastros claros na estrada atrás de quem está liderando, intensificados quando o jogador aproveita o vácuo. Troca para o novo líder após ultrapassagem, para quando ele fica lento e reduz animação com preferência de movimento reduzido. Recursos pertencem à cena e são descartados ao sair.
+- Check/build e 37 unitários aprovados, incluindo posição da esteira atrás de cada líder e largada; testes de corrida e mapa/efeitos/rodas no navegador passaram. Captura em evidence/07-wind-wake.png é inspeção visual de estado fixado no navegador. Playtest humano prolongado/GPU física pendentes. Sem merge na main.

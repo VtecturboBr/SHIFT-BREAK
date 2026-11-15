@@ -24,6 +24,7 @@ export class Vehicle {
     this.boost = 0;
     this.draftPower = 0;
     this.catchupPower = 0;
+    this.launchPower = 0;
     this.recovering = false;
     this.yieldSide = 0;
     this.drifting = false;
@@ -59,17 +60,17 @@ export class Vehicle {
     const curve = track.curvature(this.s);
     const stability = this.sync.has('stability') || this.sync.has('focus');
     const maxSpeed =
-      (this.engine > 0 ? 38 : 78) +
+      (this.engine > 0 ? 38 : 88) +
       (this.boost > 0 ? 12 : 0) +
       this.draftPower * 6 +
-      this.catchupPower * 28;
+      this.catchupPower * 44;
     const beforeSpeed = this.speed;
     const resistance =
-      Math.sign(this.speed) * (this.speed * this.speed * 0.0018 + 0.9);
+      Math.sign(this.speed) * (this.speed * this.speed * 0.001 + 0.9);
     this.speed +=
-      (control.throttle * (this.engine > 0 ? 6 : 13) +
+      (control.throttle * (this.engine > 0 ? 6 : 10) +
         (control.throttle && !control.brake
-          ? this.draftPower * 6 + this.catchupPower * 20
+          ? this.draftPower * 6 + this.catchupPower * 32 + this.launchPower * 12
           : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -

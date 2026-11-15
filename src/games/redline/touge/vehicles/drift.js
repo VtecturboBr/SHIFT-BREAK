@@ -51,7 +51,7 @@ export class Drift {
     this.grade = perfect ? 'DRIFT PERFEITO' : 'DRIFT CONTROLADO';
     this.feedback = 2.8;
     car.boost = Math.max(car.boost, perfect ? 2.2 : 1.3);
-    car.speed = Math.min(90, car.speed + (perfect ? 8 : 5));
+    car.speed = Math.min(100, car.speed + (perfect ? 8 : 5));
     car.onEvent({
       type: 'driftBanked',
       who: car.id,

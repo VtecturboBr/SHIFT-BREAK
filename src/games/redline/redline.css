@@ -37,35 +37,6 @@
   width: fit-content;
   font: 14px monospace;
 }
-.race-assist {
-  margin: 10px 28px;
-  padding: 10px 14px;
-  width: min(340px, calc(100% - 56px));
-  background: #101d2dee;
-  border-left: 3px solid #668492;
-  font: 12px monospace;
-}
-.race-assist[data-active='true'] {
-  border-color: #62e8ed;
-  color: #9afaff;
-}
-.race-assist progress {
-  display: block;
-  width: 100%;
-  height: 9px;
-  margin: 6px 0;
-  accent-color: #62e8ed;
-}
-.race-assist span,
-.race-assist small {
-  display: block;
-  line-height: 1.5;
-}
-.race-assist small {
-  margin: 4px 0 0;
-  color: #ffca87;
-  font: 11px monospace;
-}
 .redline-message {
   position: absolute;
   top: 30%;

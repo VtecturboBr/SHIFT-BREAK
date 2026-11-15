@@ -7,6 +7,7 @@ import { AudioEngine } from './touge/audio/audio.js';
 import { constrainCamera } from './touge/render/camera.js';
 import { TougeSimulation, FINISH } from './TougeSimulation';
 import { Speedometer } from './Speedometer';
+import { WindWake } from './WindWake';
 
 export class RedlineWorld implements World {
   readonly maxFrameStep = 0.08;
@@ -20,8 +21,8 @@ export class RedlineWorld implements World {
   private readonly events = new AbortController();
   private readonly keys = new Set<string>();
   private readonly hud = document.createElement('section');
-  private readonly raceAssist = document.createElement('aside');
   private readonly speedometer = new Speedometer();
+  private readonly windWake = new WindWake();
   private readonly world: TougeWorld;
   private readonly cars = [makeCar(0xcddde1), makeCar(0x923546, true)];
   private readonly audio = new AudioEngine();
@@ -88,11 +89,7 @@ export class RedlineWorld implements World {
     this.hud.setAttribute('role', 'region');
     this.hud.innerHTML = `<header><strong>REDLINE <small>DRIFT.exe · AKAGIRI PASS</small></strong><button data-audio>Silenciar áudio</button><button data-pause>Pausar</button><button data-restart>Reiniciar corrida</button><button data-exit>Sair da corrida</button></header><output class="redline-stats" aria-live="off"></output><section class="redline-message" role="status"><h1></h1><p></p><button data-start>Iniciar corrida</button></section><footer>W / ↑ acelerar · S / ↓ frear/ré · A/D ou ←/→ direção · Espaço inicia drift · Contraesterce ou solte para estabilizar · ESC pausa · R reinicia · M áudio</footer>`;
     this.hud.append(this.speedometer.element);
-    this.raceAssist.className = 'race-assist';
-    this.raceAssist.setAttribute('aria-label', 'Vácuo e rival');
-    this.raceAssist.innerHTML =
-      '<b data-draft>VÁCUO 0%</b><progress max="100" value="0" aria-label="Carga de vácuo"></progress><span data-draft-hint>Alinhe-se atrás do rival para ganhar velocidade</span><small data-rival-state></small>';
-    this.hud.append(this.raceAssist);
+    this.scene.add(this.windWake.root);
     const direction = document.createElement('button');
     direction.textContent = 'Sentido: normal';
     direction.addEventListener(
@@ -230,6 +227,7 @@ export class RedlineWorld implements World {
       player = sim.player;
     this.world.update(sim);
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.windWake.update(sim, reduced);
     for (let i = 0; i < 2; i++) {
       const car = i ? sim.rival : player,
         model = this.cars[i]!,
@@ -241,7 +239,7 @@ export class RedlineWorld implements World {
         wheel.pivot.rotation.y = wheel.front
           ? car.drifting
             ? car.drift.angle * 1.6
-            : car.steer * 0.38
+            : -car.steer * 0.38
           : 0;
         if (sim.phase === 'running') {
           wheel.tire.rotation.x += car.speed * dt * 2.5;
@@ -355,27 +353,6 @@ export class RedlineWorld implements World {
       ? 'Ativar áudio'
       : 'Silenciar áudio';
     const section = sim.track.section(player.s);
-    const draftPercent = Math.round(sim.draftCharge * 100);
-    this.raceAssist.dataset.active = String(
-      sim.drafting || sim.draftCharge > 0,
-    );
-    this.raceAssist.querySelector('[data-draft]')!.textContent =
-      `VÁCUO ${draftPercent}%`;
-    this.raceAssist.querySelector('progress')!.value = draftPercent;
-    this.raceAssist.querySelector('[data-draft-hint]')!.textContent =
-      sim.drafting
-        ? 'Vácuo ativo · aceleração e velocidade extra'
-        : sim.draftCharge > 0
-          ? 'Impulso residual · aproveite para ultrapassar'
-          : 'Alinhe-se de 5 a 42 m atrás do rival';
-    this.raceAssist.querySelector('[data-rival-state]')!.textContent = sim.rival
-      .recovering
-      ? sim.rival.catchupPower > 0
-        ? 'Rival recuperando distância'
-        : 'Rival mantendo distância'
-      : sim.rival.yieldSide
-        ? 'Rival abrindo passagem'
-        : 'Rival em disputa';
     this.speedometer.update(
       player.speed,
       player.drift.charge(player, sim.track),

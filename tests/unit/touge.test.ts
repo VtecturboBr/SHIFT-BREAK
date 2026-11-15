@@ -9,6 +9,16 @@ import { Vehicle } from '../../src/games/redline/touge/vehicles/vehicle.js';
 import { DrivingStyle } from '../../src/games/redline/DrivingStyle';
 
 const idle = { throttle: false, brake: false, steer: 0, drift: false };
+it('gives the rival a faster launch after the countdown without moving early', () => {
+  const sim = new TougeSimulation();
+  sim.start();
+  for (let i = 0; i < 150; i++) sim.update(1 / 60, idle);
+  expect(sim.rival.speed).toBe(0);
+  expect(sim.rival.s).toBe(26);
+  for (let i = 0; i < 100; i++) sim.update(1 / 60, { ...idle, throttle: true });
+  expect(sim.rival.speed).toBeGreaterThan(sim.player.speed + 5);
+  expect(sim.rival.launchPower).toBeGreaterThan(0);
+});
 it('sweeps slowly across straight lanes and holds position when the player is alongside', () => {
   const sim = new TougeSimulation();
   const car = sim.rival;
@@ -123,11 +133,11 @@ it('shows charge only when all drift requirements are met and reaches the higher
       i / 60,
     );
     if (i === 59) {
-      expect(car.speed).toBeLessThan(13);
-      expect(car.speed).toBeGreaterThan(10);
+      expect(car.speed).toBeLessThan(10);
+      expect(car.speed).toBeGreaterThan(8);
     }
   }
-  expect(car.speed).toBeCloseTo(78);
+  expect(car.speed).toBeCloseTo(88);
   car.boost = 2.2;
   for (let i = 0; i < 120; i++) {
     car.s = 0;
@@ -138,7 +148,7 @@ it('shows charge only when all drift requirements are met and reaches the higher
       i / 60,
     );
   }
-  expect(car.speed).toBeCloseTo(90);
+  expect(car.speed).toBeCloseTo(100);
   for (let i = 0; i < 30; i++) {
     car.s = 0;
     car.update(
@@ -148,7 +158,7 @@ it('shows charge only when all drift requirements are met and reaches the higher
       i / 60,
     );
   }
-  expect(car.speed).toBeLessThanOrEqual(78);
+  expect(car.speed).toBeLessThanOrEqual(88);
 });
 it('halves speed on impact, cancels turbo and avoids repeated impact penalties during cooldown', () => {
   const car = new TougeSimulation().player;
