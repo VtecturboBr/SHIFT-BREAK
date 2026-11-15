@@ -109,6 +109,40 @@ it('freezes assistance on pause and resets it with a fresh session', () => {
   expect(new TougeSimulation().draftCharge).toBe(0);
   expect(new TougeSimulation().rival.catchupPower).toBe(0);
 });
+it('recovers and re-overtakes a moving player through a separate lane on both straight directions', () => {
+  for (const reversed of [false, true]) {
+    const sim = new TougeSimulation(undefined, reversed);
+    sim.phase = 'running';
+    sim.elapsed = 10;
+    sim.player.s = reversed ? sim.track.length + 68 - 1240 : 1000;
+    sim.rival.s = sim.player.s - 26;
+    sim.player.speed = 45;
+    sim.rival.speed = 60;
+    sim.player.lane = 0;
+    sim.rival.lane = -0.65;
+    let passing = false;
+    for (let i = 0; i < 480 && sim.rival.s < sim.player.s + 8; i++) {
+      const steer = Math.max(
+        -1,
+        Math.min(
+          1,
+          (-sim.track.curvature(sim.player.s) * sim.player.speed ** 2 * 0.19 -
+            sim.player.lane * 1.8 -
+            sim.player.lateral * 0.25) /
+            7.6,
+        ),
+      );
+      sim.update(1 / 60, { ...gas, steer });
+      passing ||= sim.rival.passSide !== 0;
+      if (Math.abs(sim.rival.s - sim.player.s) < 4.45)
+        expect(Math.abs(sim.rival.lane - sim.player.lane)).toBeGreaterThan(2.1);
+    }
+    expect(passing).toBe(true);
+    expect(sim.rival.s).toBeGreaterThan(sim.player.s + 8);
+    expect(sim.player.health).toBe(100);
+    expect(sim.rival.health).toBe(100);
+  }
+});
 it('raises the player speed ceiling with drafting and fades rival recovery before close pursuit', () => {
   const sim = race();
   sim.player.speed = 93;

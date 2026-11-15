@@ -109,7 +109,7 @@ export class World {
         vertexShader:
           'varying vec3 v; void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
         fragmentShader:
-          'varying vec3 v; void main(){float h=normalize(v).y;vec3 c=mix(vec3(.075,.12,.15),vec3(.008,.017,.04),smoothstep(-.05,.7,h));gl_FragColor=vec4(c,1.);}',
+          'varying vec3 v; void main(){float h=normalize(v).y;vec3 c=mix(vec3(.018,.03,.05),vec3(.002,.004,.012),smoothstep(-.05,.7,h));gl_FragColor=vec4(c,1.);}',
       }),
     );
     this.decor.add(sky);

@@ -29,6 +29,11 @@
   font-size: 13px;
   padding: 10px 14px;
 }
+.redline-hud button[aria-pressed='true'] {
+  color: #e5fbff;
+  background: #233c49;
+  border-color: #8de5ef;
+}
 .redline-stats {
   display: block;
   margin: 0 28px;

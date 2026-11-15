@@ -25,3 +25,7 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 - [x] LOOP-02 — Uma volta completa, faixa compartilhada aos 34 m, sentido inverso, progressão acumulada e margem local na emenda. Verificados fim de corrida, proximidade/contato/vácuo e rival já finalizado.
 - [x] LOOP-03 — Streaming circular, cenário da garganta/barragem/vertedouro/galeria, materiais procedurais e descarte. Inspeção visual dos dois sentidos e teste de recursos após reinício.
 - [x] LOOP-04 — Regressão e entrega: check/49 unitários/build, 18 e2e e cinco smokes de produção aprovados. docs/AKAGIRI_LOOP.md e docs/evidence/loop/. Branch feat/akagiri-loop; sem merge na main. Playtest humano/GPU física explicitamente pendentes.
+
+- [x] NIGHT-01 — Rampas: normal do pavimento orienta o carro inclusive no drift; gravidade e distância sobre a superfície entram na física; marcas de pneus acompanham a inclinação.
+- [x] NIGHT-02 — Rival prepara e conclui ultrapassagem após perder a liderança, com faixa oposta, potência residual de recuperação e frenagem ao se aproximar no mesmo corredor. Regressão nos dois sentidos e proteção ao jogador parado.
+- [x] NIGHT-03 — Freio luminoso para os dois carros e ambiente noturno com faróis alternáveis por L/botão, estado acessível e preferência preservada no reinício. Verificações/evidências em docs/PROGRESS.md.

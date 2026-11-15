@@ -56,7 +56,10 @@ export function makeCar(color, rival = false) {
   const glass = material(0x16323e, { metalness: 0.8, roughness: 0.1 });
   const chrome = material(0x8396a6, { metalness: 0.9, roughness: 0.18 });
   const lamp = material(0xd6f9ff, { emissive: 0x9cc5ff, emissiveIntensity: 3 });
-  const red = material(0xff344c, { emissive: 0xff0a28, emissiveIntensity: 3 });
+  const red = material(0xff344c, {
+    emissive: 0xff0a28,
+    emissiveIntensity: 0.6,
+  });
   box(body, [1.91, 0.43, 4.25], [0, 0.65, 0], paint);
   box(body, [1.98, 0.18, 4.35], [0, 0.4, 0], black);
   box(body, [1.7, 0.18, 1.36], [0, 0.93, 1.12], paint);
@@ -97,12 +100,16 @@ export function makeCar(color, rival = false) {
     0.18,
   );
   underglow.rotation.x = -Math.PI / 2;
-  const light = new THREE.SpotLight(0xc1ddff, 48, 105, 0.48, 0.65, 1.25);
+  const light = new THREE.SpotLight(0xc1ddff, 140, 130, 0.48, 0.65, 1);
   light.position.set(0, 0.9, 2);
   light.target.position.set(0, 0, 38);
   root.add(light, light.target);
-  for (const side of [-1, 1])
-    glow(body, 0xff2448, 1.4, [side * 0.59, 0.78, -2.18], 0.35);
+  const tailGlows = [-1, 1].map((side) =>
+    glow(body, 0xff2448, 1.4, [side * 0.59, 0.78, -2.18], 0.12),
+  );
+  const brakeLight = new THREE.PointLight(0xff1735, 0, 5, 2);
+  brakeLight.position.set(0, 0.7, -2.3);
+  root.add(brakeLight);
   const shadow = new THREE.Mesh(
     new THREE.CircleGeometry(1, 24),
     new THREE.MeshBasicMaterial({
@@ -116,5 +123,15 @@ export function makeCar(color, rival = false) {
   shadow.scale.set(1.3, 2.5, 1);
   shadow.position.y = 0.045;
   root.add(shadow);
-  return { root, body, wheels, light, underglow };
+  return {
+    root,
+    body,
+    wheels,
+    light,
+    lamp,
+    red,
+    tailGlows,
+    brakeLight,
+    underglow,
+  };
 }

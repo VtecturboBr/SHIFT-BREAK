@@ -35,6 +35,12 @@ export class RedlineWorld implements World {
   private cameraMode = 0;
   private readonly cameraNames = ['Perseguição', 'Próxima', 'Capô', 'Alta'];
   private readonly cameraButton = document.createElement('button');
+  private headlights = true;
+  private readonly lightsButton = document.createElement('button');
+  private readonly roadNormal = new THREE.Vector3();
+  private readonly carForward = new THREE.Vector3();
+  private readonly carRight = new THREE.Vector3();
+  private readonly carBasis = new THREE.Matrix4();
   private reversed = false;
   private trailTime = [0, 0];
   private trailCursor = 0;
@@ -50,9 +56,9 @@ export class RedlineWorld implements World {
   }
   constructor(host: HTMLElement, exit: () => void, software = false) {
     this.pixelRatioLimit = software ? 0.7 : 1.5;
-    this.scene.fog = new THREE.FogExp2(0x12222f, 0.006);
-    this.scene.add(new THREE.HemisphereLight(0x9fbddf, 0x253c38, 2));
-    const moon = new THREE.DirectionalLight(0xb4d4ff, 2.1);
+    this.scene.fog = new THREE.FogExp2(0x060b15, 0.006);
+    this.scene.add(new THREE.HemisphereLight(0x9fbddf, 0x253c38, 0.28));
+    const moon = new THREE.DirectionalLight(0xb4d4ff, 0.35);
     moon.position.set(-100, 180, 90);
     this.scene.add(moon);
     this.world = new TougeWorld(this.scene, this.model.track);
@@ -120,6 +126,12 @@ export class RedlineWorld implements World {
       { signal: this.events.signal },
     );
     this.hud.querySelector('header')!.append(this.rearButton);
+    this.lightsButton.textContent = 'Faróis [L]';
+    this.lightsButton.setAttribute('aria-pressed', 'true');
+    this.lightsButton.addEventListener('click', () => this.toggleHeadlights(), {
+      signal: this.events.signal,
+    });
+    this.hud.querySelector('header')!.append(this.lightsButton);
     host.append(this.hud);
     const signal = this.events.signal;
     this.hud
@@ -162,18 +174,20 @@ export class RedlineWorld implements World {
             'KeyM',
             'KeyC',
             'KeyB',
+            'KeyL',
           ].includes(event.code)
         ) {
           event.preventDefault();
           if (
             event.repeat &&
-            ['Escape', 'KeyR', 'KeyM', 'KeyC'].includes(event.code)
+            ['Escape', 'KeyR', 'KeyM', 'KeyC', 'KeyL'].includes(event.code)
           )
             return;
           if (event.code === 'Escape') this.pause();
           else if (event.code === 'KeyR') this.restart();
           else if (event.code === 'KeyM') this.audio.toggle();
           else if (event.code === 'KeyC') this.changeCamera();
+          else if (event.code === 'KeyL') this.toggleHeadlights();
           else this.keys.add(event.code);
         }
       },
@@ -191,6 +205,11 @@ export class RedlineWorld implements World {
       { signal },
     );
     this.update(0);
+  }
+  private toggleHeadlights(): void {
+    this.headlights = !this.headlights;
+    this.lightsButton.setAttribute('aria-pressed', String(this.headlights));
+    this.dirty = true;
   }
   private changeCamera(): void {
     this.cameraMode = (this.cameraMode + 1) % this.cameraNames.length;
@@ -233,7 +252,24 @@ export class RedlineWorld implements World {
         model = this.cars[i]!,
         p = sim.track.sample(car.s, car.lane);
       model.root.position.set(p.x, p.y + 0.06, p.z);
-      model.root.rotation.y = p.angle + car.slip;
+      const heading = p.angle + car.slip;
+      this.roadNormal
+        .set(-p.grade * Math.sin(p.angle), 1, -p.grade * Math.cos(p.angle))
+        .normalize();
+      this.carForward
+        .set(Math.sin(heading), p.grade * Math.cos(car.slip), Math.cos(heading))
+        .normalize();
+      this.carRight.crossVectors(this.roadNormal, this.carForward).normalize();
+      this.carBasis.makeBasis(this.carRight, this.roadNormal, this.carForward);
+      model.root.quaternion.setFromRotationMatrix(this.carBasis);
+      const lightsOn = i > 0 || this.headlights;
+      model.light.visible = lightsOn;
+      model.lamp.emissiveIntensity = lightsOn ? 3 : 0;
+      const braking = car.braking;
+      model.red.emissiveIntensity = braking ? 5 : 0.6;
+      model.brakeLight.intensity = braking ? 3 : 0;
+      for (const glow of model.tailGlows)
+        glow.material.opacity = braking ? 0.65 : 0.12;
       model.body.rotation.z = reduced ? 0 : -car.lateral * 0.013;
       for (const wheel of model.wheels) {
         wheel.pivot.rotation.y = wheel.front
@@ -261,7 +297,7 @@ export class RedlineWorld implements World {
         puff.scale.setScalar(1);
         puff.visible = true;
         mark.position.set(p.x, p.y + 0.04, p.z);
-        mark.rotation.z = p.angle;
+        mark.rotation.set(-Math.PI / 2 - Math.atan(p.grade), p.angle, 0, 'YXZ');
         mark.visible = true;
         this.trailTime[carIndex] = sim.elapsed;
       }

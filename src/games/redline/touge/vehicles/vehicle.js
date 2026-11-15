@@ -10,6 +10,7 @@ export class Vehicle {
     this.s = id === 'player' ? 18 : 26;
     this.lane = 0;
     this.speed = 0;
+    this.braking = false;
     this.lateral = 0;
     this.steer = 0;
     this.slip = 0;
@@ -58,6 +59,8 @@ export class Vehicle {
     ])
       this[key] = Math.max(0, this[key] - dt);
     const curve = track.curvature(this.s);
+    const grade = track.grade(this.s);
+    this.braking = control.brake > 0;
     const stability = this.sync.has('stability') || this.sync.has('focus');
     const maxSpeed =
       (this.engine > 0 ? 38 : 88) +
@@ -76,7 +79,8 @@ export class Vehicle {
           : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -
-        resistance) *
+        resistance -
+        9.81 * Math.sin(Math.atan(grade))) *
       dt;
     if (!control.throttle && !control.brake && beforeSpeed * this.speed <= 0)
       this.speed = 0;
@@ -126,7 +130,8 @@ export class Vehicle {
     this.s = Math.max(
       track.closed ? -Infinity : 0,
       this.s +
-        this.speed * dt * (drift ? 0.82 + Math.cos(this.slip) * 0.18 : 1),
+        (this.speed * dt * (drift ? 0.82 + Math.cos(this.slip) * 0.18 : 1)) /
+          Math.hypot(1, grade),
     );
   }
 }

@@ -7,3 +7,7 @@ Correção atual na branch `fix/touge-map`: retornos sem cruzamentos, terreno li
 ## Checkpoint atual — Akagiri Loop
 
 Branch feat/akagiri-loop: plano do circuito implementado. Check/49 unitários/build, 18 e2e e cinco testes de produção passaram após retomada da interrupção. Detalhes em docs/AKAGIRI_LOOP.md e docs/PROGRESS.md. Sem merge/push/deploy. Playtest humano/GPU física pendentes. Próximo incremento principal continua 08.
+
+## Checkpoint atual — rampas, ultrapassagem e noite
+
+Branch fix/grade-overtakes-night-lights, base 0c6e2a0. Rampas afetam orientação e velocidade, rival prepara e conclui novas ultrapassagens, ambos têm luz de freio, noite mais escura e faróis do jogador alternáveis por L/botão. Check com 52 unitários/build aprovado; 18 cenários de navegador cobertos pela suíte e reexecução da integração/mapa; cinco testes do build de produção aprovados. Evidências e resultados detalhados em docs/PROGRESS.md. Sem merge/push/deploy; calibração humana em GPU física pendente.

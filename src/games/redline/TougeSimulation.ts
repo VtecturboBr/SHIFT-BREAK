@@ -111,9 +111,12 @@ export class TougeSimulation {
     );
     this.player.draftPower = this.draftCharge;
     if (raceGap < -4.5) this.rival.recovering = true;
-    if (raceGap > 0) this.rival.recovering = false;
+    if (raceGap > 8) this.rival.recovering = false;
     this.rival.catchupPower = this.rival.recovering
-      ? Math.max(0, Math.min(1, (-raceGap - 24) / 20))
+      ? Math.max(
+          this.rival.passSide ? 0.2 : 0,
+          Math.min(1, (-raceGap - 24) / 20),
+        )
       : 0;
     if (this.rival.recovering && raceGap > -24) this.rival.boost = 0;
     this.matchDriftPace();
@@ -142,6 +145,7 @@ export class TougeSimulation {
         this.rival.drift.active = this.rival.drifting = false;
       }
     } else {
+      this.rival.braking = this.rival.speed > 0;
       this.rival.speed = Math.max(0, this.rival.speed - 15 * dt);
       this.rival.s = Math.min(
         this.finishDistance + 70,
@@ -203,10 +207,12 @@ export class TougeSimulation {
     const rear = front === this.player ? this.rival : this.player;
     const gap = Math.abs(localGap);
     if (gap >= 14) return;
+    const beforeSpeed = rear.speed;
     rear.speed = Math.min(
       rear.speed,
       Math.max(0, front.speed + Math.max(0, gap - 7) * 1.5),
     );
+    if (rear.speed < beforeSpeed) rear.braking = true;
     rear.s -= Math.max(0, 5.5 - gap);
     rear.boost = 0;
   }

@@ -205,6 +205,87 @@ test('renders the repaired hairpins, tunnels and finish with an unobstructed cha
   await rearButton.click();
   await fixture.evaluate(({ world }) => world.update(0));
   await expect(rearButton).toHaveAttribute('aria-pressed', 'false');
+  const slopes = await fixture.evaluate(({ world, THREE }) => {
+    const errors: number[] = [];
+    for (const reversed of [false, true]) {
+      world.reversed = reversed;
+      world.restart();
+      for (const s of [3450, 3700, 4900, 5500, 6100]) {
+        for (const slip of [-0.65, 0, 0.65]) {
+          world.model.player.s = s;
+          world.model.player.slip = slip;
+          world.update(0);
+          const p = world.model.track.sample(s);
+          const normal = new THREE.Vector3(
+            -p.grade * Math.sin(p.angle),
+            1,
+            -p.grade * Math.cos(p.angle),
+          ).normalize();
+          const up = new THREE.Vector3(0, 1, 0).applyQuaternion(
+            world.cars[0].root.quaternion,
+          );
+          errors.push(up.distanceTo(normal));
+        }
+      }
+    }
+    return errors;
+  });
+  expect(Math.max(...slopes)).toBeLessThan(0.000001);
+  const lightsButton = page.getByRole('button', {
+    name: 'Faróis [L]',
+    exact: true,
+  });
+  await expect(lightsButton).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('l');
+  const offLights = await fixture.evaluate(({ world, renderer }) => {
+    world.reversed = false;
+    world.restart();
+    world.model.phase = 'running';
+    world.model.player.s = 1050;
+    world.model.player.slip = 0;
+    world.model.rival.s = 1200;
+    world.cameraMode = 0;
+    world.cameraReady = false;
+    world.update(0);
+    renderer.render(world.scene, world.camera);
+    return {
+      player: world.cars[0].light.visible,
+      rival: world.cars[1].light.visible,
+    };
+  });
+  expect(offLights).toEqual({ player: false, rival: true });
+  await expect(lightsButton).toHaveAttribute('aria-pressed', 'false');
+  await page.screenshot({ path: 'test-results/night-lights-off.png' });
+  await lightsButton.click();
+  const brakeLights = await fixture.evaluate(({ world, renderer }) => {
+    world.model.player.braking = true;
+    world.model.rival.braking = true;
+    world.update(0);
+    renderer.render(world.scene, world.camera);
+    return world.cars.map(
+      (car: {
+        red: { emissiveIntensity: number };
+        light: { visible: boolean };
+        brakeLight: { intensity: number };
+      }) => ({
+        tail: car.red.emissiveIntensity,
+        headlight: car.light.visible,
+        brake: car.brakeLight.intensity,
+      }),
+    );
+  });
+  expect(brakeLights).toEqual([
+    { tail: 5, headlight: true, brake: 3 },
+    { tail: 5, headlight: true, brake: 3 },
+  ]);
+  await expect(lightsButton).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: 'test-results/night-brake-lights.png' });
+  const released = await fixture.evaluate(({ world }) => {
+    world.model.player.braking = false;
+    world.update(0);
+    return world.cars[0].red.emissiveIntensity;
+  });
+  expect(released).toBe(0.6);
   await fixture.evaluate(({ world, renderer }) => {
     world.dispose();
     renderer.dispose();

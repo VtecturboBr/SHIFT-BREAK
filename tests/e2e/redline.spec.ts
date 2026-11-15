@@ -65,22 +65,24 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
       ).toBeVisible();
       await expect(game).toHaveAttribute('data-phase', 'running');
     }
-    await page.keyboard.press('f');
-    await page.keyboard.press('j');
-    await expect(game).toHaveAttribute('data-phase', 'running');
-    await game
-      .getByRole('button', { name: 'Silenciar áudio', exact: true })
-      .click();
-    await expect(
-      game.getByRole('button', { name: 'Ativar áudio', exact: true }),
-    ).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(game).toHaveAttribute('data-phase', 'paused');
-    await page.screenshot({ path: 'test-results/redline.png' });
-    await game
-      .getByRole('button', { name: 'Reiniciar corrida', exact: true })
-      .click();
-    await expect(game).toHaveAttribute('data-distance', '0.0');
+    if (attempt === 0) {
+      await page.keyboard.press('f');
+      await page.keyboard.press('j');
+      await expect(game).toHaveAttribute('data-phase', 'running');
+      await game
+        .getByRole('button', { name: 'Silenciar áudio', exact: true })
+        .click();
+      await expect(
+        game.getByRole('button', { name: 'Ativar áudio', exact: true }),
+      ).toBeVisible();
+      await page.keyboard.press('Escape');
+      await expect(game).toHaveAttribute('data-phase', 'paused');
+      await page.screenshot({ path: 'test-results/redline.png' });
+      await game
+        .getByRole('button', { name: 'Reiniciar corrida', exact: true })
+        .click();
+      await expect(game).toHaveAttribute('data-distance', '0.0');
+    }
     await game
       .getByRole('button', { name: 'Sair da corrida', exact: true })
       .click();

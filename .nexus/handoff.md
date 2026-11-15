@@ -1,6 +1,8 @@
 ﻿# Retomada — Akagiri Loop implementado
 
-Branch atual feat/akagiri-loop, base feat/drift-trajectory-and-tandem (96ac167). O usuário aprovou o plano de fechar o circuito, escolheu uma volta completa e pediu concluir após interrupção por limite do plano. Código, testes e capturas foram preservados; a retomada confirmou check/49 unitários/build, 18 e2e e cinco testes de produção e finalizou documentação/commit.
+Branch atual fix/grade-overtakes-night-lights, base feat/akagiri-loop (0c6e2a0). Pedido atual: corrigir rampas e retomada de ultrapassagens do rival; adicionar freio luminoso e noite mais escura com faróis alternáveis. Orientação do carro usa normal da pista, inclusive no drift; velocidade considera gravidade e distância sobre a superfície. IA prepara uma faixa oposta até 45 m antes, mantém potência residual durante a manobra e freia se o corredor ainda estiver ocupado. Fora de condições favoráveis, preserva acompanhamento. L/botão Faróis alterna o jogador, rival mantém luzes ligadas. Estado dos faróis persiste no reinício. Lanternas e luz vermelha traseira respondem à frenagem de ambos. Resultados finais em docs/PROGRESS.md.
+
+Entrega anterior do loop: o usuário aprovou fechar o circuito, escolheu uma volta completa e pediu concluir após interrupção por limite do plano. Código, testes e capturas foram preservados; a retomada confirmou check/49 unitários/build, 18 e2e e cinco testes de produção e finalizou documentação/commit 0c6e2a0.
 
 O circuito ativo está em src/games/redline/touge/world/loop-track.js; track.js é a referência do trecho original e das constantes físicas. return-route.js acrescenta 3671,398 m, totalizando 6871,398 m. Oito grampos novos, barragem, vertedouro, galeria e reencontro. Arquitetura, medidas e evidências em docs/AKAGIRI_LOOP.md.
 

@@ -12,28 +12,30 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     Math.abs(curve) < 0.002 &&
     !car.drift.active;
   const gap = track.localGap ? track.localGap(car.s, other.s) : other.s - car.s;
-  if (cruising && gap <= 5 && gap > -70 && !car.yieldSide)
+  if (cruising && gap <= 5 && gap > -70 && !car.yieldSide && !car.passSide)
     car.yieldSide =
       car.lane < -0.3 ? -1 : car.lane > 0.3 ? 1 : other.lane >= 0 ? -1 : 1;
   if (!cruising || gap > 12 || gap < -90) car.yieldSide = 0;
-  const passingLane = ROAD_EDGE - 0.35;
-  if (gap < -8 || gap > 24 || Math.abs(curve) > 0.011) car.passSide = 0;
+  const passingLane = ROAD_EDGE - 0.08;
+  const canPass = other.speed > 15 && !other.braking && bend < 0.008;
+  if (gap < -8 || gap > 50 || !canPass) car.passSide = 0;
   if (
     !car.passSide &&
     gap > 0 &&
-    gap < 14 &&
-    car.speed > other.speed + 0.6 &&
-    Math.abs(curve) < 0.008
+    gap < 45 &&
+    (car.recovering || car.speed > other.speed + 0.6) &&
+    canPass
   ) {
     car.passSide = other.lane > 0 ? -1 : 1;
+    car.yieldSide = 0;
   }
   let lane = cruising ? -1.55 * Math.cos((time * Math.PI) / 12) : -0.55;
   if (gap > 0 && gap < 24) {
     lane = other.lane;
   }
   if (car.passSide) lane = car.passSide * passingLane;
-  if (car.yieldSide) lane = car.yieldSide * 1.85;
-  if (car.recovering) lane = gap < 18 ? car.lane : -0.65;
+  if (car.yieldSide && !car.passSide) lane = car.yieldSide * 1.85;
+  if (car.recovering && !car.passSide) lane = gap < 18 ? car.lane : -0.65;
   for (const h of hazards) {
     if (h.s > car.s && h.s - car.s < Math.max(35, car.speed * 1.5))
       lane = h.lane > 0 ? -passingLane : passingLane;
@@ -61,12 +63,19 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
       ),
     );
   const tandem = car.drift.active && other.drift.active && gap > 0 && gap < 14;
-  if (car.recovering && !tandem)
+  const following = car.recovering && !tandem && !car.passSide;
+  if (following)
     desired = Math.min(desired, Math.max(0, other.speed + (gap - 24) * 0.75));
+  if (car.passSide && car.recovering)
+    desired = Math.max(desired, Math.min(100, other.speed + 8));
   const recoveryBrake =
-    car.recovering &&
-    !tandem &&
-    car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 18));
+    (following &&
+      car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 18))) ||
+    (!tandem &&
+      (car.recovering || car.passSide) &&
+      gap > 0 &&
+      Math.abs(car.lane - other.lane) < 2.1 &&
+      car.speed > Math.sqrt(other.speed ** 2 + 36 * Math.max(0, gap - 7)));
   if (gap > 0 && gap < 11 && Math.abs(car.lane - other.lane) < 2.1) {
     desired = Math.min(desired, other.speed + Math.max(0, gap - 6) * 0.6);
   }
@@ -79,13 +88,15 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
     (car.sync.has('stability') || car.sync.has('focus') ? 0.11 : 0.19);
   // Hold the lane alongside the player rather than sweeping into an overtake.
   const lateralTarget =
-    cruising && Math.abs(gap) < 5 && Math.abs(car.lane - other.lane) > 1.2
+    cruising &&
+    Math.abs(gap) < 5 &&
+    Math.abs(car.lane - other.lane) > (car.passSide ? 2.1 : 1.2)
       ? 0
       : cruising
         ? clamp(
             (lane - car.lane) * 1.8,
-            car.yieldSide ? -1 : -0.4,
-            car.yieldSide ? 1 : 0.4,
+            car.passSide ? -1.8 : car.yieldSide ? -1 : -0.4,
+            car.passSide ? 1.8 : car.yieldSide ? 1 : 0.4,
           )
         : (lane - car.lane) * 1.8;
   const section = track.section(car.s);
@@ -112,7 +123,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
       car.lateral * 0.3) /
       1.8;
   return {
-    throttle: !emergency && car.speed < desired ? 1 : 0,
+    throttle: !emergency && !recoveryBrake && car.speed < desired ? 1 : 0,
     brake: recoveryBrake
       ? 1
       : emergency && car.speed > other.speed
