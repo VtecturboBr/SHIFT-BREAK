@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { SCREEN } from '../monitor/display';
 
 // Deterministic, small procedural maps keep the room self-contained.
 function surface(kind: 'wood' | 'floor' | 'fabric' | 'rug') {
@@ -210,7 +211,43 @@ export function createBedroom(scene: THREE.Scene): void {
     );
   }
   box('Mousepad', 1.78, 0.008, 0.58, 0, 0.808, -0.68, cloth);
-  box('Moldura monitor', 1.46, 0.88, 0.085, 0, 1.46, -1.03, dark);
+  const casing = box(
+    'Moldura monitor',
+    1.46,
+    0.88,
+    0.085,
+    SCREEN.x,
+    SCREEN.y,
+    -1.03,
+    dark,
+  );
+  casing.castShadow = false;
+  const bezel = new THREE.MeshBasicMaterial({ color: 0x171a20 });
+  const edge = 0.035;
+  for (const side of [-1, 1]) {
+    const vertical = box(
+      'Borda vertical monitor',
+      edge,
+      SCREEN.height + edge * 2,
+      0.012,
+      SCREEN.x + (side * (SCREEN.width + edge)) / 2,
+      SCREEN.y,
+      SCREEN.z,
+      bezel,
+    );
+    const horizontal = box(
+      'Borda horizontal monitor',
+      SCREEN.width,
+      edge,
+      0.012,
+      SCREEN.x,
+      SCREEN.y + (side * (SCREEN.height + edge)) / 2,
+      SCREEN.z,
+      bezel,
+    );
+    vertical.castShadow = horizontal.castShadow = false;
+    vertical.receiveShadow = horizontal.receiveShadow = false;
+  }
   box('Haste monitor', 0.07, 0.24, 0.09, 0, 0.97, -1.07, dark);
   box('Base monitor', 0.42, 0.025, 0.23, 0, 0.817, -1.04, dark);
   box('Teclado', 0.64, 0.026, 0.22, -0.12, 0.831, -0.49, dark);

@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { disposeScene, type World } from '../graphics/World';
 import { LookModel } from './LookModel';
 import { createBedroom } from './Bedroom';
-import { MONITOR_FRAME, monitorDistance } from '../monitor/display';
+import { MONITOR_FRAME, monitorDistance, SCREEN } from '../monitor/display';
 import { MonitorSurface } from '../monitor/MonitorSurface';
 import { monitorCoordinates } from '../monitor/projection';
 
-export const SCREEN = { x: 0, y: 1.46, z: -0.965, width: 1.36, height: 0.765 };
+export { SCREEN } from '../monitor/display';
 
 export class RoomWorld implements World {
   readonly scene = new THREE.Scene();

@@ -1,5 +1,7 @@
 # ALEF//OS — portfólio e experiências
 
+Correção posterior da moldura: plano interativo e bordas físicas compartilham `SCREEN` em `src/monitor/display.ts`. Quatro bordas delimitam a tela na mesma profundidade, sem receber sombras que confundam a área útil. A carcaça traseira permanece para as vistas laterais. Captura revisada: `docs/evidence/os-redesign/monitor-bezel-fixed.png`. Check/74 unitários/build e sete testes de quarto, projeção, resize, cliques e navegação aprovados. GPU física não verificada.
+
 Direção escolhida pelo autor: portfólio dentro de um OS, janelas guiadas, visual grafite/branco/vermelho e destaque equivalente para projetos e jogos.
 
 ## Entrada e navegação

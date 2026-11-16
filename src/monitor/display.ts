@@ -1,4 +1,5 @@
 export const DESKTOP = { width: 1280, height: 720 };
+export const SCREEN = { x: 0, y: 1.46, z: -0.965, width: 1.36, height: 0.765 };
 export const MONITOR_FRAME = { width: 1920, height: 1080 };
 
 export function monitorDistance(
