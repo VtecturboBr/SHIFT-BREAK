@@ -1,0 +1,118 @@
+{
+  "repository": "https://github.com/fatec-jacarei-dsm-portfolio/ra2581392613033",
+  "published": "https://fatec-jacarei-dsm-portfolio.github.io/ra2581392613033/",
+  "htmlBlob": "ed3c19d8750889206820185ef32269e57de7348b",
+  "javascriptBlob": "94892ed99be6ca035e7d98cf67db2a6569077543",
+  "assets": [
+    {
+      "path": "docs/assets/images/ALEF-disc.png",
+      "blob": "d878268c5c7a341dcbf1b95b68a6846bb8fbfc60",
+      "bytes": 843803
+    },
+    {
+      "path": "docs/assets/images/V-TEC-logo.png",
+      "blob": "f0b82013ffc49d420bbedc0a52228ed6f72d0b11",
+      "bytes": 129867
+    },
+    {
+      "path": "docs/assets/images/alef.jpeg",
+      "blob": "881ff3419751abcbb18a8cf5ecdfd5d6906f0c72",
+      "bytes": 73109
+    },
+    {
+      "path": "docs/assets/images/armadura.png",
+      "blob": "9ac29c447968c105495a8cd7ce1b1b040b4653cc",
+      "bytes": 57599
+    },
+    {
+      "path": "docs/assets/images/chapeu.png",
+      "blob": "04bfc9802f2b72964fa885df5e68c80b8ea04557",
+      "bytes": 58083
+    },
+    {
+      "path": "docs/assets/images/corvo-feliz.png",
+      "blob": "d8a1a6d926728a6be3a04bb42987910902f32476",
+      "bytes": 2343708
+    },
+    {
+      "path": "docs/assets/images/demo.gif",
+      "blob": "fc8209939a75a0d965d13024418ca27e75e271e3",
+      "bytes": 1004431
+    },
+    {
+      "path": "docs/assets/images/espada.png",
+      "blob": "770d8049163d0883b45af5fc870b7dc1156e54c1",
+      "bytes": 174338
+    },
+    {
+      "path": "docs/assets/images/fogueira.png",
+      "blob": "cb7dab5700f8d89f49800af95c2ef3a670e30cdb",
+      "bytes": 132888
+    },
+    {
+      "path": "docs/assets/images/honda-logo.png",
+      "blob": "92aac52e6a356850b1dcedfd8dd60034b1a794c1",
+      "bytes": 8941
+    },
+    {
+      "path": "docs/assets/images/kanji.png",
+      "blob": "d481b1789a0838b5b98e47c8d7b2dc4a6b1b5aa4",
+      "bytes": 81396
+    },
+    {
+      "path": "docs/assets/images/lin0-background.png",
+      "blob": "50350e89d42b4d7f44d830ebb70285b70225ccbb",
+      "bytes": 1692311
+    },
+    {
+      "path": "docs/assets/images/lin0-logo.png",
+      "blob": "f56a810060c74e80e532c8c461ea27ea01f74c94",
+      "bytes": 1551090
+    },
+    {
+      "path": "docs/assets/images/lin0-mapa.jpg",
+      "blob": "78bd530fbc7c247c02dace6a656d568999fe05f2",
+      "bytes": 105719
+    },
+    {
+      "path": "docs/assets/images/lin0-personagem.png",
+      "blob": "b08b4daa7a0b7135d2baf51577a39cd8f4639b9e",
+      "bytes": 2226664
+    },
+    {
+      "path": "docs/assets/images/logo-principal.png",
+      "blob": "37a9b442fae647f0da7ae1781c3638b6e0329429",
+      "bytes": 463088
+    },
+    {
+      "path": "docs/assets/images/logo.png",
+      "blob": "802b0d741565e75e2bd3a09a1f72500cf43de0d5",
+      "bytes": 33443
+    },
+    {
+      "path": "docs/assets/images/octopus.png",
+      "blob": "2a4c7074a853ee6c3347c59a911a841797282524",
+      "bytes": 93127
+    },
+    {
+      "path": "docs/assets/images/soldado.png",
+      "blob": "7e6666c634716fa6b5cbc8ed6bc7a2f07d821c35",
+      "bytes": 443690
+    },
+    {
+      "path": "docs/assets/images/trofeu.png",
+      "blob": "fbe5054867198be7047d1227b9353312d89199e2",
+      "bytes": 92253
+    },
+    {
+      "path": "docs/assets/images/velocimetro-vtec.png",
+      "blob": "56f225cd41b72789df41d38d8da5b1d1723c6db7",
+      "bytes": 246887
+    },
+    {
+      "path": "docs/assets/music/Faint 8 Bit Tribute to Linkin Park 8 Bit Universe.mp3",
+      "blob": "e099965638a5034b90c7c90304601199dcc15d40",
+      "bytes": 2886519
+    }
+  ]
+}

@@ -12,7 +12,7 @@ export function createFilesystem(content: PortfolioContent): VirtualFile {
     {
       kind: 'text',
       name: 'identity.txt',
-      content: `Nome público: ${profile.name ?? 'a informar pelo autor'}\nIdade: ${profile.age ?? 'a informar pelo autor'}\nLocalização: ${profile.location ?? 'a informar pelo autor'}\nFormação: ${profile.education ?? 'a informar pelo autor'}\nÁrea de atuação: ${profile.focus ?? 'a informar pelo autor'}`,
+      content: `Nome público: ${profile.name ?? 'a informar pelo autor'}\nFormação: ${profile.education ?? 'a informar pelo autor'}\nÁrea de atuação: ${profile.focus ?? 'a informar pelo autor'}`,
     },
     {
       kind: 'text',
@@ -45,7 +45,7 @@ export function createFilesystem(content: PortfolioContent): VirtualFile {
           {
             kind: 'text',
             name: 'README.md',
-            content: `# ${project.title}\n\n${project.summary}\n\nEstado: ${project.status}`,
+            content: `# ${project.title}\n\n${project.summary}\n\nEstado: ${project.status}\nCategoria: ${project.category ?? 'Não informada'}\nSemestre: ${project.period ?? 'Não informado'}\n\n${(project.contributions ?? []).join('\n\n')}\n\nRepositório: ${project.repository ?? 'Não informado'}\nVídeo: ${project.video ?? 'Não informado'}\nEntregas: ${project.deliveries ?? 'Não informadas'}`,
           },
           {
             kind: 'code',

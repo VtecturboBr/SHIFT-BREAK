@@ -107,6 +107,11 @@ export class MonitorSurface {
 
   setActive(active: boolean): void {
     this.games.setActive(active);
+    if (!active)
+      for (const media of this.element.querySelectorAll<HTMLMediaElement>(
+        'audio, video',
+      ))
+        media.pause();
     if (!active) this.desktop.cancelDrag();
     this.focusPending = active && !this.active;
     this.active = active;

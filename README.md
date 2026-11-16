@@ -9,7 +9,9 @@ npm run dev
 
 Abra o endereço local exibido pelo Vite. Node 22.12+.
 
-A versão **0.7.1 (incrementos 01–07)** tem quarto físico, câmera, monitor HTML interativo, janelas, arquivos/viewers, projetos e biblioteca com SIGNAL.exe e REDLINE jogáveis. Identidade, habilidades, contatos e currículo ficam claramente pendentes, conforme escolha do proprietário. Luta, FPS, campanha e incrementos 08–14 continuam pendentes.
+A versão **0.7.1 (incrementos 01–07)** tem quarto físico, câmera, monitor HTML interativo, janelas, arquivos/viewers, projetos e biblioteca com SIGNAL.exe e REDLINE jogáveis. Apresentação, foto, formação, habilidades, contatos e projetos foram integrados a partir do portfólio acadêmico do proprietário. Currículo em PDF e conteúdos não fornecidos continuam pendentes. Luta, FPS, campanha e incrementos 08–14 continuam pendentes.
+
+O [portfólio institucional](https://fatec-jacarei-dsm-portfolio.github.io/ra2581392613033/) também tem uma cópia estática corrigida em `docs/index.html`, sem build, backend ou Actions. O original integrado abre em `portfolio-original/index.html` no servidor do projeto. Veja [procedência, correções e entrega institucional](docs/PORTFOLIO_IMPORT.md). Para atualizar a cópia estática após editar `public/portfolio-original/`, execute `node scripts/sync-academic-portfolio.mjs`; os arquivos de `docs/` já ficam prontos para hospedagem estática. O modelo de README institucional está em `docs/README-INSTITUCIONAL.md`; este README continua documentando o projeto de desenvolvimento.
 
 Use E, clique na tela ou Usar computador; Escape retorna ao quarto. No menu ALEF//, abra Biblioteca de jogos → Iniciar SIGNAL.exe. Colete oito sinais em vinte segundos; Escape pausa, R reinicia, Sair do jogo retorna ao OS sem reload. Portfólio acessível abre `?view=portfolio`, inclusive sem WebGL. Diagnóstico → Capturar quadro no monitor demonstra a transferência de uma imagem 3D, sem representar a cinemática final.
 

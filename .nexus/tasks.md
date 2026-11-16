@@ -35,3 +35,6 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 - [x] FEEL-03 — Áudio híbrido local CC0, motor espacial do rival, ambientes nos dois sentidos, controles persistentes, fallback e descarte durante carregamento. Manifesto e detalhes em docs/RACE_FEEL.md.
 
 - [x] ROOM-VISUAL-01 — Interpretar o quarto de referência com marcenaria clara, cama vermelha/grafite, janela/persiana e decoração automotiva, preservando a tela física e o OS. Três vistas inspecionadas e documentadas em docs/ROOM_REFERENCE.md.
+
+- [x] ACADEMIC-01 — Importar identidade, foto, formação, habilidades, redes e projetos do portfólio institucional fornecido; preservar contribuições por sprint e vídeo da ABP nos apps/arquivos/leitor.
+- [x] ACADEMIC-02 — Remover reprodução automática do HTML e JS, tornar apresentação atemporal e preservar metadados históricos exigidos. Manter cópia estática completa em docs/, sincronizada e testada sem build. Procedência em docs/PORTFOLIO_IMPORT.md.

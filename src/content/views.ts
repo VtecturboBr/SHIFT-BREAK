@@ -62,6 +62,16 @@ export function projectView(project: Project): HTMLElement {
     links.append(externalLink('Repositório', project.repository));
   if (project.demo) links.append(externalLink('Demonstração', project.demo));
   article.append(links);
+  if (project.period) article.append(text('p', project.period));
+  if (project.contributions?.length) {
+    article.append(text('h3', 'Minha contribuição'));
+    for (const contribution of project.contributions)
+      article.append(text('p', contribution));
+  }
+  if (project.deliveries)
+    links.append(externalLink('Entregas por sprint', project.deliveries));
+  if (project.video)
+    links.append(externalLink('Vídeo da ABP no YouTube', project.video));
   for (const image of project.images) article.append(imageView(image));
   return article;
 }
@@ -72,10 +82,7 @@ export function contactView(content: PortfolioContent): HTMLElement {
   root.append(text('h2', 'Contato'));
   if (!content.contacts.length)
     root.append(
-      text(
-        'p',
-        'GitHub pessoal, LinkedIn e e-mail de contato ainda não foram fornecidos pelo autor.',
-      ),
+      text('p', 'Redes profissionais ainda não fornecidas pelo autor.'),
     );
   for (const contact of content.contacts)
     root.append(externalLink(contact.label, contact.url, true));
@@ -91,11 +98,29 @@ export function contactView(content: PortfolioContent): HTMLElement {
   return root;
 }
 
+export function projectsView(content: PortfolioContent): HTMLElement {
+  const root = text('div', '', 'content-app');
+  for (const category of ['Acadêmicos', 'Pessoais', 'Profissionais']) {
+    root.append(text('h2', category));
+    const projects = content.projects.filter((p) => p.category === category);
+    if (!projects.length)
+      root.append(text('p', 'Nenhum projeto cadastrado nesta categoria.'));
+    for (const project of projects) root.append(projectView(project));
+  }
+  return root;
+}
+
 export function overviewView(content: PortfolioContent): HTMLElement {
   const root = document.createElement('section');
   root.className = 'content-app';
   root.append(
-    text('p', 'PORTFÓLIO · CONTEÚDO EM PREPARAÇÃO', 'eyebrow'),
+    text(
+      'p',
+      content.profile.name
+        ? 'PORTFÓLIO · APRESENTAÇÃO'
+        : 'PORTFÓLIO · CONTEÚDO EM PREPARAÇÃO',
+      'eyebrow',
+    ),
     text('h2', content.profile.name ?? 'Identidade pública a informar'),
     text(
       'p',
@@ -104,6 +129,11 @@ export function overviewView(content: PortfolioContent): HTMLElement {
     ),
     text('h3', 'Habilidades'),
   );
+  if (content.profile.photo) {
+    const photo = imageView(content.profile.photo);
+    photo.classList.add('profile-photo');
+    root.prepend(photo);
+  }
   root.append(
     text(
       'p',
@@ -114,8 +144,6 @@ export function overviewView(content: PortfolioContent): HTMLElement {
   );
   const details = document.createElement('dl');
   for (const [label, value] of [
-    ['Idade', content.profile.age],
-    ['Localização', content.profile.location],
     ['Formação', content.profile.education],
     ['Área de atuação', content.profile.focus],
   ]) {
@@ -125,5 +153,26 @@ export function overviewView(content: PortfolioContent): HTMLElement {
     );
   }
   root.append(details);
+  const academic = document.createElement('a');
+  academic.href = `${import.meta.env.BASE_URL}portfolio-original/index.html`;
+  academic.textContent = 'Portfólio acadêmico completo';
+  academic.target = '_blank';
+  academic.rel = 'noopener noreferrer';
+  root.append(academic);
+  if (content.profile.audio) {
+    const src = safeAsset(content.profile.audio.src);
+    if (src) {
+      const audio = document.createElement('audio');
+      audio.controls = true;
+      audio.preload = 'none';
+      audio.src = src;
+      audio.setAttribute('aria-label', content.profile.audio.title);
+      root.append(
+        text('h3', 'Trilha opcional'),
+        text('p', content.profile.audio.title),
+        audio,
+      );
+    }
+  }
   return root;
 }

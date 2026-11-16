@@ -10,6 +10,8 @@ Branch feat/akagiri-loop: plano do circuito implementado. Check/49 unitários/bu
 
 ## Checkpoint atual — rampas, ultrapassagem e noite
 
+Integração acadêmica atual: branch feat/integrate-academic-portfolio, base 4dd0269. Perfil/foto/projetos reais fornecidos pelo proprietário integrados ao OS e leitor; correções de autoplay e escrita atemporal aplicadas. Edição original corrigida local em public/portfolio-original e cópia estática pronta em docs/index.html. Check/67 unitários/build aprovado, sete testes específicos do portfólio aprovados. Detalhes em docs/PORTFOLIO_IMPORT.md. Versão 3D ainda usa TS/Vite. Sem merge/push/deploy ou modificação do site institucional remoto.
+
 Atualização visual do quarto: branch feat/room-warm-built-in-bedroom, base e163982. Marcenaria, cama, janela, materiais e iluminação seguem imagem/vídeo do proprietário, preservando monitor e câmera. Check/65 unitários/build aprovado. Detalhes em docs/ROOM_REFERENCE.md; resultados finais em docs/PROGRESS.md. Sem merge/push/deploy.
 
 Atualização de apresentação: branch feat/turbo-suspension-environment-audio, base 691b975. Plano aprovado implementado com dois turbos legíveis, suspensão visual independente da física e áudio híbrido CC0/ambientes/rival/volumes. Check/65 unitários/build aprovado; detalhes, evidências, benchmark e limites em docs/RACE_FEEL.md. Resultados finais de integração em docs/PROGRESS.md. Sem merge/push/deploy; escuta humana e GPU física pendentes.

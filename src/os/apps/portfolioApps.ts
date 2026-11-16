@@ -3,7 +3,7 @@ import {
   contactView,
   imageView,
   overviewView,
-  projectView,
+  projectsView,
   text,
 } from '../../content/views';
 import type { AppDefinition } from '../registry';
@@ -31,12 +31,7 @@ export const portfolioApps: AppDefinition[] = [
     symbol: '◇',
     description: 'Trabalhos e tecnologias',
     wide: true,
-    create: () => {
-      const root = text('div', '', 'content-app');
-      for (const project of portfolio.projects)
-        root.append(projectView(project));
-      return root;
-    },
+    create: () => projectsView(portfolio),
   },
   {
     id: 'gallery',

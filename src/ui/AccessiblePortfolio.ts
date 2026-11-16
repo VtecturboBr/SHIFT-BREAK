@@ -1,5 +1,10 @@
 import { portfolio } from '../content/portfolio';
-import { contactView, overviewView, projectView, text } from '../content/views';
+import {
+  contactView,
+  overviewView,
+  projectsView,
+  text,
+} from '../content/views';
 
 export function accessiblePortfolio(root: HTMLElement, reason?: string): void {
   root.replaceChildren();
@@ -38,8 +43,7 @@ export function accessiblePortfolio(root: HTMLElement, reason?: string): void {
   const projects = document.createElement('section');
   projects.id = 'projects';
   projects.append(text('h2', 'Projetos'));
-  for (const project of portfolio.projects)
-    projects.append(projectView(project));
+  projects.append(projectsView(portfolio));
   const contact = contactView(portfolio);
   contact.id = 'contact';
   main.append(projects, contact);

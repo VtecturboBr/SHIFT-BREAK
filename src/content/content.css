@@ -11,6 +11,14 @@
 .content-app h3 {
   font-size: 16px;
 }
+.profile-photo img {
+  width: 180px;
+  max-height: 230px;
+  object-fit: cover;
+}
+.content-app audio {
+  max-width: 100%;
+}
 .content-app a {
   color: #a6d3ff;
   display: inline-block;

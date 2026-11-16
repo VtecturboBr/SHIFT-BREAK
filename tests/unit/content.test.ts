@@ -13,7 +13,7 @@ describe('verified content and virtual filesystem', () => {
     expect(resolveFile(fs, ['..', 'identity.txt'])).toBeNull();
     expect(resolveFile(fs, ['skills.json', 'nested'])).toBeNull();
     expect(resolveFile(fs, ['identity.txt'])).toMatchObject({
-      content: expect.stringContaining('a informar pelo autor'),
+      content: expect.stringContaining('Alef Gabriel de Oliveira'),
     });
     const configured = createFilesystem({
       ...portfolio,
@@ -35,9 +35,7 @@ describe('verified content and virtual filesystem', () => {
       'ftp://example.test',
     ])
       expect(safeLink(value)).toBeNull();
-    expect(safeLink('mailto:owner@example.test', true)).toBe(
-      'mailto:owner@example.test',
-    );
+    expect(safeLink('mailto:owner@example.test', true)).toBeNull();
     expect(safeLink('mailto:owner@example.test?body=hidden', true)).toBeNull();
     expect(safeAsset('./media/photo.png')).toBe('./media/photo.png');
     expect(safeAsset('/media/../secret')).toBeNull();
