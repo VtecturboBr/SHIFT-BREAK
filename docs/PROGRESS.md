@@ -223,3 +223,13 @@
 - Check com 65 unitários, tipos, lint, formatação e build aprovado. Suíte completa de navegador: 21 testes aprovados em 4,0 min, incluindo voltas completas nos dois sentidos e retorno ao mesmo canvas/OS/notas. Reexecução dos três testes de apresentação/áudio após corrigir o reposicionamento da câmera da fixture passou; capturas e WAVs finais revisados/registrados em docs/evidence/race-feel/.
 - Comparação visual por software contra 691b975 manteve 339 draws e os mesmos recursos de GPU no trecho sem turbo. Medianas 12,60 → 12,03 ms e P95 20,03 → 18,00 ms não provam ganho de FPS; método e dados completos documentados. Não mede áudio ativo ou GPU física. Escuta humana, playtest prolongado e outros navegadores permanecem pendentes. Aviso conhecido do bundle permanece. Sem merge na main, push ou deploy.
 - Build de produção: cinco testes aprovados em 1,1 min, com integração da corrida/retorno ao OS em 56,5 s. Metadados finais do manifesto também verificados por SHA-256 e cabeçalhos PCM nos testes unitários.
+
+## Quarto inspirado nas referências do proprietário
+
+- Branch feat/room-warm-built-in-bedroom, base e163982. O vídeo orientou a disposição dos móveis e a imagem orientou materiais/paleta/iluminação. Interpretação procedural e estilizada, documentada em docs/ROOM_REFERENCE.md.
+- Marcenaria clara com bancada, armários, puxadores e nichos; piso de madeira e tapete; cama vermelha/grafite com gavetas, roupa de cama e estofados arredondados; janela com persianas, criado-mudo e luminária. Plantas, miniaturas, figuras, medalha, console, headset, volante/pedais e PC RGB completam a decoração.
+- Iluminação ambiente quente, luz pela janela, faixas sob armários/prateleira e vermelho atrás do monitor. Geometria de caixas e materiais compartilhados; texturas pequenas geradas localmente. Nenhum asset externo ou dependência nova.
+- Posição e dimensões da tela física, câmera sentada, controles e OS preservados. Cenário isolado em src/room/Bedroom.ts e integrado ao ciclo existente de descarte. Jogos e renderer não foram alterados.
+- Check de tipos/lint/formatação, 65 unitários e build aprovado. Capturas nas três vistas revisadas em docs/evidence/room-reference/; fixture de composição oculta a camada HTML, enquanto testes de monitor validam a interação real. GPU física e calibração prolongada permanecem pendentes. Aviso conhecido de bundle permanece. Sem merge na main, push ou deploy.
+- Suíte completa de navegador: 22 testes aprovados em 4,9 min, incluindo monitor em dois tamanhos, cenário novo, entrada/saída dos jogos e retorno ao OS com notas preservadas.
+- Build de produção: cinco testes aprovados em 1,1 min, com corrida/reabertura/retorno ao OS em 54,8 s. Nenhum merge na main, push ou deploy realizado.

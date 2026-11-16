@@ -33,3 +33,5 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 - [x] FEEL-01 — Compartilhar critérios de turbo entre recompensa, HUD e efeitos; preservar dois níveis e balanceamento; ciano/dourado, avisos únicos, partículas reutilizáveis e escapamento.
 - [x] FEEL-02 — Molas visuais da carroceria e quatro rodas, sem mudança de aderência, com limites, pausa/reset e movimento reduzido.
 - [x] FEEL-03 — Áudio híbrido local CC0, motor espacial do rival, ambientes nos dois sentidos, controles persistentes, fallback e descarte durante carregamento. Manifesto e detalhes em docs/RACE_FEEL.md.
+
+- [x] ROOM-VISUAL-01 — Interpretar o quarto de referência com marcenaria clara, cama vermelha/grafite, janela/persiana e decoração automotiva, preservando a tela física e o OS. Três vistas inspecionadas e documentadas em docs/ROOM_REFERENCE.md.

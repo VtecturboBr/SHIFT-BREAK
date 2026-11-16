@@ -10,6 +10,8 @@ Branch feat/akagiri-loop: plano do circuito implementado. Check/49 unitários/bu
 
 ## Checkpoint atual — rampas, ultrapassagem e noite
 
+Atualização visual do quarto: branch feat/room-warm-built-in-bedroom, base e163982. Marcenaria, cama, janela, materiais e iluminação seguem imagem/vídeo do proprietário, preservando monitor e câmera. Check/65 unitários/build aprovado. Detalhes em docs/ROOM_REFERENCE.md; resultados finais em docs/PROGRESS.md. Sem merge/push/deploy.
+
 Atualização de apresentação: branch feat/turbo-suspension-environment-audio, base 691b975. Plano aprovado implementado com dois turbos legíveis, suspensão visual independente da física e áudio híbrido CC0/ambientes/rival/volumes. Check/65 unitários/build aprovado; detalhes, evidências, benchmark e limites em docs/RACE_FEEL.md. Resultados finais de integração em docs/PROGRESS.md. Sem merge/push/deploy; escuta humana e GPU física pendentes.
 
 Atualização posterior: branch fix/drift-race-audit corrige a auditoria de IA, classificação, contato orientado, tandem e freio/ré; reutiliza vetores e reduz atualização do HUD. Check/57 unitários/build aprovado. Detalhes e limites em docs/PROGRESS.md; recursos opcionais não implementados. Sem merge/push/deploy.
