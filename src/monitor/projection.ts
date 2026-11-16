@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-export const DESKTOP = { width: 960, height: 540 };
+import { DESKTOP } from './display';
+export { DESKTOP } from './display';
 
 export function desktopCoordinates(
   x: number,

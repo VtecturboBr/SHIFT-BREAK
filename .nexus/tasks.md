@@ -38,3 +38,5 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 
 - [x] ACADEMIC-01 — Importar identidade, foto, formação, habilidades, redes e projetos do portfólio institucional fornecido; preservar contribuições por sprint e vídeo da ABP nos apps/arquivos/leitor.
 - [x] ACADEMIC-02 — Remover reprodução automática do HTML e JS, tornar apresentação atemporal e preservar metadados históricos exigidos. Manter cópia estática completa em docs/, sincronizada e testada sem build. Procedência em docs/PORTFOLIO_IMPORT.md.
+
+- [x] MONITOR-HD — Aproximar câmera adaptativamente, ampliar desktop para 1280×720 e quadros para 1920×1080, preservar projeção/cliques/janelas e aumentar o canvas do SIGNAL sem mudar as regras. Check/71 unitários, 16 integrações e oito testes de produção aprovados.

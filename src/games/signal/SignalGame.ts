@@ -35,12 +35,13 @@ export class SignalGame implements GameSession {
     bar.append(title, prototype, this.pauseButton, restart, close);
     const arena = document.createElement('div');
     arena.className = 'signal-arena';
-    this.canvas.width = 960;
-    this.canvas.height = 380;
+    this.canvas.width = 1920;
+    this.canvas.height = 760;
     this.canvas.setAttribute('aria-hidden', 'true');
     const context = this.canvas.getContext('2d');
     if (!context) throw new Error('Canvas 2D unavailable');
     this.context = context;
+    this.context.scale(2, 2);
     this.target.className = 'signal-target';
     this.target.textContent = '+';
     this.result.className = 'game-result';

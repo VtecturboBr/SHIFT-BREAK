@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
+import { monitorDistance } from '../../src/monitor/display';
 import {
   DESKTOP,
   desktopCoordinates,
@@ -24,6 +25,23 @@ function fixture(width = 1440, height = 900) {
 }
 
 describe('physical monitor projection', () => {
+  it.each([
+    [1920, 1080],
+    [1440, 900],
+    [1024, 768],
+    [390, 844],
+  ])('fits the closer monitor without cropping at %i × %i', (width, height) => {
+    const camera = new THREE.PerspectiveCamera(48, width / height, 0.04, 50);
+    camera.position.z = monitorDistance(48, width / height, 1.36, 0.765);
+    camera.updateMatrixWorld();
+    for (const x of [-0.68, 0.68])
+      for (const y of [-0.3825, 0.3825]) {
+        const p = new THREE.Vector3(x, y, 0).project(camera);
+        expect(Math.abs(p.x)).toBeLessThanOrEqual(0.940001);
+        expect(Math.abs(p.y)).toBeLessThanOrEqual(0.860001);
+      }
+    if (width / height > 1) expect(camera.position.z).toBeLessThan(1.55);
+  });
   it.each([
     [1440, 900],
     [800, 600],

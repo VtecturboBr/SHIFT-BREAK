@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { World } from './World';
+import { MONITOR_FRAME } from '../monitor/display';
 
 export class Engine {
   readonly renderer: THREE.WebGLRenderer;
@@ -99,8 +100,7 @@ export class Engine {
 
   captureFrame(): THREE.DataTexture {
     if (!this.world) throw new Error('No active scene to capture');
-    const width = 960,
-      height = 540;
+    const { width, height } = MONITOR_FRAME;
     const target = new THREE.WebGLRenderTarget(width, height);
     target.texture.colorSpace = THREE.SRGBColorSpace;
     const previousTarget = this.renderer.getRenderTarget();

@@ -1,3 +1,5 @@
+import { DESKTOP } from '../monitor/display';
+
 export interface WindowState {
   id: string;
   x: number;
@@ -16,8 +18,8 @@ export class WindowModel {
   private order = 0;
 
   constructor(
-    readonly width = 960,
-    readonly height = 494,
+    readonly width = DESKTOP.width,
+    readonly height = DESKTOP.height - 46,
   ) {}
 
   open(id: string, wide = false): WindowState {

@@ -2,7 +2,9 @@
 
 ## Escolha
 
-Usar DOM nativo com uma matriz projetiva `matrix3d` derivada das matrizes do Three.js. Um desktop lógico 960 × 540 é transformado para o plano físico de 1,36 × 0,765 m e então para coordenadas CSS do viewport. O navegador mantém hit testing, inputs, foco e semântica acessível. Um raycast independente calcula UV para diagnóstico do ponteiro.
+Usar DOM nativo com uma matriz projetiva `matrix3d` derivada das matrizes do Three.js. Um desktop lógico 1280 × 720 é transformado para o plano físico de 1,36 × 0,765 m e então para coordenadas CSS do viewport. O navegador mantém hit testing, inputs, foco e semântica acessível. Um raycast independente calcula UV para diagnóstico do ponteiro.
+
+Resoluções centralizadas em `src/monitor/display.ts`: desktop 1280 × 720 e textura/capturas 1920 × 1080. Ao usar o computador, a distância considera largura e altura disponíveis, com limites de 94% horizontal e 86% vertical para a superfície interativa. Não altera a posição sentada ao sair. O gerenciador de janelas usa as mesmas dimensões lógicas; SIGNAL mantém sua área de jogo de 960 × 380, centralizada e desenhada com canvas 1920 × 760.
 
 A matriz usa pixels CSS; DPR afeta apenas o renderizador WebGL. Resize atualiza câmera e projeção. Entrada de câmera e interação DOM têm donos distintos: room ou monitor; Escape e botão de saída são sempre recuperáveis. O quarto e as bordas continuam visíveis, sem desktop fullscreen.
 

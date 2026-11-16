@@ -25,7 +25,7 @@ test('desktop manages multiple windows, text state, dragging, keyboard and taskb
   await notes
     .getByRole('button', { name: 'Maximizar ou restaurar Notas', exact: true })
     .click();
-  await expect(notes).toHaveCSS('width', '960px');
+  await expect(notes).toHaveCSS('width', '1280px');
   await notes
     .getByRole('button', { name: 'Maximizar ou restaurar Notas', exact: true })
     .click();

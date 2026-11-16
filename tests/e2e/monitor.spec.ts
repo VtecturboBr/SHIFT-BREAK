@@ -22,6 +22,12 @@ for (const profile of [
     await expect(page.locator('#app')).toHaveAttribute('data-mode', 'monitor');
     const surface = page.getByRole('region', { name: 'Monitor ALEF//OS' });
     await expect(surface).toHaveAttribute('data-ready', 'true');
+    await expect(surface).toHaveCSS('width', '1280px');
+    await expect(surface).toHaveCSS('height', '720px');
+    const bounds = await surface.boundingBox();
+    expect(bounds!.width / profile.width).toBeGreaterThan(0.8);
+    expect(bounds!.y).toBeGreaterThanOrEqual(0);
+    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(profile.height);
     await surface.getByRole('button', { name: 'Pulso de teste' }).click();
     await expect(surface.locator('[data-count]')).toHaveText('1');
     await surface.getByRole('textbox').fill('Entrada real no monitor.');

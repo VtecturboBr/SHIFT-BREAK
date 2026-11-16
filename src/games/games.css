@@ -91,6 +91,7 @@
   height: 380px;
   width: 960px;
   position: relative;
+  margin-inline: auto;
 }
 .signal-arena canvas {
   display: block;

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { disposeScene, type World } from '../graphics/World';
 import { LookModel } from './LookModel';
 import { createBedroom } from './Bedroom';
+import { MONITOR_FRAME, monitorDistance } from '../monitor/display';
 import { MonitorSurface } from '../monitor/MonitorSurface';
 import { monitorCoordinates } from '../monitor/projection';
 
@@ -36,9 +37,10 @@ export class RoomWorld implements World {
     this.camera.position.copy(this.seat);
     createBedroom(this.scene);
     const screenCanvas = document.createElement('canvas');
-    screenCanvas.width = 960;
-    screenCanvas.height = 540;
+    screenCanvas.width = MONITOR_FRAME.width;
+    screenCanvas.height = MONITOR_FRAME.height;
     const context = screenCanvas.getContext('2d')!;
+    context.scale(2, 2);
     context.fillStyle = '#111820';
     context.fillRect(0, 0, 960, 540);
     context.fillStyle = '#ff606c';
@@ -177,13 +179,11 @@ export class RoomWorld implements World {
     this.targetRotation.setFromEuler(this.euler);
     this.targetPosition.copy(this.seat);
     if (this.monitorMode) {
-      const distance = Math.max(
-        1.55,
-        SCREEN.width /
-          (2 *
-            Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2)) *
-            this.camera.aspect *
-            0.8),
+      const distance = monitorDistance(
+        this.camera.fov,
+        this.camera.aspect,
+        SCREEN.width,
+        SCREEN.height,
       );
       this.targetPosition.set(0, SCREEN.y, SCREEN.z + distance);
     }

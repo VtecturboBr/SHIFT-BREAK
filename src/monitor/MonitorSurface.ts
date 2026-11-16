@@ -1,4 +1,5 @@
 import type * as THREE from 'three';
+import { DESKTOP } from './display';
 import {
   desktopCoordinates,
   monitorCoordinates,
@@ -28,11 +29,13 @@ export class MonitorSurface {
     private readonly scene: THREE.Scene,
   ) {
     this.element.className = 'monitor-surface';
+    this.element.style.width = `${DESKTOP.width}px`;
+    this.element.style.height = `${DESKTOP.height}px`;
     this.element.setAttribute('aria-label', 'Monitor ALEF//OS');
     this.element.innerHTML = `
       <header class="monitor-bar"><strong>ALEF<span>//</span>OS</strong><span>INTERFACE DE VALIDAÇÃO · 0.3</span><i aria-hidden="true">● ONLINE</i></header>
       <div class="monitor-body"><p class="eyebrow">O COMPUTADOR É PARTE DO MUNDO.</p><h1>O mundo continua<br>lá fora.</h1><p>Uma interface viva, na tela de um objeto físico.<br>O quarto permanece ao seu redor.</p><div class="monitor-test"><button data-pulse>Pulso de teste <b data-count>0</b></button><button data-reset>Zerar</button><label>Mensagem <input aria-label="Mensagem no monitor" value="Olá, mundo." maxlength="100"></label></div><p class="monitor-feedback" role="status">Interaja com o monitor para testar os controles.</p></div>
-      <footer class="monitor-footer"><span>ESC · voltar ao quarto</span><span data-coordinates>960 × 540 / superfície interativa</span></footer>`;
+      <footer class="monitor-footer"><span>ESC · voltar ao quarto</span><span data-coordinates>${DESKTOP.width} × ${DESKTOP.height} / superfície interativa</span></footer>`;
     host.append(this.element);
     const signal = this.events.signal;
     this.element.querySelector('[data-pulse]')!.addEventListener(
