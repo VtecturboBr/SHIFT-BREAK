@@ -28,6 +28,15 @@ for (const profile of [
     expect(bounds!.width / profile.width).toBeGreaterThan(0.8);
     expect(bounds!.y).toBeGreaterThanOrEqual(0);
     expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(profile.height);
+    await surface
+      .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+      .click();
+    await surface
+      .getByRole('searchbox', { name: 'Buscar aplicativos' })
+      .fill('diagnostico');
+    await surface
+      .getByRole('button', { name: 'Diagnóstico do monitor', exact: true })
+      .click();
     await surface.getByRole('button', { name: 'Pulso de teste' }).click();
     await expect(surface.locator('[data-count]')).toHaveText('1');
     await surface.getByRole('textbox').fill('Entrada real no monitor.');
@@ -50,7 +59,7 @@ for (const profile of [
 test('captures a rendered diagnostic frame into the physical monitor', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/?debug=1');
   await page.getByRole('button', { name: 'Diagnóstico', exact: true }).click();
   await page
     .getByRole('button', { name: 'Capturar quadro no monitor' })
@@ -62,7 +71,7 @@ test('captures a rendered diagnostic frame into the physical monitor', async ({
   await page.getByRole('button', { name: 'Restaurar interface' }).click();
   await page.keyboard.press('e');
   await expect(
-    page.getByRole('button', { name: 'Pulso de teste' }),
+    page.getByRole('button', { name: 'Explorar projetos', exact: true }),
   ).toBeVisible();
 });
 

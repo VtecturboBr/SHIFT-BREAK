@@ -14,6 +14,9 @@ test('DRIFT.exe drives, pauses, restarts and preserves the room and notes', asyn
     .click();
   const surface = page.getByRole('region', { name: 'Monitor ALEF//OS' });
   await expect(surface).toHaveAttribute('data-ready', 'true');
+  await surface
+    .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+    .click();
   await surface.getByRole('button', { name: 'Notas', exact: true }).click();
   const notes = surface.getByRole('dialog', { name: 'Notas', exact: true });
   await notes.getByRole('textbox').fill('Preservar durante REDLINE.');

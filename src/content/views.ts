@@ -98,15 +98,90 @@ export function contactView(content: PortfolioContent): HTMLElement {
   return root;
 }
 
-export function projectsView(content: PortfolioContent): HTMLElement {
+export function projectsView(
+  content: PortfolioContent,
+  interactive = false,
+): HTMLElement {
   const root = text('div', '', 'content-app');
-  for (const category of ['Acadêmicos', 'Pessoais', 'Profissionais']) {
-    root.append(text('h2', category));
-    const projects = content.projects.filter((p) => p.category === category);
-    if (!projects.length)
-      root.append(text('p', 'Nenhum projeto cadastrado nesta categoria.'));
-    for (const project of projects) root.append(projectView(project));
+  const categories = ['Acadêmicos', 'Pessoais', 'Profissionais'].filter(
+    (category) => content.projects.some((p) => p.category === category),
+  );
+  if (!interactive) {
+    for (const category of categories) {
+      root.append(text('h2', category));
+      for (const project of content.projects.filter(
+        (p) => p.category === category,
+      ))
+        root.append(projectView(project));
+    }
+    return root;
   }
+  root.classList.add('project-browser');
+  let active = 'Todos';
+  const render = (returnTo?: string) => {
+    root.replaceChildren(
+      text('p', 'PORTFÓLIO / PROJETOS', 'eyebrow'),
+      text('h2', 'Ideias em prática.'),
+      text(
+        'p',
+        'Interfaces, projetos em equipe e experiências interativas. Explore os detalhes de cada trabalho.',
+      ),
+    );
+    const filters = text('nav', '', 'project-filters');
+    filters.setAttribute('aria-label', 'Filtrar projetos');
+    for (const category of ['Todos', ...categories]) {
+      const button = document.createElement('button');
+      button.textContent = category;
+      button.setAttribute('aria-pressed', String(active === category));
+      button.onclick = () => {
+        active = category;
+        render();
+        root
+          .querySelector<HTMLButtonElement>('button[aria-pressed="true"]')
+          ?.focus();
+      };
+      filters.append(button);
+    }
+    const grid = text('div', '', 'project-grid');
+    for (const project of content.projects.filter(
+      (p) => active === 'Todos' || p.category === active,
+    )) {
+      const card = text('article', '', 'project-preview');
+      const image = project.images[0];
+      if (image) card.append(imageView(image));
+      card.append(
+        text('p', project.category ?? 'Projeto', 'eyebrow'),
+        text('h3', project.title),
+        text('p', project.summary),
+        text(
+          'p',
+          project.technologies.slice(0, 4).join(' · '),
+          'project-stack',
+        ),
+      );
+      const button = document.createElement('button');
+      button.dataset.project = project.id;
+      button.textContent = `Ver ${project.title}`;
+      button.onclick = () => {
+        const back = document.createElement('button');
+        back.textContent = 'Voltar aos projetos';
+        back.onclick = () => {
+          render(project.id);
+        };
+        root.replaceChildren(back, projectView(project));
+        root.closest('.os-content')?.scrollTo(0, 0);
+        back.focus();
+      };
+      card.append(button);
+      grid.append(card);
+    }
+    root.append(filters, grid);
+    if (returnTo)
+      root
+        .querySelector<HTMLButtonElement>(`[data-project="${returnTo}"]`)
+        ?.focus();
+  };
+  render();
   return root;
 }
 
@@ -134,14 +209,13 @@ export function overviewView(content: PortfolioContent): HTMLElement {
     photo.classList.add('profile-photo');
     root.prepend(photo);
   }
-  root.append(
-    text(
-      'p',
-      content.profile.skills.length
-        ? content.profile.skills.join(' · ')
-        : 'Habilidades profissionais ainda não confirmadas pelo autor.',
-    ),
-  );
+  const skills = text('ul', '', 'skill-list');
+  for (const skill of content.profile.skills) skills.append(text('li', skill));
+  root.append(skills);
+  if (!content.profile.skills.length)
+    root.append(
+      text('p', 'Habilidades profissionais ainda não confirmadas pelo autor.'),
+    );
   const details = document.createElement('dl');
   for (const [label, value] of [
     ['Formação', content.profile.education],

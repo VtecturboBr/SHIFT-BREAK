@@ -1,5 +1,7 @@
 import { DESKTOP } from '../monitor/display';
 
+export const TASKBAR_HEIGHT = 56;
+
 export interface WindowState {
   id: string;
   x: number;
@@ -19,30 +21,42 @@ export class WindowModel {
 
   constructor(
     readonly width = DESKTOP.width,
-    readonly height = DESKTOP.height - 46,
+    readonly height = DESKTOP.height - TASKBAR_HEIGHT,
   ) {}
 
-  open(id: string, wide = false): WindowState {
+  open(
+    id: string,
+    wide = false,
+    size?: { width: number; height: number },
+  ): WindowState {
     let window = this.windows.get(id);
     if (!window) {
       window = {
         id,
-        x: 130 + this.windows.size * 24,
-        y: 35 + this.windows.size * 24,
-        width: wide ? 760 : 510,
-        height: wide ? 420 : 310,
+        x: 0,
+        y: 0,
+        width: size?.width ?? (wide ? 1040 : 760),
+        height: size?.height ?? (wide ? 584 : 520),
         minimized: false,
         maximized: false,
         z: 0,
       };
       window.width = Math.min(window.width, this.width);
       window.height = Math.min(window.height, this.height);
+      window.x = (this.width - window.width) / 2 + (this.windows.size % 3) * 24;
+      window.y =
+        (this.height - window.height) / 2 + (this.windows.size % 3) * 24;
       this.windows.set(id, window);
       this.move(id, window.x, window.y);
     }
     window.minimized = false;
     this.focus(id);
     return window;
+  }
+
+  minimizeAll(): void {
+    for (const window of this.windows.values()) window.minimized = true;
+    this.focused = undefined;
   }
 
   focus(id: string): void {

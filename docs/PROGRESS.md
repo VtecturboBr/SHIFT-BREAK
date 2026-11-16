@@ -1,5 +1,15 @@
 # Progresso real
 
+## ALEF//OS — redesign de navegação e apresentação · 16/11/2026
+
+- Branch `feat/alef-os-redesign`, partindo de `b56c0a4`. Entrada com identidade real e destaque equivalente para projetos e jogos; visual grafite/branco/vermelho e SVGs locais. A tela de espera também usa a apresentação nova.
+- Menu único com categorias e busca sem distinção de acentos/caixa. Início preserva janelas e conteúdo; janelas maiores e centralizadas, foco/arraste/maximização preservados. Diagnóstico do monitor em Ferramentas → Avançado; ferramentas externas somente com `?debug=1`.
+- Projetos com cartões, filtros existentes, detalhes e retorno com foco. Biblioteca apresenta DRIFT/SIGNAL primeiro e recolhe títulos futuros. Perfil, habilidades, arquivos, contatos, leitor e textos do sistema refinados. Dados acadêmicos, áudio manual e edição estática independentes preservados.
+- `npm run check`: typecheck, lint, formatação, 74 testes unitários e build aprovados. `npm run test:e2e`: 28 testes Chromium aprovados, incluindo corridas nos dois sentidos, dois lançamentos do DRIFT, restauração de notas, áudio e modo de leitura sem WebGL.
+- `npm run test:production`: 10 testes aprovados após rebuild final, incluindo os dois cenários de redesign, SIGNAL, DRIFT, arquivos, áudio manual, importação acadêmica e leitor sem WebGL. Capturas finais de entrada, projetos, biblioteca e múltiplas janelas inspecionadas.
+- Novos testes cobrem 1280×720/DPR 1 e 900×650/DPR 2, contraste representativo ≥4,5:1, posição dos controles externos, busca, filtros e foco. Evidências em `docs/evidence/os-redesign/`; contratos e limites em `docs/ALEF_OS_REDESIGN.md`.
+- Limites: GPU física, outros navegadores e auditoria completa com leitor de tela continuam pendentes; permanece o aviso conhecido de tamanho do bundle Three.js. Sem dependências novas, merge, push ou publicação.
+
 ## Inventário inicial — 14/11/2026
 
 - Remoto público VtecturboBr/SHIFT-BREAK vazio; clone local na pasta de trabalho.

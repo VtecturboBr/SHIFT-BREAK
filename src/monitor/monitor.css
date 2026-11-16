@@ -96,13 +96,12 @@
 }
 .monitor-help {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 8px;
+  right: 16px;
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 10px 16px;
+  padding: 3px 8px;
   background: #11171ff0;
   border: 1px solid #59606f;
   border-radius: 4px;
@@ -138,7 +137,7 @@ button:disabled {
     padding: 12px;
   }
   .monitor-help {
-    bottom: 38px;
+    bottom: 8px;
     gap: 8px;
   }
   .monitor-help span {

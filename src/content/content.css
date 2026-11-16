@@ -1,15 +1,15 @@
 .content-app {
-  padding: 22px;
-  font-size: 14px;
+  padding: 28px;
+  font-size: 16px;
   line-height: 1.65;
 }
 .content-app h2 {
-  font-size: 21px;
+  font-size: 28px;
   line-height: 1.3;
   margin: 6px 0 14px;
 }
 .content-app h3 {
-  font-size: 16px;
+  font-size: 20px;
 }
 .profile-photo img {
   width: 180px;
@@ -20,7 +20,7 @@
   max-width: 100%;
 }
 .content-app a {
-  color: #a6d3ff;
+  color: #ffb3b7;
   display: inline-block;
   margin: 6px 14px 6px 0;
   text-underline-offset: 3px;
@@ -53,10 +53,10 @@
   margin-bottom: 12px;
 }
 .content-app button {
-  font-size: 12px;
+  font-size: 15px;
   padding: 7px 12px;
-  background: #29394f;
-  border-color: #5d718d;
+  background: var(--os-raised, #25282f);
+  border-color: var(--os-border, #454950);
 }
 .file-list {
   display: grid;
@@ -66,6 +66,9 @@
 .file-list button {
   text-align: left;
   padding: 10px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 .empty-state {
   color: #c0cbdb;
@@ -88,18 +91,9 @@
   width: 100%;
   height: 330px;
 }
-.os-icons {
-  max-height: 470px;
-  overflow: auto;
-  scrollbar-width: thin;
-}
-.os-menu {
-  max-height: 420px;
-  overflow: auto;
-}
 .accessible-portfolio {
   min-height: 100dvh;
-  background: #111820;
+  background: #101114;
   color: #ecf1f8;
 }
 .accessible-portfolio main {
@@ -114,7 +108,7 @@
   line-height: 1.15;
 }
 .accessible-portfolio a {
-  color: #b2d8ff;
+  color: #ffb3b7;
   padding: 5px 0;
   text-underline-offset: 4px;
 }
@@ -151,4 +145,143 @@
   place-items: center;
   font: 16px monospace;
   color: #d2dcec;
+}
+
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: 8px;
+  padding: 0;
+}
+.skill-list li {
+  border: 1px solid #555963;
+  background: #25282f;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+.content-app dt {
+  color: #babec8;
+  font-weight: 600;
+  margin-top: 14px;
+}
+.content-app dd {
+  margin: 4px 0 0;
+}
+.project-filters {
+  display: flex;
+  gap: 8px;
+  margin: 22px 0;
+  flex-wrap: wrap;
+}
+.project-filters button[aria-pressed='true'] {
+  border-color: #ff7278;
+  background: #44272e;
+}
+.project-grid,
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+.project-preview {
+  padding: 18px;
+  border: 1px solid #454950;
+  border-radius: 12px;
+  background: #15161a;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.project-preview .portfolio-image {
+  width: 100%;
+  margin: 0 0 12px;
+}
+.project-preview .portfolio-image img {
+  width: 100%;
+  height: 155px;
+  object-fit: contain;
+  background: #101114;
+  border: 0;
+}
+.project-preview figcaption {
+  display: none;
+}
+.project-preview h3 {
+  margin: 4px 0 8px;
+}
+.project-preview p {
+  margin: 4px 0 12px;
+}
+.project-preview .project-stack {
+  color: #bdc0ca;
+  font-size: 13px;
+}
+.project-preview button {
+  margin-top: auto;
+}
+.project-card {
+  padding-top: 20px;
+}
+.game-card-body {
+  padding: 16px;
+}
+.game-card-body h3 {
+  font-size: 25px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+.game-library > .eyebrow {
+  margin: 0 0 6px;
+}
+.game-library > h2 {
+  margin-bottom: 18px;
+}
+.game-library .game-cover {
+  height: 112px;
+}
+.game-library .game-card p {
+  min-height: 0;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+.game-library .game-card .eyebrow {
+  font-size: 10px;
+  margin-bottom: 6px;
+}
+.future-games {
+  border-top: 1px solid #454950;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+.future-games summary {
+  cursor: pointer;
+  color: #c2c5cd;
+  font-size: 15px;
+  padding: 8px 0;
+}
+.future-games h3 {
+  font-size: 17px;
+  margin-bottom: 0;
+}
+.future-games p {
+  color: #b9bcc5;
+  margin-top: 4px;
+}
+.accessible-portfolio .profile-photo img {
+  width: 160px;
+  border-radius: 12px;
+}
+.accessible-portfolio .project-card {
+  padding: 22px 0;
+  border-bottom: 1px solid #454950;
+}
+@media (max-width: 600px) {
+  .accessible-portfolio .content-app {
+    padding: 20px 0;
+  }
+  .accessible-portfolio .content-app h2 {
+    overflow-wrap: anywhere;
+  }
 }

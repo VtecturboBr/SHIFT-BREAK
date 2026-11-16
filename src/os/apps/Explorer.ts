@@ -1,21 +1,30 @@
 import { createFilesystem, resolveFile } from '../../content/filesystem';
 import { portfolio, safeAsset } from '../../content/portfolio';
 import { imageView, text } from '../../content/views';
+import { appIcon } from '../icons';
 
 export function createExplorer(): HTMLElement {
   const root = document.createElement('div');
   root.className = 'content-app explorer-app';
   const filesystem = createFilesystem(portfolio);
   let path: string[] = [];
+  const focusPath = () =>
+    root
+      .querySelector<HTMLElement>(
+        '.text-viewer, .code-viewer, .file-path button:last-child',
+      )
+      ?.focus({ preventScroll: true });
   const render = () => {
     root.replaceChildren();
     const nav = document.createElement('nav');
     nav.className = 'file-path';
+    nav.setAttribute('aria-label', 'Caminho do arquivo');
     const home = document.createElement('button');
     home.textContent = 'home';
     home.onclick = () => {
       path = [];
       render();
+      focusPath();
     };
     nav.append(home);
     path.forEach((part, index) => {
@@ -24,6 +33,7 @@ export function createExplorer(): HTMLElement {
       button.onclick = () => {
         path = path.slice(0, index + 1);
         render();
+        focusPath();
       };
       nav.append(button);
     });
@@ -34,6 +44,7 @@ export function createExplorer(): HTMLElement {
       back.onclick = () => {
         path.pop();
         render();
+        focusPath();
       };
       root.append(back);
     }
@@ -48,9 +59,19 @@ export function createExplorer(): HTMLElement {
       for (const item of file.children) {
         const button = document.createElement('button');
         button.textContent = `${item.kind === 'folder' ? '▸ ' : ''}${item.name}`;
+        button.prepend(
+          appIcon(
+            item.kind === 'folder'
+              ? 'explorer'
+              : item.kind === 'image'
+                ? 'gallery'
+                : 'notes',
+          ),
+        );
         button.onclick = () => {
           path.push(item.name);
           render();
+          focusPath();
         };
         list.append(button);
       }

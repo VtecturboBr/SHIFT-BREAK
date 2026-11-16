@@ -3,8 +3,13 @@ import base from './playwright.config';
 
 export default defineConfig({
   ...base,
-  testMatch: ['launcher.spec.ts', 'portfolio.spec.ts', 'redline.spec.ts'],
-  grep: /launches, plays|explores real files|mobile accessible|unavailable WebGL|DRIFT.exe|integrates academic|preserves the original|shows imported/,
+  testMatch: [
+    'launcher.spec.ts',
+    'portfolio.spec.ts',
+    'redline.spec.ts',
+    'os-redesign.spec.ts',
+  ],
+  grep: /launches, plays|explores real files|mobile accessible|unavailable WebGL|DRIFT.exe|integrates academic|preserves the original|shows imported|guided OS navigation/,
   use: { ...base.use, baseURL: 'http://127.0.0.1:4174' },
   webServer: {
     command: 'npm run preview -- --port 4174 --strictPort',

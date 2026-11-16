@@ -5,7 +5,7 @@ test('room mouse and keyboard look are bounded, recoverable and disposable', asy
 }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/?debug=1');
   const canvas = page.locator('canvas');
   await expect(page.locator('#app')).toHaveAttribute('data-mode', 'room');
   await expect(canvas).toHaveAttribute('data-yaw', '0.000');

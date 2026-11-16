@@ -147,6 +147,19 @@ button:hover {
   background: #101216b0;
   padding: 7px;
 }
+#app:not([data-debug='true']) .diagnostics,
+#app:not([data-debug='true']) [data-action='diagnostic'] {
+  display: none;
+}
+#app[data-mode='monitor'] > .brand,
+#app[data-mode='monitor'] > .top-actions {
+  display: none;
+}
+.monitor-help a {
+  color: #f3d8da;
+  font-size: 12px;
+  text-underline-offset: 3px;
+}
 @media (max-width: 600px) {
   .brand {
     top: 20px;

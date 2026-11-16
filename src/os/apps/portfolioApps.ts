@@ -20,6 +20,7 @@ export const portfolioApps: AppDefinition[] = [
   },
   {
     id: 'profile',
+    category: 'Portfólio',
     title: 'Apresentação',
     symbol: '◎',
     description: 'Identidade e habilidades',
@@ -27,14 +28,16 @@ export const portfolioApps: AppDefinition[] = [
   },
   {
     id: 'projects',
+    category: 'Portfólio',
     title: 'Projetos',
     symbol: '◇',
     description: 'Trabalhos e tecnologias',
     wide: true,
-    create: () => projectsView(portfolio),
+    create: () => projectsView(portfolio, true),
   },
   {
     id: 'gallery',
+    category: 'Portfólio',
     title: 'Galeria',
     symbol: '▧',
     description: 'Capturas reais e trabalhos visuais',
@@ -48,6 +51,7 @@ export const portfolioApps: AppDefinition[] = [
   },
   {
     id: 'contact',
+    category: 'Portfólio',
     title: 'Contato',
     symbol: '@',
     description: 'Links profissionais e currículo',

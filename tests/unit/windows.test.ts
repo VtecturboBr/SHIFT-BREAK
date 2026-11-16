@@ -35,3 +35,32 @@ it('preserves windows through focus, minimize, maximize/restore and bounded move
   model.close('other');
   expect(model.focused).toBeUndefined();
 });
+
+it('returns home without losing window geometry and restores a single selected window', () => {
+  const model = new WindowModel();
+  const notes = model.open('notes', false, { width: 560, height: 400 });
+  model.move('notes', 125, 100);
+  model.open('projects', true);
+  model.minimizeAll();
+  expect(model.focused).toBeUndefined();
+  expect([...model.windows.values()].every((w) => w.minimized)).toBe(true);
+  expect(model.open('notes')).toBe(notes);
+  expect(notes).toMatchObject({
+    x: 125,
+    y: 100,
+    width: 560,
+    height: 400,
+    minimized: false,
+  });
+  expect(model.windows.get('projects')?.minimized).toBe(true);
+});
+
+it('keeps large guided windows within a smaller work area', () => {
+  const model = new WindowModel(600, 400);
+  expect(model.open('projects', true)).toMatchObject({
+    x: 0,
+    y: 0,
+    width: 600,
+    height: 400,
+  });
+});

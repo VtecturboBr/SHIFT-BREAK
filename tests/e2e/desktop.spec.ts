@@ -10,10 +10,36 @@ test('desktop manages multiple windows, text state, dragging, keyboard and taskb
     .click();
   const surface = page.getByRole('region', { name: 'Monitor ALEF//OS' });
   await expect(surface).toHaveAttribute('data-ready', 'true');
+  await surface
+    .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+    .click();
   await surface.getByRole('button', { name: 'Notas', exact: true }).click();
   const notes = surface.getByRole('dialog', { name: 'Notas', exact: true });
   await notes.getByRole('textbox').fill('Estado preservado.');
   await expect(notes).toHaveAttribute('data-focused', 'true');
+  await surface
+    .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+    .click();
+  await surface
+    .locator('.os-menu')
+    .getByRole('button', { name: 'Sobre o sistema', exact: true })
+    .click();
+  const system = surface.getByRole('dialog', {
+    name: 'Sobre o sistema',
+    exact: true,
+  });
+  await expect(system).toBeVisible();
+  await surface
+    .getByRole('button', { name: 'Restaurar Notas', exact: true })
+    .click();
+  await page.screenshot({ path: 'test-results/os-windows.png' });
+  await surface.getByRole('button', { name: 'Início', exact: true }).click();
+  await expect(notes).toBeHidden();
+  await expect(system).toBeHidden();
+  await surface
+    .getByRole('button', { name: 'Restaurar Notas', exact: true })
+    .click();
+  await expect(notes.getByRole('textbox')).toHaveValue('Estado preservado.');
   await notes
     .getByRole('button', { name: 'Minimizar Notas', exact: true })
     .click();
@@ -29,17 +55,17 @@ test('desktop manages multiple windows, text state, dragging, keyboard and taskb
   await notes
     .getByRole('button', { name: 'Maximizar ou restaurar Notas', exact: true })
     .click();
-  await expect(notes).toHaveCSS('width', '510px');
+  await expect(notes).toHaveCSS('width', '560px');
   const titlebar = notes.getByLabel('Mover Notas com as setas');
   await titlebar.focus();
   await page.keyboard.press('ArrowRight');
-  await expect(notes).toHaveCSS('left', '166px');
+  await expect(notes).toHaveCSS('left', '372px');
   const rect = await titlebar.boundingBox();
   await page.mouse.move(rect!.x + 30, rect!.y + 10);
   await page.mouse.down();
   await page.mouse.move(rect!.x + 90, rect!.y + 45, { steps: 3 });
   await page.mouse.up();
-  await expect(notes).not.toHaveCSS('left', '166px');
+  await expect(notes).not.toHaveCSS('left', '372px');
   await expect(page.locator('canvas')).toHaveAttribute('data-yaw', '0.000');
   await page.screenshot({ path: 'test-results/desktop.png' });
   await notes

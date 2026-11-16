@@ -48,7 +48,7 @@ export class RoomWorld implements World {
     context.fillText('ALEF//OS', 195, 260);
     context.fillStyle = '#c5cedb';
     context.font = '19px monospace';
-    context.fillText('COMPUTADOR EM CONSTRUÇÃO', 225, 315);
+    context.fillText('PORTFÓLIO & EXPERIÊNCIAS', 225, 315);
     const texture = new THREE.CanvasTexture(screenCanvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     this.screen = new THREE.Mesh(

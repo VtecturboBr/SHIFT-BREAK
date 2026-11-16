@@ -40,3 +40,5 @@ Evidência 07: 14 unitários e 14 e2e Chromium passaram; screenshot real revisad
 - [x] ACADEMIC-02 — Remover reprodução automática do HTML e JS, tornar apresentação atemporal e preservar metadados históricos exigidos. Manter cópia estática completa em docs/, sincronizada e testada sem build. Procedência em docs/PORTFOLIO_IMPORT.md.
 
 - [x] MONITOR-HD — Aproximar câmera adaptativamente, ampliar desktop para 1280×720 e quadros para 1920×1080, preservar projeção/cliques/janelas e aumentar o canvas do SIGNAL sem mudar as regras. Check/71 unitários, 16 integrações e oito testes de produção aprovados.
+
+- [x] OS-REDESIGN — Portfólio e jogos em destaque equivalente, identidade grafite/vermelho, menu com busca, Início preservando janelas, projetos em cartões/detalhes, biblioteca clara e leitor alinhado. Verificação em docs/ALEF_OS_REDESIGN.md e docs/PROGRESS.md.

@@ -1,5 +1,7 @@
 import type { AppDefinition } from './registry';
 import { WindowModel } from './WindowModel';
+import { createHome } from './Home';
+import { appIcon, searchText } from './icons';
 
 type Point = { x: number; y: number };
 
@@ -11,7 +13,7 @@ export class Desktop {
   private readonly tasks = document.createElement('div');
   private readonly menu = document.createElement('div');
   private readonly clock = document.createElement('time');
-  private readonly notification = document.createElement('div');
+  private readonly home: HTMLElement;
   private readonly timer: ReturnType<typeof setInterval>;
   private drag?: {
     id: string;
@@ -27,40 +29,71 @@ export class Desktop {
     private readonly point: (x: number, y: number) => Point | null,
   ) {
     root.classList.add('os-desktop');
-    root.innerHTML =
-      '<div class="os-wallpaper" aria-hidden="true"><strong>ALEF<span>//</span>OS</strong><p>MAKE SPACE FOR WHAT COMES NEXT.</p></div>';
-    const icons = document.createElement('nav');
-    icons.className = 'os-icons';
-    icons.setAttribute('aria-label', 'Aplicativos do desktop');
+    root.replaceChildren();
+    this.home = createHome((id) => this.open(id));
     this.menu.className = 'os-menu';
     this.menu.hidden = true;
     this.menu.setAttribute('aria-label', 'Menu de aplicativos');
-    for (const app of apps) {
-      for (const host of [icons, this.menu]) {
-        const button = document.createElement('button');
-        button.className = 'os-icon';
-        button.title = app.description;
-        const symbol = document.createElement('b');
-        symbol.textContent = app.symbol;
-        symbol.setAttribute('aria-hidden', 'true');
-        const title = document.createElement('span');
-        title.textContent = app.title;
-        button.append(symbol, title);
-        button.addEventListener(
-          'click',
-          () => {
-            this.open(app.id);
-            this.closeMenu();
-          },
-          { signal: this.events.signal },
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.placeholder = 'Encontre um aplicativo…';
+    search.setAttribute('aria-label', 'Buscar aplicativos');
+    const results = document.createElement('div');
+    results.className = 'os-menu-results';
+    const renderMenu = () => {
+      results.replaceChildren();
+      const query = searchText(search.value);
+      const matches = apps.filter((app) =>
+        searchText(`${app.title} ${app.description}`).includes(query),
+      );
+      for (const category of ['Portfólio', 'Experiências', 'Ferramentas']) {
+        const entries = matches.filter(
+          (app) => (app.category ?? 'Ferramentas') === category,
         );
-        host.append(button);
+        if (!entries.length) continue;
+        const heading = document.createElement('h2');
+        heading.textContent = category;
+        results.append(heading);
+        for (const app of entries.filter((app) => app.id !== 'monitor')) {
+          results.append(this.appButton(app));
+        }
+        const diagnostic = entries.find((app) => app.id === 'monitor');
+        if (diagnostic) {
+          const advanced = document.createElement('details');
+          advanced.open = Boolean(query);
+          const summary = document.createElement('summary');
+          summary.textContent = 'Avançado';
+          advanced.append(summary, this.appButton(diagnostic));
+          results.append(advanced);
+        }
       }
-    }
+      if (!matches.length) {
+        const empty = document.createElement('p');
+        empty.setAttribute('role', 'status');
+        empty.textContent = 'Nenhum aplicativo encontrado. Tente outro nome.';
+        results.append(empty);
+      }
+    };
+    search.addEventListener('input', renderMenu, {
+      signal: this.events.signal,
+    });
+    renderMenu();
+    this.menu.append(search, results);
+    this.menu.addEventListener(
+      'keydown',
+      (event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation();
+          this.closeMenu();
+          start.focus();
+        }
+      },
+      { signal: this.events.signal },
+    );
     const bar = document.createElement('footer');
     bar.className = 'os-taskbar';
     const start = document.createElement('button');
-    start.textContent = 'ALEF//';
+    start.textContent = 'ALEF// Aplicativos';
     start.setAttribute('aria-label', 'Menu de aplicativos');
     start.setAttribute('aria-expanded', 'false');
     start.addEventListener(
@@ -68,6 +101,24 @@ export class Desktop {
       () => {
         this.menu.hidden = !this.menu.hidden;
         start.setAttribute('aria-expanded', String(!this.menu.hidden));
+        if (!this.menu.hidden) {
+          search.value = '';
+          renderMenu();
+          search.focus();
+        }
+      },
+      { signal: this.events.signal },
+    );
+    const home = document.createElement('button');
+    home.className = 'os-home-button';
+    home.append(appIcon('home'), document.createTextNode('Início'));
+    home.addEventListener(
+      'click',
+      () => {
+        this.model.minimizeAll();
+        this.closeMenu();
+        this.sync();
+        this.home.querySelector<HTMLButtonElement>('button')?.focus();
       },
       { signal: this.events.signal },
     );
@@ -78,20 +129,14 @@ export class Desktop {
     coordinates.dataset.coordinates = '';
     coordinates.className = 'os-coordinates';
     coordinates.setAttribute('aria-hidden', 'true');
-    this.notification.className = 'os-notification';
-    this.notification.setAttribute('role', 'status');
-    this.notification.hidden = true;
-    bar.append(start, this.tasks, coordinates, this.clock);
-    root.append(icons, this.menu, this.notification, bar);
+    bar.append(start, home, this.tasks, coordinates, this.clock);
+    root.append(this.home, this.menu, bar);
     this.tick();
     this.timer = setInterval(() => this.tick(), 1000);
     root.addEventListener(
       'pointerdown',
       (event) => {
-        if (
-          event.target === root ||
-          (event.target as HTMLElement).closest('.os-wallpaper')
-        )
+        if (!(event.target as HTMLElement).closest('.os-menu, .os-taskbar'))
           this.closeMenu();
       },
       { signal: this.events.signal },
@@ -102,7 +147,20 @@ export class Desktop {
     document.addEventListener('visibilitychange', () => this.cancelDrag(), {
       signal: this.events.signal,
     });
-    this.open('monitor', false);
+  }
+
+  private appButton(app: AppDefinition): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.className = 'os-icon';
+    button.title = app.description;
+    const title = document.createElement('span');
+    title.textContent = app.title;
+    button.append(appIcon(app.id), title);
+    button.onclick = () => {
+      this.open(app.id);
+      this.closeMenu();
+    };
+    return button;
   }
 
   private tick(): void {
@@ -115,15 +173,14 @@ export class Desktop {
     this.clock.title = now.toLocaleDateString('pt-BR', { dateStyle: 'full' });
   }
 
-  open(id: string, notify = true): void {
+  open(id: string): void {
     const app = this.apps.find((entry) => entry.id === id);
     if (!app) return;
-    this.model.open(id, app.wide);
+    this.model.open(id, app.wide, app.initialSize);
     if (!this.windowElements.has(id)) this.createWindow(app);
     this.sync();
     const element = this.windowElements.get(id)!;
     element.focus({ preventScroll: true });
-    if (notify) this.notify(`${app.title} aberto.`);
   }
 
   private createWindow(app: AppDefinition): void {
@@ -138,14 +195,14 @@ export class Desktop {
     const titlebar = document.createElement('header');
     titlebar.className = 'os-titlebar';
     const title = document.createElement('strong');
-    title.textContent = `${app.symbol}  ${app.title}`;
+    title.append(appIcon(app.id), document.createTextNode(app.title));
     titlebar.append(title);
     for (const [label, symbol, run] of [
-      ['Minimizar', '−', () => this.model.minimize(app.id)],
-      ['Maximizar ou restaurar', '□', () => this.model.maximize(app.id)],
+      ['Minimizar', 'minimize', () => this.model.minimize(app.id)],
+      ['Maximizar ou restaurar', 'maximize', () => this.model.maximize(app.id)],
       [
         'Fechar',
-        '×',
+        'close',
         () => {
           this.model.close(app.id);
           this.cancelDrag();
@@ -153,7 +210,7 @@ export class Desktop {
       ],
     ] as const) {
       const button = document.createElement('button');
-      button.textContent = symbol;
+      button.append(appIcon(symbol));
       button.setAttribute('aria-label', `${label} ${app.title}`);
       button.addEventListener(
         'click',
@@ -256,6 +313,7 @@ export class Desktop {
   }
 
   private sync(): void {
+    this.home.inert = Boolean(this.model.focused);
     for (const [id, element] of this.windowElements) {
       const window = this.model.windows.get(id);
       if (!window) {
@@ -278,7 +336,7 @@ export class Desktop {
         'aria-pressed',
         String(window.id === this.model.focused),
       );
-      button.onclick = () => this.open(window.id, false);
+      button.onclick = () => this.open(window.id);
       this.tasks.append(button);
     }
   }
@@ -299,19 +357,6 @@ export class Desktop {
     this.root
       .querySelector('.os-taskbar button')
       ?.setAttribute('aria-expanded', 'false');
-  }
-  private notify(message: string): void {
-    this.notification.replaceChildren();
-    const text = document.createElement('span');
-    text.textContent = message;
-    const close = document.createElement('button');
-    close.textContent = '×';
-    close.setAttribute('aria-label', 'Dispensar notificação');
-    close.onclick = () => {
-      this.notification.hidden = true;
-    };
-    this.notification.append(text, close);
-    this.notification.hidden = false;
   }
   cancelDrag(): void {
     this.drag = undefined;

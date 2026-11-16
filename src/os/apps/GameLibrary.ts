@@ -1,3 +1,4 @@
+import { text } from '../../content/views';
 import type { AppDefinition } from '../registry';
 
 export function gameLibrary(
@@ -8,69 +9,68 @@ export function gameLibrary(
     id: 'games',
     title: 'Biblioteca de jogos',
     symbol: '◉',
+    category: 'Experiências',
     description: 'Jogos e experiências',
     wide: true,
     create: () => {
-      const root = document.createElement('section');
-      root.className = 'content-app game-library';
-      const heading = document.createElement('h2');
-      heading.textContent = 'Sua próxima experiência.';
-      root.append(heading);
-      const cards = [
-        [
-          'SIGNAL.exe',
-          'Colete sinais antes que o tempo termine. Jogo de teste do launcher.',
-          'Disponível · protótipo',
-          true,
-        ],
-        [
-          'SHIFT//BREAK',
-          'Campanha REDLINE → BREAKPOINT → OVERDRIVE.',
-          'Em desenvolvimento · incrementos 10–12',
-          false,
-        ],
+      const root = text('section', '', 'content-app game-library');
+      root.append(
+        text('p', 'EXPERIÊNCIAS / JOGOS', 'eyebrow'),
+        text('h2', 'Escolha sua próxima experiência.'),
+      );
+      const grid = text('div', '', 'game-grid');
+      for (const [title, description, image, run] of [
         [
           'DRIFT.exe',
-          'Akagiri Loop: 6,9 km de touge, onze grampos, barragem e vertedouro seco. Uma volta completa nos dois sentidos.',
-          'Disponível · protótipo REDLINE',
-          true,
+          'Desafie seu rival no Akagiri Loop. Curvas fechadas, mudanças de elevação e turbo conquistado no drift.',
+          'drift-preview.png',
+          launchRedline,
         ],
         [
-          'FIGHT.exe',
-          'Combate corpo a corpo na estrada.',
-          'Em desenvolvimento · incremento 08',
-          false,
+          'SIGNAL.exe',
+          'Uma pausa rápida: colete os sinais antes que o tempo termine e desafie sua pontuação.',
+          'signal-preview.png',
+          launch,
         ],
-        [
-          'FPS.exe',
-          'Combate em primeira pessoa no túnel.',
-          'Em desenvolvimento · incremento 09',
-          false,
-        ],
-      ] as const;
-      for (const [title, description, status, available] of cards) {
-        const card = document.createElement('article');
-        card.className = 'game-card';
-        const cover = document.createElement('div');
+      ] as const) {
+        const card = text('article', '', 'game-card');
+        const cover = document.createElement('img');
         cover.className = 'game-cover';
-        cover.textContent = title;
-        cover.setAttribute('aria-hidden', 'true');
-        const name = document.createElement('h3');
-        name.textContent = title;
-        const note = document.createElement('p');
-        note.textContent = description;
-        const state = document.createElement('small');
-        state.textContent = status;
+        cover.src = `${import.meta.env.BASE_URL}media/${image}`;
+        cover.alt =
+          title === 'DRIFT.exe'
+            ? 'Corrida noturna no Akagiri Loop'
+            : 'Arena do minijogo SIGNAL';
+        cover.loading = 'lazy';
+        const body = text('div', '', 'game-card-body');
+        body.append(
+          text('p', 'DISPONÍVEL · PROTÓTIPO JOGÁVEL', 'eyebrow'),
+          text('h3', title),
+          text('p', description),
+        );
         const button = document.createElement('button');
-        button.textContent = available
-          ? `Iniciar ${title}`
-          : 'Indisponível nesta versão';
-        button.disabled = !available;
-        if (available)
-          button.onclick = title === 'DRIFT.exe' ? launchRedline : launch;
-        card.append(cover, name, note, state, button);
-        root.append(card);
+        button.className = 'primary-action';
+        button.textContent = `Iniciar ${title}`;
+        button.onclick = run;
+        body.append(button);
+        card.append(cover, body);
+        grid.append(card);
       }
+      const future = document.createElement('details');
+      future.className = 'future-games';
+      const summary = document.createElement('summary');
+      summary.textContent = 'Em desenvolvimento';
+      future.append(summary);
+      for (const [name, note] of [
+        [
+          'SHIFT//BREAK',
+          'Uma campanha que conecta corrida, luta e ação em primeira pessoa.',
+        ],
+        ['FIGHT.exe', 'Combate corpo a corpo na estrada.'],
+        ['FPS.exe', 'Ação em primeira pessoa no túnel.'],
+      ])
+        future.append(text('h3', name!), text('p', note!));
+      root.append(grid, future);
       return root;
     },
   };

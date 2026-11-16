@@ -4,6 +4,8 @@ export interface AppDefinition {
   symbol: string;
   description: string;
   wide?: boolean;
+  category?: 'Portfólio' | 'Experiências' | 'Ferramentas';
+  initialSize?: { width: number; height: number };
   create: () => HTMLElement;
 }
 
@@ -19,6 +21,7 @@ export function coreApps(diagnostic: HTMLElement): AppDefinition[] {
     },
     {
       id: 'notes',
+      initialSize: { width: 560, height: 400 },
       title: 'Notas',
       symbol: '▤',
       description: 'Um espaço para experimentar',
@@ -47,7 +50,7 @@ export function coreApps(diagnostic: HTMLElement): AppDefinition[] {
         const content = document.createElement('div');
         content.className = 'system-app';
         content.innerHTML =
-          '<p class="eyebrow">ALEF//OS · 0.6.0</p><h2>Um sistema dentro do mundo.</h2><p>Núcleo do desktop em desenvolvimento. Janelas, foco e controles funcionam no monitor físico.</p><p>Portfólio e arquivos disponíveis. Identidade, habilidades e contatos aguardam os dados do autor; jogos seguem o roadmap.</p>';
+          '<p class="eyebrow">ALEF//OS</p><h2>Um espaço para conhecer e explorar.</h2><p>O portfólio de Alef Gabriel de Oliveira, dentro de um computador no quarto. Conheça os projetos, explore os arquivos ou experimente os jogos.</p><h3>Como navegar</h3><p>Use Início para voltar à apresentação sem fechar suas janelas. Aplicativos reúne todas as áreas. Minimize e restaure pela barra inferior; pressione Esc para voltar ao quarto.</p><p>Os jogos disponíveis são protótipos jogáveis. Outros títulos continuam em desenvolvimento.</p>';
         return content;
       },
     },
