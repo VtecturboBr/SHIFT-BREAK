@@ -22,6 +22,21 @@ for (const profile of [
     const surface = page.getByRole('region', { name: 'Monitor ALEF//OS' });
     await expect(surface).toHaveAttribute('data-ready', 'true');
     await expect(surface.getByRole('dialog')).toHaveCount(0);
+    await expect(surface.locator('.os-wallpaper')).toHaveCSS(
+      'background-image',
+      /desktop-wallpaper\.png/,
+    );
+    await expect(surface.locator('.os-taskbar')).toHaveCSS('height', '56px');
+    await page.screenshot({
+      path: `test-results/os-wallpaper-${profile.width}.png`,
+    });
+    await surface
+      .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+      .click();
+    await surface
+      .locator('.os-menu')
+      .getByRole('button', { name: 'Central ALEF//OS', exact: true })
+      .click();
     await expect(
       surface.getByRole('heading', {
         name: 'Alef Gabriel de Oliveira',
@@ -38,7 +53,7 @@ for (const profile of [
     await expect
       .poll(() =>
         surface
-          .locator('.os-home img')
+          .locator('.os-hub img')
           .evaluateAll((images) =>
             images.every((img) => (img as HTMLImageElement).naturalWidth > 0),
           ),
@@ -64,10 +79,10 @@ for (const profile of [
         return rgb[0]! * 0.2126 + rgb[1]! * 0.7152 + rgb[2]! * 0.0722;
       };
       return [
-        ['.home-identity > p:not(.eyebrow)', '.os-home'],
+        ['.home-identity > p:not(.eyebrow)', '.os-hub'],
         ['.home-card-body > p', '.home-destination'],
         ['.primary-action', '.primary-action'],
-        ['.home-caption', '.os-home'],
+        ['.home-caption', '.os-hub'],
       ].map(([text, background]) => {
         const foreground = luminance(
           getComputedStyle(el.querySelector(text!)!).color,
@@ -121,6 +136,9 @@ for (const profile of [
     ).toHaveAttribute('aria-pressed', 'true');
     await surface.getByRole('button', { name: 'Início', exact: true }).click();
     await expect(projects).toBeHidden();
+    await surface
+      .getByRole('button', { name: 'Restaurar Central ALEF//OS', exact: true })
+      .click();
     await surface
       .getByRole('button', { name: 'Explorar jogos', exact: true })
       .click();

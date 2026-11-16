@@ -1,5 +1,13 @@
 # ALEF//OS — portfólio e experiências
 
+## Ajuste solicitado: wallpaper e Central
+
+A entrada agora mostra somente o wallpaper fornecido pelo autor (`public/media/desktop-wallpaper.png`), copiado integralmente, sem edição. A barra inferior mantém seus estilos, dimensões e controles. Início minimiza as janelas e retorna ao wallpaper. A página anterior permanece integralmente no aplicativo **Central ALEF//OS**, acessível por **ALEF// Aplicativos → Portfólio**, além dos acessos individuais já existentes. Central usa as mesmas funções de abertura do desktop e preserva seu estado ao minimizar. A projeção e a moldura não mudaram.
+
+Check, 74 testes unitários e 14 testes de integração aprovados. Capturas revisadas: `docs/evidence/os-redesign/wallpaper-desktop.png` e `central-app.png`. O modo acadêmico estático permanece intacto. GPU física não verificada.
+
+## Redesign anterior e correções
+
 Correção posterior da moldura: plano interativo e bordas físicas compartilham `SCREEN` em `src/monitor/display.ts`. Quatro bordas delimitam a tela na mesma profundidade, sem receber sombras que confundam a área útil. A carcaça traseira permanece para as vistas laterais. Captura revisada: `docs/evidence/os-redesign/monitor-bezel-fixed.png`. Check/74 unitários/build e sete testes de quarto, projeção, resize, cliques e navegação aprovados. GPU física não verificada.
 
 Direção escolhida pelo autor: portfólio dentro de um OS, janelas guiadas, visual grafite/branco/vermelho e destaque equivalente para projetos e jogos.

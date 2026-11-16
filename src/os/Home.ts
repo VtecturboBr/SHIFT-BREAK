@@ -3,7 +3,7 @@ import { text } from '../content/views';
 import { appIcon } from './icons';
 
 export function createHome(open: (id: string) => void): HTMLElement {
-  const root = text('section', '', 'os-home');
+  const root = text('section', '', 'os-hub');
   root.setAttribute('aria-label', 'Início do ALEF//OS');
   const header = text('header', '', 'home-header');
   header.append(

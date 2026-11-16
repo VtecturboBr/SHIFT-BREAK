@@ -30,7 +30,18 @@ export class Desktop {
   ) {
     root.classList.add('os-desktop');
     root.replaceChildren();
-    this.home = createHome((id) => this.open(id));
+    this.home = document.createElement('section');
+    this.home.className = 'os-wallpaper';
+    this.home.setAttribute('aria-label', 'Área de trabalho');
+    apps.unshift({
+      id: 'welcome',
+      title: 'Central ALEF//OS',
+      symbol: '',
+      category: 'Portfólio',
+      description: 'Apresentação, projetos, jogos e contato',
+      initialSize: { width: 1200, height: 640 },
+      create: () => createHome((id) => this.open(id)),
+    });
     this.menu.className = 'os-menu';
     this.menu.hidden = true;
     this.menu.setAttribute('aria-label', 'Menu de aplicativos');
@@ -118,7 +129,7 @@ export class Desktop {
         this.model.minimizeAll();
         this.closeMenu();
         this.sync();
-        this.home.querySelector<HTMLButtonElement>('button')?.focus();
+        home.focus();
       },
       { signal: this.events.signal },
     );

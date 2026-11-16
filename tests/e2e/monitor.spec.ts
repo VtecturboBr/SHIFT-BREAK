@@ -71,7 +71,7 @@ test('captures a rendered diagnostic frame into the physical monitor', async ({
   await page.getByRole('button', { name: 'Restaurar interface' }).click();
   await page.keyboard.press('e');
   await expect(
-    page.getByRole('button', { name: 'Explorar projetos', exact: true }),
+    page.getByRole('button', { name: 'Menu de aplicativos', exact: true }),
   ).toBeVisible();
 });
 

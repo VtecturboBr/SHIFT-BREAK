@@ -49,9 +49,8 @@
   flex: 0 0 22px;
   vertical-align: middle;
 }
-.os-home {
-  position: absolute;
-  inset: 0 0 56px;
+.os-hub {
+  min-height: 100%;
   padding: 0 40px;
   background:
     radial-gradient(ellipse at 90% 0, #4f202433, transparent 55%), #101114;
@@ -64,8 +63,11 @@
   gap: 20px;
   border-bottom: 1px solid #33363e;
 }
-.os-home[inert] {
-  opacity: 0.4;
+.os-wallpaper {
+  position: absolute;
+  inset: 0 0 56px;
+  background: #101114 url('/media/desktop-wallpaper.png') center / cover
+    no-repeat;
 }
 .home-wordmark {
   font-size: 25px;

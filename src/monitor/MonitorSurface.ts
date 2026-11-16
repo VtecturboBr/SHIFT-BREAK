@@ -147,7 +147,7 @@ export class MonitorSurface {
         .querySelector<HTMLButtonElement>(
           this.element.dataset.game
             ? '.game-session button:not(:disabled)'
-            : '.os-window[data-focused="true"] .os-titlebar, .os-home:not([inert]) button',
+            : '.os-window[data-focused="true"] .os-titlebar, .os-home-button',
         )
         ?.focus({ preventScroll: true });
     }

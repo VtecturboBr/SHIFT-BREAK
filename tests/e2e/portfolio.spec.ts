@@ -274,6 +274,9 @@ test('shows imported identity in the OS and pauses optional music when leaving t
   const surface = page.getByRole('region', { name: 'Monitor ALEF//OS' });
   await expect(surface).toHaveAttribute('data-ready', 'true');
   await surface
+    .getByRole('button', { name: 'Menu de aplicativos', exact: true })
+    .click();
+  await surface
     .getByRole('button', { name: 'Apresentação', exact: true })
     .click();
   const profile = surface.getByRole('dialog', {
