@@ -12,7 +12,7 @@ import {
 import { readFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
-it('uses the same eligibility for readiness and the released turbo, including cooldown and borders', () => {
+it('uses the same eligibility for readiness and release without blocking turbo on scoring cooldown', () => {
   for (const level of [0, 1, 2]) {
     const events: Record<string, unknown>[] = [];
     const sim = new TougeSimulation((e) => events.push(e)),
@@ -30,10 +30,13 @@ it('uses the same eligibility for readiness and the released turbo, including co
     if (level) {
       expect(events.find((e) => e.type === 'driftBanked')?.level).toBe(level);
       car.drift.active = true;
-      expect(car.drift.turboState(car, sim.track)).toEqual({
-        level: 0,
-        progress: 0,
-      });
+      expect(car.drift.turboState(car, sim.track).level).toBe(level);
+      car.boost = 0;
+      car.sync.update(10);
+      const score = sim.score;
+      car.drift.finish(car, sim.track);
+      expect(car.boost).toBeGreaterThan(0);
+      expect(sim.score).toBe(score);
     }
   }
   const sim = new TougeSimulation(),
@@ -46,7 +49,7 @@ it('uses the same eligibility for readiness and the released turbo, including co
   car.lane = 2;
   expect(car.drift.turboState(car, sim.track)).toEqual({
     level: 1,
-    progress: 0,
+    progress: 99,
   });
   car.lane = 2.25;
   expect(car.drift.turboState(car, sim.track)).toEqual({

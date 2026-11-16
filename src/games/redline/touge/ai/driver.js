@@ -58,7 +58,7 @@ export function driveAI(car, other, track, hazards, time, autopilot = false) {
   if (gap > 30 && bend < 0.006) desired += 2;
   if (car.catchupPower > 0)
     desired = Math.min(
-      88 + car.catchupPower * 44,
+      88 + car.catchupPower * 56,
       Math.sqrt(
         ((car.drift.active ? 36 : 26) + car.catchupPower * 6) /
           Math.max(0.002, bend),

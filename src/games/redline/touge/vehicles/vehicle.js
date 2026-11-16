@@ -69,7 +69,7 @@ export class Vehicle {
       (this.engine > 0 ? 38 : 88) +
       (this.boost > 0 ? 12 : 0) +
       this.draftPower * 2.5 +
-      this.catchupPower * 44;
+      this.catchupPower * 56;
     const beforeSpeed = this.speed;
     if (!control.brake) this.reverseArmed = true;
     else if (beforeSpeed > 0.5) this.reverseArmed = false;
@@ -79,8 +79,8 @@ export class Vehicle {
       (control.throttle * (this.engine > 0 ? 6 : 10) +
         (control.throttle && !control.brake
           ? this.draftPower * 2.5 +
-            this.catchupPower * 32 +
-            this.launchPower * 5
+            this.catchupPower * 42 +
+            this.launchPower * 8
           : 0) +
         (this.boost > 0 && this.speed >= 0 && !control.brake ? 12 : 0) -
         control.brake * (this.speed > 0 ? (this.recovering ? 42 : 24) : 5) -

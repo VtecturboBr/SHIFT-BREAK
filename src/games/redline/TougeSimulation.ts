@@ -91,7 +91,7 @@ export class TougeSimulation {
     this.elapsed += dt;
     this.player.sync.update(dt);
     this.rival.sync.update(dt);
-    this.rival.launchPower = Math.max(0, 1 - this.elapsed / 2);
+    this.rival.launchPower = Math.max(0, 1 - this.elapsed / 3);
     const raceGap = this.rival.s - this.player.s;
     const gapBefore = this.track.localGap(this.player.s, this.rival.s);
     const p = this.track.sample(this.player.s),

@@ -13,18 +13,16 @@ export class Drift {
     this.score = 0;
     this.settle = 0;
     this.held = false;
+    this.pressBuffer = 0;
     this.lastCorner = null;
     this.grade = '';
     this.feedback = 0;
     this.announced = 0;
   }
   turboState(car, track) {
-    if (
-      !this.active ||
-      !car.sync.canReward('drift') ||
-      this.lastCorner === track.section(car.s).id ||
-      Math.abs(car.lane) >= ROAD_EDGE - 0.12
-    )
+    // Keep the shared HUD/physics call signature; scoring cooldown no longer gates turbo.
+    void track;
+    if (!this.active || Math.abs(car.lane) >= ROAD_EDGE - 0.12)
       return { level: 0, progress: 0 };
     const normal =
       this.validTime >= 1.2 && this.turn > 0.1 && this.score >= 100;
@@ -33,21 +31,18 @@ export class Drift {
       this.validTime >= 3 &&
       this.score > 420 &&
       Math.abs(car.lane) < ROAD_EDGE - 0.4;
-    const progress =
-      Math.abs(car.lane) >= ROAD_EDGE - 0.4
-        ? 0
-        : Math.floor(
-            100 *
-              clamp(
-                Math.min(
-                  this.validTime / 3,
-                  this.turn / 0.100001,
-                  this.score / 420.000001,
-                ),
-                0,
-                1,
-              ),
-          );
+    const progress = Math.floor(
+      100 *
+        clamp(
+          Math.min(
+            this.validTime / 3,
+            this.turn / 0.100001,
+            this.score / 420.000001,
+          ),
+          0,
+          1,
+        ),
+    );
     return {
       level: perfect ? 2 : normal ? 1 : 0,
       progress: perfect ? 100 : Math.min(99, progress),
@@ -72,11 +67,10 @@ export class Drift {
       return;
     }
     const perfect = level === 2;
-    const reward = car.sync.reward('drift', perfect ? 'perfect' : 'good');
-    if (!reward) {
-      this.score = 0;
-      return;
-    }
+    const reward =
+      this.lastCorner === corner
+        ? 0
+        : car.sync.reward('drift', perfect ? 'perfect' : 'good');
     this.lastCorner = corner;
     this.grade = perfect ? 'DRIFT PERFEITO' : 'DRIFT CONTROLADO';
     this.feedback = 2.8;
@@ -87,7 +81,7 @@ export class Drift {
       type: 'driftBanked',
       who: car.id,
       grade: this.grade,
-      points: Math.round(this.score),
+      points: reward ? Math.round(this.score) : 0,
       sync: reward,
       perfect,
       level,
@@ -96,15 +90,18 @@ export class Drift {
   update(dt, car, control, track, curve) {
     this.feedback = Math.max(0, this.feedback - dt);
     const pressed = control.handbrake && !this.held;
+    this.pressBuffer = pressed ? 0.25 : Math.max(0, this.pressBuffer - dt);
+    if (!control.handbrake) this.pressBuffer = 0;
     this.held = !!control.handbrake;
     if (this.active && !control.handbrake) this.finish(car, track);
     if (
-      pressed &&
+      this.pressBuffer > 0 &&
       !this.active &&
       car.speed > 14 &&
       Math.abs(control.steer) > 0.18
     ) {
       this.active = true;
+      this.pressBuffer = 0;
       this.direction = Math.sign(control.steer);
       this.duration = 0;
       this.offCurveTime = 0;

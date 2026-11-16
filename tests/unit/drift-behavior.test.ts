@@ -2,6 +2,33 @@ import { expect, it } from 'vitest';
 import { TougeSimulation } from '../../src/games/redline/TougeSimulation';
 import { driveAI } from '../../src/games/redline/touge/ai/driver.js';
 
+it('buffers Space briefly until steering is applied, but does not restart a held drift', () => {
+  const sim = new TougeSimulation(),
+    car = sim.player;
+  car.speed = 30;
+  const control = { handbrake: true, throttle: 1, brake: 0, steer: 0 };
+  car.drift.update(0.01, car, control, sim.track, 0);
+  expect(car.drift.active).toBe(false);
+  car.drift.update(0.1, car, { ...control, steer: 1 }, sim.track, 0);
+  expect(car.drift.active).toBe(true);
+  car.drift.finish(car, sim.track);
+  car.drift.update(0.01, car, { ...control, steer: 1 }, sim.track, 0);
+  expect(car.drift.active).toBe(false);
+  car.drift.update(0.01, car, { ...control, handbrake: false }, sim.track, 0);
+  car.drift.update(0.01, car, { ...control, steer: 1 }, sim.track, 0);
+  expect(car.drift.active).toBe(true);
+});
+
+it('expires the buffered input instead of starting a drift much later', () => {
+  const sim = new TougeSimulation(),
+    car = sim.player;
+  car.speed = 30;
+  const control = { handbrake: true, throttle: 1, brake: 0, steer: 0 };
+  car.drift.update(0.01, car, control, sim.track, 0);
+  car.drift.update(0.3, car, { ...control, steer: 1 }, sim.track, 0);
+  expect(car.drift.active).toBe(false);
+});
+
 it('moves a drifting car toward its heading and ends straight-line drifts without rewards', () => {
   const cars = [new TougeSimulation().player, new TougeSimulation().player];
   const track = new TougeSimulation().track;

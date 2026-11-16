@@ -16,10 +16,10 @@ it('gives the rival a faster launch after the countdown without moving early', (
   expect(sim.rival.speed).toBe(0);
   expect(sim.rival.s).toBe(26);
   for (let i = 0; i < 100; i++) sim.update(1 / 60, { ...idle, throttle: true });
-  expect(sim.rival.speed).toBeGreaterThan(sim.player.speed + 2);
-  expect(sim.rival.speed).toBeLessThan(sim.player.speed + 5);
+  expect(sim.rival.speed).toBeGreaterThan(sim.player.speed + 5);
+  expect(sim.rival.speed).toBeLessThan(sim.player.speed + 10);
   expect(sim.rival.launchPower).toBeGreaterThan(0);
-  for (let i = 0; i < 90; i++) sim.update(1 / 60, idle);
+  for (let i = 0; i < 120; i++) sim.update(1 / 60, idle);
   expect(sim.rival.launchPower).toBe(0);
 });
 it('sweeps slowly across straight lanes and holds position when the player is alongside', () => {
